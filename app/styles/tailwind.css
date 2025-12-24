@@ -1,0 +1,409 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import './custom-font.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Custom Pallete */
+  --color-mint: var(--mint);
+  --color-secondary-green: var(--secondary-green);
+  --color-primary: var(--primary);
+  --color-primary-900: var(--primary-900);
+  --color-primary-700: var(--primary-700);
+  --color-primary-600: var(--primary-600);
+  --color-primary-500: var(--primary-500);
+  --color-primary-300: var(--primary-300);
+  --color-primary-200: var(--primary-200);
+  --color-primary-100: var(--primary-100);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-900: var(--secondary-900);
+  --color-secondary-800: var(--secondary-800);
+  --color-secondary-700: var(--secondary-700);
+  --color-secondary-500: var(--secondary-500);
+  --color-secondary-300: var(--secondary-300);
+  --color-secondary-200: var(--secondary-200);
+  --color-secondary-100: var(--secondary-100);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-50: var(--neutral-50);
+  --color-mid-grey: var(--mid-grey);
+  --color-default-grey: var(--default-grey);
+  --color-orange: var(--orange);
+  --color-lavender: var(--lavender);
+  --color-sky-blue: var(--sky-blue);
+
+  /* Typography: font families */
+  --font-whyte:
+    'Whyte Inktrap', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  /* Typography scale - Responsive */
+  /* Display */
+  --text-display-l: 44px;
+  --text-display-l--line-height: 1.05; /* 105% */
+  --text-display-l--letter-spacing: -0.03em; /* -3% */
+
+  /* Body */
+  --text-body-l: 16.5px;
+  --text-body-l--line-height: 1.3; /* 130% */
+  --text-body-l--letter-spacing: 0; /* 0% */
+
+  --text-paragraph: 14px;
+  --text-paragraph--line-height: 1.3; /* 130% */
+  --text-paragraph--letter-spacing: 0; /* 0% */
+
+  /* Caption */
+  --text-caption: 12px;
+  --text-caption--line-height: 1.24; /* 124% */
+  --text-caption--letter-spacing: 0.02em; /* 2% */
+
+  --text-caption-uppercase: 12px;
+  --text-caption-uppercase--line-height: 1.3; /* 130% */
+  --text-caption-uppercase--letter-spacing: 0.05em; /* 5% */
+
+  /* Desktop specific */
+  /* Headings */
+  --text-h1-desktop: 40px;
+  --text-h1-desktop--line-height: 1.12; /* 112% */
+  --text-h1-desktop--letter-spacing: -0.03em; /* -3% */
+
+  --text-h2-desktop: 28px;
+  --text-h2-desktop--line-height: 1.14; /* 114% */
+  --text-h2-desktop--letter-spacing: -0.01em; /* -1% */
+
+  /* Paragraphs */
+  --text-p-large-desktop: 20px;
+  --text-p-large-desktop--line-height: 1.2; /* 120% */
+  --text-p-large-desktop--letter-spacing: 0; /* 0% */
+
+  --text-p-small-desktop: 18px;
+  --text-p-small-desktop--line-height: 1.3; /* 130% */
+  --text-p-small-desktop--letter-spacing: 0; /* 0% */
+
+  --text-caption-desktop: 14px;
+  --text-caption-desktop--line-height: 1.3; /* 130% */
+  --text-caption-desktop--letter-spacing: 0.04em; /* 4% */
+
+  /* Mobile specific */
+  /* Headings */
+  --text-h1-mobile: 24px;
+  --text-h1-mobile--line-height: 1.2; /* 120% */
+  --text-h1-mobile--letter-spacing: -0.02em; /* -2% */
+
+  --text-h2-mobile: 20px;
+  --text-h2-mobile--line-height: 1.2; /* 120% */
+  --text-h2-mobile--letter-spacing: 0; /* 0% */
+
+  /* Paragraphs */
+  --text-p-large-mobile: 14px;
+  --text-p-large-mobile--line-height: 1.25; /* 125% */
+  --text-p-large-mobile--letter-spacing: 0; /* 0% */
+
+  --text-p-small-mobile: 12.5px;
+  --text-p-small-mobile--line-height: 1.35; /* 135% */
+  --text-p-small-mobile--letter-spacing: 0.005em; /* 0.5% */
+
+  --text-caption-mobile: 10px;
+  --text-caption-mobile--line-height: 1.3; /* 130% */
+  --text-caption-mobile--letter-spacing: 0.06em; /* 6% */
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: var(--neutral-50);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --mint: #caf68c;
+  --secondary-green: #62a700;
+  --primary-900: #401db3;
+  --primary-700: #5429d6;
+  --primary-600: #6633ee;
+  --primary-500: #865cf1; /* base */
+  --primary-300: #a385f5;
+  --primary-200: #c8b2ff;
+  --primary-100: #e0d6fc;
+  --primary: var(--primary-500);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary-900: #172099;
+  --secondary-800: #262fb8;
+  --secondary-700: #3844dd;
+  --secondary-500: #4050ff; /* base */
+  --secondary-300: #8096f8;
+  --secondary-200: #b8ccfb;
+  --secondary-100: #d3e3fc;
+  --secondary: var(--secondary-500);
+  --secondary-foreground: oklch(0.205 0 0);
+  --neutral-900: #3c3f43;
+  --neutral-800: #4b5563;
+  --neutral-700: #6b7280;
+  --neutral-500: #b2b2b2; /* base */
+  --neutral-400: #cfcfcf;
+  --neutral-300: #d3d3d3;
+  --neutral-200: #e8e8e8;
+  --neutral-100: #eeeeee;
+  --neutral-50: #f7f7f7;
+  --neutral: var(--neutral-500);
+  --mid-grey: #898989;
+  --default-grey: #e1e1e1;
+  --orange: #f6621e;
+  --lavender: #b39be5;
+  --sky-blue: #71b8f3;
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-whyte);
+  }
+  h1 {
+    @apply typo-h1;
+  }
+  h2 {
+    @apply typo-h2;
+  }
+  p {
+    @apply typo-paragraph;
+  }
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+@utility typo-h1 {
+  font-family: var(--font-whyte);
+  font-size: var(--text-h1-mobile);
+  line-height: var(--text-h1-mobile--line-height);
+  letter-spacing: var(--text-h1-mobile--letter-spacing);
+  font-weight: 400; /* Regular on mobile */
+
+  @media (min-width: 768px) {
+    font-size: var(--text-h1-desktop);
+    line-height: var(--text-h1-desktop--line-height);
+    letter-spacing: var(--text-h1-desktop--letter-spacing);
+    font-weight: 300; /* Light on desktop */
+  }
+}
+
+@utility typo-h2 {
+  font-family: var(--font-whyte);
+  font-size: var(--text-h2-mobile);
+  line-height: var(--text-h2-mobile--line-height);
+  letter-spacing: var(--text-h2-mobile--letter-spacing);
+  font-weight: 400; /* Regular */
+
+  @media (min-width: 768px) {
+    font-size: var(--text-h2-desktop);
+    line-height: var(--text-h2-desktop--line-height);
+    letter-spacing: var(--text-h2-desktop--letter-spacing);
+    font-weight: 400; /* Regular on desktop too */
+  }
+}
+
+@utility typo-paragraph {
+  font-family: var(--font-whyte);
+  font-size: var(--text-paragraph);
+  line-height: var(--text-paragraph--line-height);
+  letter-spacing: var(--text-paragraph--letter-spacing);
+  font-weight: 350; /* Book */
+}
+
+/* Core typography utilities */
+@layer utility {
+  /* Responsive typography */
+  .typo-display-l {
+    font-family: var(--font-whyte);
+    font-size: var(--text-display-l);
+    line-height: var(--text-display-l--line-height);
+    letter-spacing: var(--text-display-l--letter-spacing);
+    font-weight: 300; /* Light */
+  }
+
+  .typo-body-l {
+    font-family: var(--font-whyte);
+    font-size: var(--text-body-l);
+    line-height: var(--text-body-l--line-height);
+    letter-spacing: var(--text-body-l--letter-spacing);
+    font-weight: 400; /* Regular */
+  }
+
+  .typo-caption-responsive {
+    font-family: var(--font-whyte);
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    letter-spacing: var(--text-caption--letter-spacing);
+    font-weight: 400; /* Regular */
+  }
+
+  .typo-caption-responsive-uppercase {
+    font-family: var(--font-whyte);
+    font-size: var(--text-caption-uppercase);
+    line-height: var(--text-caption-uppercase--line-height);
+    letter-spacing: var(--text-caption-uppercase--letter-spacing);
+    font-weight: 500; /* Medium */
+    text-transform: uppercase;
+  }
+
+  /* Responsive paragraphs */
+  .typo-p-large {
+    font-family: var(--font-whyte);
+    font-size: var(--text-p-large-mobile);
+    line-height: var(--text-p-large-mobile--line-height);
+    letter-spacing: var(--text-p-large-mobile--letter-spacing);
+    font-weight: 400; /* Regular */
+
+    @media (min-width: 768px) {
+      font-size: var(--text-p-large-desktop);
+      line-height: var(--text-p-large-desktop--line-height);
+      letter-spacing: var(--text-p-large-desktop--letter-spacing);
+      font-weight: 400; /* Regular on desktop too */
+    }
+  }
+
+  .typo-p-small {
+    font-family: var(--font-whyte);
+    font-size: var(--text-p-small-mobile);
+    line-height: var(--text-p-small-mobile--line-height);
+    letter-spacing: var(--text-p-small-mobile--letter-spacing);
+    font-weight: 400; /* Regular */
+
+    @media (min-width: 768px) {
+      font-size: var(--text-p-small-desktop);
+      line-height: var(--text-p-small-desktop--line-height);
+      letter-spacing: var(--text-p-small-desktop--letter-spacing);
+      font-weight: 300; /* Light on desktop */
+    }
+  }
+
+  /* Responsive caption */
+  .typo-caption {
+    font-family: var(--font-whyte);
+    font-size: var(--text-caption-mobile);
+    line-height: var(--text-caption-mobile--line-height);
+    letter-spacing: var(--text-caption-mobile--letter-spacing);
+    font-weight: 400; /* Regular */
+    text-transform: uppercase;
+
+    @media (min-width: 768px) {
+      font-size: var(--text-caption-desktop);
+      line-height: var(--text-caption-desktop--line-height);
+      letter-spacing: var(--text-caption-desktop--letter-spacing);
+      font-weight: 500; /* Medium on desktop */
+    }
+  }
+
+  /* decorative typography utilities */
+  .text-gradient-purple-lime {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#8a38f5] to-[#d5e6a2];
+  }
+
+  .max-w-content {
+    @apply max-w-[1440px] md:mx-auto;
+  }
+}

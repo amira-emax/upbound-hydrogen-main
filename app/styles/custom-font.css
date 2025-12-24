@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'Whyte Inktrap';
+  font-display: swap;
+  font-weight: 500;
+  src: url('./fonts/WhyteInktrap-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Whyte Inktrap';
+  font-display: swap;
+  font-weight: 400;
+  src: url('./fonts/WhyteInktrap-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Whyte Inktrap';
+  font-display: swap;
+  font-weight: 350;
+  src: url('./fonts/WhyteInktrap-Book.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Whyte Inktrap';
+  font-display: swap;
+  font-weight: 300;
+  src: url('./fonts/WhyteInktrap-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Whyte Inktrap';
+  font-display: swap;
+  font-weight: 275;
+  src: url('./fonts/WhyteInktrap-ExtraLight.woff2') format('woff2');
+}

@@ -1,0 +1,524 @@
+// Fragment definitions for different module types
+// These will be used by codegen to generate TypeScript types
+
+export const HERO_WITH_CTA_FRAGMENT = `#graphql
+  fragment HeroWithCta on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    description: field(key: "description") {
+      value
+    }
+    desktopImage: field(key: "desktop_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    mobileImage: field(key: "mobile_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    cta: field(key: "cta") {
+      reference {
+        ... on Metaobject {
+          type
+          label: field(key: "label") {
+            value
+          }
+          internalUrl: field(key: "internal_url") {
+            value
+          }
+          externalUrl: field(key: "external_url") {
+            value
+          }
+          iconVariant: field(key: "icon_variant") {
+            value
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const TEXT_WITH_CTA_FRAGMENT = `#graphql
+  fragment TextWithCta on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    description: field(key: "description") {
+      value
+    }
+    cta: field(key: "cta") {
+      reference {
+        ... on Metaobject {
+          type
+          label: field(key: "label") {
+            value
+          }
+          internalUrl: field(key: "internal_url") {
+            value
+          }
+          externalUrl: field(key: "external_url") {
+            value
+          }
+          iconVariant: field(key: "icon_variant") {
+            value
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const IMAGE_CAROUSEL_FRAGMENT = `#graphql
+  fragment ImageCarousel on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    subtitle: field(key: "subtitle") {
+      value
+    }
+    cta: field(key: "cta") {
+      reference {
+        ... on Metaobject {
+          type
+          label: field(key: "label") {
+            value
+          }
+          internalUrl: field(key: "internal_url") {
+            value
+          }
+          externalUrl: field(key: "external_url") {
+            value
+          }
+          iconVariant: field(key: "icon_variant") {
+            value
+          }
+        }
+      }
+    }
+    cards: field(key: "cards") {
+      references(first: 20) {
+        nodes {
+          ... on Metaobject {
+            title: field(key: "title") {
+              value
+            }
+            description: field(key: "description") {
+              value
+            }
+            mixBlend: field(key: "mix_blend_font") {
+              value
+            }
+            image: field(key: "image") {
+              reference {
+                ... on MediaImage {
+                  image {
+                    height
+                    width
+                    url
+                    altText
+                  }
+                }
+              }
+            }
+            internalUrl: field(key: "internal_url") {
+              value
+            }
+            variant: field(key: "variant") {
+              value
+            }
+            tags: field(key: "tags") {
+              value
+            }
+          }
+        }
+      }
+    }
+    mobileLayout: field(key: "mobile_layout") {
+      value
+    }
+  }
+`;
+
+export const ACCORDION_FRAGMENT = `#graphql
+  fragment Accordion on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    collapsible: field(key: "collapsible") {
+      value
+    }
+    iconVariant: field(key: "icon_variant") {
+      value
+    }
+    numberedContent: field(key: "numbered_content") {
+      value
+    }
+    variant: field(key: "variant") {
+      value
+    }
+    content: field(key: "content") {
+      references(first: 20) {
+        nodes {
+          ... on Metaobject {
+            title: field(key: "title") {
+              value
+            }
+            description: field(key: "description") {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const SCIENCE_HERO_FRAGMENT = `#graphql
+  fragment ScienceHero on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    subtitle: field(key: "subtitle") {
+      value
+    }
+    description: field(key: "description") {
+      value
+    }
+    hero_image: field(key: "hero_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const COMMUNITY_HERO_FRAGMENT = `#graphql
+  fragment CommunityHero on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    hero_image: field(key: "hero_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    description: field(key: "description") {
+      value
+    }
+    grid_title: field(key: "grid_title") {
+      value
+    }
+    grid_description: field(key: "grid_description") {
+      value
+    }
+  }
+`;
+
+export const HERO_IMAGE_WITH_PRODUCT = `#graphql
+  fragment HeroImageWithProduct on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    desktopImage: field(key: "desktop_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    mobileImage: field(key: "mobile_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    featuredProduct: field(key: "featured_product") {
+      reference {
+        ... on Product {
+          id
+          title
+          description
+          productType
+          selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {
+            id
+            availableForSale
+            price {
+              amount
+              currencyCode
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const HERO_FEATURED_PRODUCT_FRAGMENT = `#graphql
+  fragment HeroFeaturedProduct on Metaobject {
+    id
+    type
+    platformLogos: field(key: "featured_platforms_logo") {
+      references(first: 5) {
+        nodes {
+          ... on MediaImage {
+            image {
+              height
+              width
+              url
+              altText
+            }
+          }
+        }
+      }
+    }
+    title: field(key: "title") {
+      value
+    }
+    featuredProduct: field(key: "featured_product") {
+      reference {
+        ... on Product {
+          id
+          title
+          description
+          productType
+          featuredImage {
+            altText
+            id
+            url
+            height
+            width
+          }
+          selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {
+            id
+            availableForSale
+          }
+        }
+      }
+    }
+    desktopImage: field(key: "desktop_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    mobileImage: field(key: "mobile_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GALLERY_IMAGE_CARD_FRAGMENT = `#graphql
+  fragment GalleryImageCard on Metaobject {
+    id
+    type
+    shape: field(key: "shape") {
+      value
+    }
+    desktopImage: field(key: "desktop_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    mobileImage: field(key: "mobile_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const FOUNDER_CARD_FRAGMENT = `#graphql
+  fragment FounderCard on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    description: field(key: "description") {
+      value
+    }
+    image: field(key: "image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+    # TODO: Article is only available from version 2025-10
+    # dialogContent: field(key: "dialog_content") {
+    #   reference {
+    #     ... on Article {
+    #       id
+    #       title
+    #       handle
+    #       contentHtml
+    #     }
+    #   }
+    # }
+  }
+`;
+
+export const PRODUCT_ENDORSEMENT_CARD_FRAGMENT = `#graphql
+  fragment ProductEndorsementCard on Metaobject {
+    id
+    type
+    description: field(key: "description") {
+      value
+    }
+    name: field(key: "name") {
+      value
+    }
+    position: field(key: "position") {
+      value
+    }
+    image: field(key: "image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const CUSTOM_MENU_ITEM_FRAGMENT = `#graphql
+  fragment CustomMenuItem on Metaobject {
+    id
+    type
+    label: field(key: "label") {
+      value
+    }
+    internalUrl: field(key: "internal_url") {
+      value
+    }
+    externalUrl: field(key: "external_url") {
+      value
+    }
+    icon: field(key: "icon") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const FOOTER_MENU_GROUP_FRAGMENT = `#graphql
+  ${CUSTOM_MENU_ITEM_FRAGMENT}
+  
+  fragment FooterMenuGroup on Metaobject {
+    id
+    type
+    title: field(key: "title") {  
+      value
+    }
+    items: field(key: "items") {
+      references(first: 10) {
+        nodes {
+          ...CustomMenuItem
+        }
+      } 
+    }
+  }
+`;

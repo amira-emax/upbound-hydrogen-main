@@ -1,15 +1,15 @@
-import {Image} from '@shopify/hydrogen';
-import type {HeroFeaturedProductFragment} from 'types/storefrontapi.generated';
-import {AddToCartButton} from '~/components/AddToCartButton';
+import { Image } from '@shopify/hydrogen';
+import type { HeroFeaturedProductFragment } from 'types/storefrontapi.generated';
+import { AddToCartButton } from '~/components/AddToCartButton';
 
 interface HeroFeaturedProductProps {
   reference: HeroFeaturedProductFragment;
 }
 
-function HeroFeaturedProduct({reference}: HeroFeaturedProductProps) {
+function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
   const platformLogos = reference?.platformLogos?.references?.nodes || [];
   const product = reference?.featuredProduct?.reference;
-  const {desktopImage, mobileImage, title} = reference ?? {};
+  const { desktopImage, mobileImage, title } = reference ?? {};
 
   if (!product) return null;
 
@@ -105,15 +105,18 @@ function HeroFeaturedProduct({reference}: HeroFeaturedProductProps) {
               lines={
                 product.selectedOrFirstAvailableVariant?.availableForSale
                   ? [
-                      {
-                        merchandiseId:
-                          product.selectedOrFirstAvailableVariant?.id,
-                        quantity: 1,
-                      },
-                    ]
+                    {
+                      merchandiseId:
+                        product.selectedOrFirstAvailableVariant?.id,
+                      quantity: 1,
+                    },
+                  ]
                   : []
               }
               buttonClassName="rounded-none w-full md:w-fit"
+              productData={product}
+              quantity={1}
+              page="Hero Featured Product"
             >
               ADD TO CART
             </AddToCartButton>

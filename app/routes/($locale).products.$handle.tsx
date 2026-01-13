@@ -7,14 +7,14 @@ import {
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from 'react-router';
-import {ProductForm} from '~/components/ProductForm';
+import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { useLoaderData, type MetaFunction } from 'react-router';
+import { ProductForm } from '~/components/ProductForm';
 import {
   DesktopProductImage,
   MobileProductImage,
 } from '~/components/ProductImage';
-import {ProductPrice} from '~/components/ProductPrice';
+import { ProductPrice } from '~/components/ProductPrice';
 import {
   Accordion,
   AccordionContent,
@@ -26,13 +26,13 @@ import {
   ACCORDION_FRAGMENT,
   PRODUCT_ENDORSEMENT_CARD_FRAGMENT,
 } from '~/graphql/cms/ModuleFragments';
-import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {Image as ShopifyImage} from '@shopify/hydrogen/storefront-api-types';
+import { redirectIfHandleIsLocalized } from '~/lib/redirect';
+import { Image as ShopifyImage } from '@shopify/hydrogen/storefront-api-types';
 import ProductEndorsementCard from '~/components/ProductEndorsementCard';
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
-    {title: `Upbound | ${data?.product.title ?? ''}`},
+    { title: `Upbound | ${data?.product.title ?? ''}` },
     {
       rel: 'canonical',
       href: `/products/${data?.product.handle}`,
@@ -45,9 +45,10 @@ export async function loader(args: LoaderFunctionArgs) {
   const deferredData = loadDeferredData(args);
 
   // Await the critical data required to render initial state of the page
+
   const criticalData = await loadCriticalData(args);
 
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
 /**
@@ -59,26 +60,40 @@ async function loadCriticalData({
   params,
   request,
 }: LoaderFunctionArgs) {
-  const {handle} = params;
-  const {storefront} = context;
+  const { handle } = params;
+  const { storefront } = context;
 
   if (!handle) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}] = await Promise.all([
+  const [{ product }] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      variables: { handle, selectedOptions: getSelectedProductOptions(request) },
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!product?.id) {
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
   // The API handle might be localized, so redirect to the localized handle
-  redirectIfHandleIsLocalized(request, {handle, data: product});
+  redirectIfHandleIsLocalized(request, { handle, data: product });
+
+  const selectedOptions = getSelectedProductOptions(request);
+
+  const selectedVariant = product.variants.nodes.find((v: any) =>
+    v.selectedOptions.every(
+      (option: any) =>
+        selectedOptions.some(
+          (sel: any) => sel.name === option.name && sel.value === option.value
+        )
+    )
+  );
+
+  const variantType = selectedVariant?.metafield?.value;
+  product.variantType = variantType;
 
   return {
     product,
@@ -90,7 +105,7 @@ async function loadCriticalData({
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context, params}: LoaderFunctionArgs) {
+function loadDeferredData({ context, params }: LoaderFunctionArgs) {
   // Put any API calls that is not critical to be available on first page render
   // For example: product reviews, product recommendations, social feeds.
 
@@ -98,7 +113,7 @@ function loadDeferredData({context, params}: LoaderFunctionArgs) {
 }
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
+  const { product } = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -116,6 +131,11 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
+  console.log('sini selectedVariant', selectedVariant);
+
+  console.log('sini product', product);
+
+
   const {
     title,
     descriptionHtml,
@@ -127,6 +147,7 @@ export default function Product() {
     productEndorsements,
     tags,
     images,
+    variantType
   } = product;
   const certifiedLogosArray = certifiedLogos?.references?.nodes || [];
 
@@ -146,7 +167,7 @@ export default function Product() {
           />
           <div className="product-main space-y-6 col-span-6">
             <h2>{title}</h2>
-            <p className="typo-p-small text-mid-grey">{productType}</p>
+            <p className="typo-p-small text-mid-grey">{variantType}</p>
             <ProductPrice
               price={selectedVariant?.price}
               compareAtPrice={selectedVariant?.compareAtPrice}
@@ -169,7 +190,7 @@ export default function Product() {
                   Description
                 </AccordionTrigger>
                 <AccordionContent className="typo-p">
-                  <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+                  <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                 </AccordionContent>
               </AccordionItem>
               {ingredients && (
@@ -430,6 +451,21 @@ const PRODUCT_QUERY = `#graphql
   ) @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       ...Product
+      variants(first: 100) {
+        nodes {
+          id
+          title
+          selectedOptions {
+            name
+            value
+          }
+          metafield(key: "variant_type", namespace: "custom") {
+            type
+            value
+          }
+        }
+      }
+
       howToConsume: metafield(key: "how_to_consume", namespace: "custom") {
         type
         value

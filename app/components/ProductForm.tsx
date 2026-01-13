@@ -1,16 +1,16 @@
-import {type MappedProductOptions} from '@shopify/hydrogen';
+import { type MappedProductOptions } from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
 } from '@shopify/hydrogen/storefront-api-types';
-import {Link, useNavigate} from 'react-router';
-import type {ProductFragment} from 'types/storefrontapi.generated';
-import {AddToCartButton} from './AddToCartButton';
-import {useAside} from './Aside';
-import {ProductQuantityControl} from './ProductQuantityControl';
-import {Button} from './ui/button';
-import {cn} from '~/lib/utils';
-import {useState} from 'react';
+import { Link, useNavigate } from 'react-router';
+import type { ProductFragment } from 'types/storefrontapi.generated';
+import { AddToCartButton } from './AddToCartButton';
+import { useAside } from './Aside';
+import { ProductQuantityControl } from './ProductQuantityControl';
+import { Button } from './ui/button';
+import { cn } from '~/lib/utils';
+import { useState } from 'react';
 
 export function ProductForm({
   productOptions,
@@ -20,7 +20,7 @@ export function ProductForm({
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
 }) {
   const navigate = useNavigate();
-  const {open} = useAside();
+  const { open } = useAside();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -121,16 +121,20 @@ export function ProductForm({
           lines={
             selectedVariant
               ? [
-                  {
-                    merchandiseId: selectedVariant.id,
-                    quantity: quantity,
-                    selectedVariant,
-                  },
-                ]
+                {
+                  merchandiseId: selectedVariant.id,
+                  quantity: quantity,
+                  selectedVariant,
+                },
+              ]
               : []
           }
+
           buttonClassName="rounded-none w-full"
           containerClassName="flex-1"
+          productData={selectedVariant}
+          quantity={quantity}
+          page="Product Page"
         >
           {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
         </AddToCartButton>

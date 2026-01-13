@@ -1,14 +1,14 @@
-import {Image} from '@shopify/hydrogen';
-import type {HeroImageWithProductFragment} from 'types/storefrontapi.generated';
-import {AddToCartButton} from '~/components/AddToCartButton';
-import {ProductPrice} from '../ProductPrice';
+import { Image } from '@shopify/hydrogen';
+import type { HeroImageWithProductFragment } from 'types/storefrontapi.generated';
+import { AddToCartButton } from '~/components/AddToCartButton';
+import { ProductPrice } from '../ProductPrice';
 
 interface HeroImageWithProductProps {
   reference: HeroImageWithProductFragment;
 }
 
-function HeroImageWithProduct({reference}: HeroImageWithProductProps) {
-  const {title, desktopImage, mobileImage, featuredProduct} = reference ?? {};
+function HeroImageWithProduct({ reference }: HeroImageWithProductProps) {
+  const { title, desktopImage, mobileImage, featuredProduct } = reference ?? {};
   const product = featuredProduct?.reference;
 
   if (!product) return null;
@@ -32,16 +32,19 @@ function HeroImageWithProduct({reference}: HeroImageWithProductProps) {
             lines={
               product.selectedOrFirstAvailableVariant?.availableForSale
                 ? [
-                    {
-                      merchandiseId:
-                        product.selectedOrFirstAvailableVariant?.id,
-                      quantity: 1,
-                    },
-                  ]
+                  {
+                    merchandiseId:
+                      product.selectedOrFirstAvailableVariant?.id,
+                    quantity: 1,
+                  },
+                ]
                 : []
             }
             buttonClassName="rounded-none w-full"
             containerClassName="hidden md:block w-full "
+            productData={product}
+            quantity={1}
+            page="Hero Image With Product"
           >
             <div className="flex w-full justify-between items-center">
               <p className="typo-caption-responsive">ADD TO CART</p>
@@ -76,15 +79,18 @@ function HeroImageWithProduct({reference}: HeroImageWithProductProps) {
         lines={
           product.selectedOrFirstAvailableVariant?.availableForSale
             ? [
-                {
-                  merchandiseId: product.selectedOrFirstAvailableVariant?.id,
-                  quantity: 1,
-                },
-              ]
+              {
+                merchandiseId: product.selectedOrFirstAvailableVariant?.id,
+                quantity: 1,
+              },
+            ]
             : []
         }
         buttonClassName="rounded-none w-full"
         containerClassName="md:hidden w-full"
+        productData={product}
+        quantity={1}
+        page="Hero Image With Product 2"
       >
         <div className="flex justify-between items-center w-full">
           <p className="typo-caption-responsive">ADD TO CART</p>

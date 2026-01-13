@@ -1,5 +1,5 @@
-import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
-import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
+import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import {
   isRouteErrorResponse,
   Links,
@@ -12,13 +12,13 @@ import {
   type ShouldRevalidateFunction,
 } from 'react-router';
 import favicon from '~/assets/favicon.png';
-import {HEADER_QUERY} from '~/lib/fragments';
+import { HEADER_QUERY } from '~/lib/fragments';
 import appStyles from '~/styles/app.css?url';
 import reactMediumImageZoom from '~/styles/react-medium-image-zoom.css?url';
-import {PageLayout} from './components/PageLayout';
-import {FOOTER_MENU_CMS_QUERY} from './graphql/cms/FooterMenuQuery';
-import {GLOBAL_BANNER_CMS_QUERY} from './graphql/cms/GlobalBannerQuery';
-import {GLOBAL_NEWSLETTER_POPUP_CMS_QUERY} from './graphql/cms/GlobalNewsletterPopupQuery';
+import { PageLayout } from './components/PageLayout';
+import { FOOTER_MENU_CMS_QUERY } from './graphql/cms/FooterMenuQuery';
+import { GLOBAL_BANNER_CMS_QUERY } from './graphql/cms/GlobalBannerQuery';
+import { GLOBAL_NEWSLETTER_POPUP_CMS_QUERY } from './graphql/cms/GlobalNewsletterPopupQuery';
 import tailwindCss from './styles/tailwind.css?url';
 
 export type RootLoader = typeof loader;
@@ -65,7 +65,7 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/png', href: favicon},
+    { rel: 'icon', type: 'image/png', href: favicon },
   ];
 }
 
@@ -76,7 +76,7 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  const {storefront, env} = args.context;
+  const { storefront, env } = args.context;
 
   return {
     ...deferredData,
@@ -89,7 +89,7 @@ export async function loader(args: LoaderFunctionArgs) {
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: false,
+      withPrivacyBanner: true,
       // localize the privacy banner
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
@@ -101,8 +101,8 @@ export async function loader(args: LoaderFunctionArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-async function loadCriticalData({context}: LoaderFunctionArgs) {
-  const {storefront} = context;
+async function loadCriticalData({ context }: LoaderFunctionArgs) {
+  const { storefront } = context;
 
   const [header] = await Promise.all([
     storefront.query(HEADER_QUERY, {
@@ -114,7 +114,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {header};
+  return { header };
 }
 
 /**
@@ -122,8 +122,8 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context}: LoaderFunctionArgs) {
-  const {storefront, customerAccount, cart} = context;
+function loadDeferredData({ context }: LoaderFunctionArgs) {
+  const { storefront, customerAccount, cart } = context;
 
   // defer the footer query (below the fold)
   // const footer = storefront
@@ -177,13 +177,25 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
   };
 }
 
-export function Layout({children}: {children?: React.ReactNode}) {
+export function Layout({ children }: { children?: React.ReactNode }) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
 
   return (
     <html lang="en">
       <head>
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDL9ZLTD');
+      `,
+          }}
+        />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={reactMediumImageZoom}></link>
@@ -193,6 +205,19 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Links />
       </head>
       <body>
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `
+              <iframe
+                src="https://www.googletagmanager.com/ns.html?id=GTM-KDL9ZLTD"
+                height="0"
+                width="0"
+                style="display:none;visibility:hidden"
+              ></iframe>
+            `,
+          }}
+        />
+
         {data ? (
           <Analytics.Provider
             cart={data.cart}

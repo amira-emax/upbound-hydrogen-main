@@ -1,12 +1,12 @@
-import {Image, Money} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import { Image, Money } from '@shopify/hydrogen';
+import { Link } from 'react-router';
 import type {
   CollectionItemFragment,
   ProductItemFragment,
 } from 'types/storefrontapi.generated';
-import {cn} from '~/lib/utils';
-import {useVariantUrl} from '~/lib/variants';
-import {AddToCartButton} from './AddToCartButton';
+import { cn } from '~/lib/utils';
+import { useVariantUrl } from '~/lib/variants';
+import { AddToCartButton } from './AddToCartButton';
 
 export function ProductItem({
   product,
@@ -94,13 +94,16 @@ export function ProductItem({
           soldOut
             ? []
             : [
-                {
-                  merchandiseId:
-                    product?.selectedOrFirstAvailableVariant?.id ?? '',
-                  quantity: 1,
-                },
-              ]
+              {
+                merchandiseId:
+                  product?.selectedOrFirstAvailableVariant?.id ?? '',
+                quantity: 1,
+              },
+            ]
         }
+        productData={product}
+        quantity={1}
+        page="Product List Page"
       >
         {soldOut ? 'Sold Out' : 'Add to cart'}
       </AddToCartButton>

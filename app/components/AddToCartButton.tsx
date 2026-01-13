@@ -1,11 +1,12 @@
-import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
-import {VariantProps} from 'class-variance-authority';
-import {Loader2} from 'lucide-react';
-import {type FetcherWithComponents} from 'react-router';
-import {useEffect, useRef, useState} from 'react';
-import {cn} from '~/lib/utils';
-import {Button, buttonVariants} from './ui/button';
-import {useAside} from './Aside';
+import { CartForm, type OptimisticCartLineInput, useAnalytics } from '@shopify/hydrogen';
+import { VariantProps } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
+import { type FetcherWithComponents } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '~/lib/utils';
+import { Button, buttonVariants } from './ui/button';
+import { useAside } from './Aside';
+
 
 export function AddToCartButton({
   analytics,
@@ -18,6 +19,9 @@ export function AddToCartButton({
   variant,
   size,
   openCartOnSubmit = true,
+  productData,
+  quantity,
+  page
 }: {
   analytics?: unknown;
   children: React.ReactNode;
@@ -27,18 +31,23 @@ export function AddToCartButton({
   buttonClassName?: string;
   containerClassName?: string;
   openCartOnSubmit?: boolean;
+  productData?: Record<string, any>;
+  quantity?: number;
+  page?: string;
 } & VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
-  const {open} = useAside();
+  asChild?: boolean;
+}) {
+  const { open } = useAside();
   const [isLocalLoading, setIsLocalLoading] = useState(false);
   const previousFetcherState = useRef('idle');
+  const { shop } = useAnalytics();
+  const currencyCode = shop?.currency || 'MYR';
 
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
         route="/cart"
-        inputs={{lines}}
+        inputs={{ lines }}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {
@@ -49,6 +58,38 @@ export function AddToCartButton({
           ) {
             // This means we've completed a full cycle and returned to idle
             setIsLocalLoading(false);
+
+            // GA Add to Cart event (Shopify Google & YouTube app)
+            if (typeof window !== 'undefined' && window.dataLayer) {
+
+              const info = {
+                id: productData?.id ?? 0,
+                name: productData?.name ?? productData?.product?.title ?? productData?.title ?? '',
+                variant: productData?.variant ?? productData?.productType ?? productData?.title ?? productData?.sku ?? '',
+                price: productData?.selectedOrFirstAvailableVariant?.price?.amount ?? productData?.price?.amount ?? productData?.priceRange?.minVariantPrice?.amount ?? '0',
+                quantity: quantity ?? productData?.quantity ?? 1,
+                currency: productData?.price?.currencyCode ?? currencyCode ?? 'MYR',
+              };
+
+              window.dataLayer.push({
+                event: 'add_to_cart',
+                eventPage: page ?? 'unknown',
+                details: info,
+                product_id: info.id,
+                currency: info.currency,
+                quantity: info.quantity
+              });
+
+              console.log('sini datalayer', {
+                event: 'add_to_cart',
+                eventPage: page ?? 'unknown',
+                details: info,
+                product_id: info.id,
+                currency: info.currency,
+                quantity: info.quantity
+              });
+            }
+
             if (openCartOnSubmit) open('cart');
           }
 
@@ -76,11 +117,11 @@ export function AddToCartButton({
               >
                 {isLoading
                   ? (loadingChildren ?? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Adding Item...
-                      </div>
-                    ))
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Adding Item...
+                    </div>
+                  ))
                   : children}
               </Button>
             </div>

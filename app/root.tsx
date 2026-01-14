@@ -186,7 +186,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
     <html lang="en">
       <head>
         <script
-          nonce={useNonce()}
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

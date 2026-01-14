@@ -43,7 +43,7 @@ export default async function handleRequest(
       <ServerRouter
         context={reactRouterContext}
         url={request.url}
-        nonce={nonce}
+       
       />
     </NonceProvider>,
     {

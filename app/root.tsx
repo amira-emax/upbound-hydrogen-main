@@ -20,7 +20,6 @@ import { FOOTER_MENU_CMS_QUERY } from './graphql/cms/FooterMenuQuery';
 import { GLOBAL_BANNER_CMS_QUERY } from './graphql/cms/GlobalBannerQuery';
 import { GLOBAL_NEWSLETTER_POPUP_CMS_QUERY } from './graphql/cms/GlobalNewsletterPopupQuery';
 import tailwindCss from './styles/tailwind.css?url';
-import { useEffect } from 'react';
 
 export type RootLoader = typeof loader;
 
@@ -115,7 +114,6 @@ async function loadCriticalData({ context }: LoaderFunctionArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-
   return { header };
 }
 
@@ -183,25 +181,23 @@ export function Layout({ children }: { children?: React.ReactNode }) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
 
-  useEffect(() => {
-    const gtmScript = document.createElement('script');
-    gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KDL9ZLTD';
-    gtmScript.async = true;
-    gtmScript.nonce = nonce;
-    document.head.appendChild(gtmScript);
-
-    // Initialize dataLayer if not already
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'gtm.js' });
-
-    return () => {
-      document.head.removeChild(gtmScript);
-    };
-  }, [nonce]);
-
   return (
     <html lang="en">
       <head>
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+var n=d.querySelector('[nonce]');n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));
+f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDL9ZLTD');
+      `,
+          }}
+        />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={reactMediumImageZoom}></link>

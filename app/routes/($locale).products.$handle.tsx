@@ -131,10 +131,6 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  console.log('sini selectedVariant', selectedVariant);
-
-  console.log('sini product', product);
-
 
   const {
     title,

@@ -17,13 +17,15 @@ export default async function handleRequest(
       "'self'",
       'https://cdn.shopify.com',
       'https://*.googletagmanager.com',
-      'https://*.google-analytics.com'
+      'https://*.google-analytics.com',
+      'https://connect.facebook.net',
     ],
     imgSrc: [
       "'self'",
       'https://cdn.shopify.com',
       'https://*.google-analytics.com',
       'https://*.googletagmanager.com',
+      'https://www.facebook.com',
     ],
 
     shop: {
@@ -36,6 +38,8 @@ export default async function handleRequest(
       'https://*.google-analytics.com',
       'https://*.analytics.google.com',
       'https://*.googletagmanager.com',
+      'https://www.facebook.com',
+      'https://connect.facebook.net',
     ],
   });
 

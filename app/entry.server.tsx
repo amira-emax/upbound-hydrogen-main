@@ -1,9 +1,9 @@
-import type {AppLoadContext} from '@shopify/remix-oxygen';
-import {ServerRouter} from 'react-router';
-import {isbot} from 'isbot';
-import {renderToReadableStream} from 'react-dom/server';
-import {createContentSecurityPolicy} from '@shopify/hydrogen';
-import type {EntryContext} from 'react-router';
+import type { AppLoadContext } from '@shopify/remix-oxygen';
+import { ServerRouter } from 'react-router';
+import { isbot } from 'isbot';
+import { renderToReadableStream } from 'react-dom/server';
+import { createContentSecurityPolicy } from '@shopify/hydrogen';
+import type { EntryContext } from 'react-router';
 
 export default async function handleRequest(
   request: Request,
@@ -12,19 +12,23 @@ export default async function handleRequest(
   reactRouterContext: EntryContext,
   context: AppLoadContext,
 ) {
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({
-     scriptSrc: [
+  const { nonce, header, NonceProvider } = createContentSecurityPolicy({
+    scriptSrc: [
       "'self'",
       'https://cdn.shopify.com',
       'https://*.googletagmanager.com',
+      'https://*.google-analytics.com',
+      'https://connect.facebook.net',
+      "'sha256-HSqsF0AqO4Au0siH0PmBAIJZrNYC4UQlwQCJy/WhzZ8='",
     ],
     imgSrc: [
       "'self'",
       'https://cdn.shopify.com',
       'https://*.google-analytics.com',
       'https://*.googletagmanager.com',
+      'https://www.facebook.com',
     ],
-    
+
     shop: {
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
@@ -35,6 +39,8 @@ export default async function handleRequest(
       'https://*.google-analytics.com',
       'https://*.analytics.google.com',
       'https://*.googletagmanager.com',
+      'https://www.facebook.com',
+      'https://connect.facebook.net',
     ],
   });
 

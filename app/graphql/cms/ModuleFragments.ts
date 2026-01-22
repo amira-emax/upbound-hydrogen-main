@@ -522,3 +522,88 @@ export const FOOTER_MENU_GROUP_FRAGMENT = `#graphql
     }
   }
 `;
+
+export const HERO_IMAGE_MULTI_TEXT_FRAGMENT = `#graphql
+fragment HeroImageMultiText on Metaobject {
+  id
+  type
+
+  background_image: field(key: "background_image") {
+    reference {
+      ... on MediaImage {
+        image {
+          url
+          altText
+        }
+      }
+    }
+  }
+
+  enable_overlay: field(key: "enable_overlay") {
+    value
+  }
+  overlay_opacity: field(key: "overlay_opacity") {
+    value
+  }
+
+  logo: field(key: "logo") {
+    references(first: 10) {
+      nodes {
+        ... on Metaobject {
+          image: field(key: "image") {
+            reference {
+              ... on MediaImage {
+                image {
+                  url
+                  altText
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  texts: field(key: "texts") {
+    references(first: 10) {
+      nodes {
+        ... on Metaobject {
+          text: field(key: "text") { value }
+          position: field(key: "position") { value }
+          font_size: field(key: "font_size") { value }
+          font_weight: field(key: "font_weight") { value }
+          text_color: field(key: "text_color") { value }
+          tag: field(key: "tag") { value }
+          label: field(key: "label") { value }
+        }
+      }
+    }
+  }
+}
+`;
+
+// ModuleFragments.ts
+export const TEXT_BLOCK_FRAGMENT = `#graphql
+fragment TextBlock on Metaobject {
+  id
+  type
+  label: field(key: "label") {
+    value
+  }
+  description: field(key: "description") {
+    value
+  }
+  header: field(key: "header") {
+    value
+  }
+  listing: field(key: "listing") {
+    value
+  }
+  footer: field(key: "footer") {
+    value
+  }
+}
+`;
+
+

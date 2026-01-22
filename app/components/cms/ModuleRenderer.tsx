@@ -3,6 +3,9 @@ import TextWithCta from './TextWithCta';
 import CarouselWithCta from './CarouselWithCta';
 import HeroAccordion from './HeroAccordion';
 import HeroFeaturedProduct from './HeroFeaturedProduct';
+import HeroImageMultiText from './HeroImageMultiText';
+import TextBlock from './TextBlock';
+
 import type {
   HeroWithCtaFragment,
   TextWithCtaFragment,
@@ -10,6 +13,8 @@ import type {
   AccordionFragment,
   HeroFeaturedProductFragment,
   HeroImageWithProductFragment,
+  HeroImageMultiTextFragment,
+  TextBlockFragment,
 } from 'types/storefrontapi.generated';
 import HeroImageWithProduct from './HeroImageWithProduct';
 
@@ -19,7 +24,9 @@ type Module =
   | TextWithCtaFragment
   | ImageCarouselFragment
   | AccordionFragment
-  | HeroFeaturedProductFragment;
+  | HeroFeaturedProductFragment
+  | HeroImageMultiTextFragment
+  | TextBlockFragment;
 
 interface ModuleRendererProps {
   modules: Module[];
@@ -86,6 +93,22 @@ export default function ModuleRenderer({
               <HeroImageWithProduct
                 key={module.id || index}
                 reference={module as HeroImageWithProductFragment}
+              />
+            );
+
+          case 'hero_image_multi_text':
+            return (
+              <HeroImageMultiText
+                key={module.id || index}
+                reference={module as HeroImageMultiTextFragment}
+              />
+            );
+
+          case 'text_block':
+            return (
+              <TextBlock
+                key={module.id || index}
+                reference={module as TextBlockFragment}
               />
             );
 

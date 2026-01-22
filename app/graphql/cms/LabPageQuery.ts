@@ -7,7 +7,8 @@ import {
   HERO_IMAGE_WITH_PRODUCT,
   HERO_IMAGE_MULTI_TEXT_FRAGMENT,
   TEXT_BLOCK_FRAGMENT,
-  GALLERY_IMAGE_CARD_FRAGMENT
+  GALLERY_IMAGE_CARD_FRAGMENT,
+  BANNER_STEPS_FRAGMENT
 
 } from './ModuleFragments';
 
@@ -21,6 +22,7 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
     ${HERO_IMAGE_MULTI_TEXT_FRAGMENT}
     ${TEXT_BLOCK_FRAGMENT}
     ${GALLERY_IMAGE_CARD_FRAGMENT}
+    ${BANNER_STEPS_FRAGMENT}
 
   query LabPageCms {
     paceLabPage: metaobject(
@@ -30,7 +32,6 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
       handle
 
       header_feature: field(key: "header_feature") { value }
-      people: field(key: "people") { value }
 
       hero_with_text: field(key: "hero_with_text") {
           reference {
@@ -68,18 +69,6 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
           }
         }
       }
-        
-      join: field(key: "join") {
-          reference {
-              ... on Metaobject {
-                  id
-                  type
-                  ...Accordion
-              }
-          }
-      }
-
-    
 
       question_title: field(key: "question_title") {
           reference {
@@ -109,8 +98,13 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
         }
       }
 
-    
-
+      steps: field(key: "steps") {
+         reference {
+          ... on Metaobject {
+            ...BannerSteps
+          }
+        }
+      }
 
 
       modules: field(key: "modules") {

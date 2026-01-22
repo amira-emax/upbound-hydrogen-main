@@ -5,6 +5,7 @@ import ModuleRenderer from '~/components/cms/ModuleRenderer';
 import HeroAccordion from '~/components/cms/HeroAccordion';
 import HeroImageMultiText from '~/components/cms/HeroImageMultiText';
 import TextBlock from '~/components/cms/TextBlock';
+import BannerSteps from '~/components/cms/BannerSteps';
 
 
 export const meta: MetaFunction = () => {
@@ -87,9 +88,7 @@ export default function LabPage() {
                 )}
             </div>
 
-            {paceLabPage?.banner?.reference && (
-                <HeroImageMultiText reference={paceLabPage?.banner.reference} />
-            )}
+            
 
             {/* <ModuleRenderer modules={paceLabPage?.banner?.references?.nodes ?? []} /> */}
 
@@ -98,6 +97,10 @@ export default function LabPage() {
                     <TextBlock reference={paceLabPage.description.reference} />
                 )}
             </div>
+
+            {paceLabPage?.steps?.reference && (
+                <BannerSteps reference={paceLabPage?.steps.reference} />
+            )}
 
             <ModuleRenderer modules={joinModules} />
 

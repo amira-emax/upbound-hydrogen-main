@@ -5,6 +5,7 @@ import HeroAccordion from './HeroAccordion';
 import HeroFeaturedProduct from './HeroFeaturedProduct';
 import HeroImageMultiText from './HeroImageMultiText';
 import TextBlock from './TextBlock';
+import BannerSteps from './BannerSteps';
 
 import type {
   HeroWithCtaFragment,
@@ -15,6 +16,7 @@ import type {
   HeroImageWithProductFragment,
   HeroImageMultiTextFragment,
   TextBlockFragment,
+  BannerStepsFragment
 } from 'types/storefrontapi.generated';
 import HeroImageWithProduct from './HeroImageWithProduct';
 
@@ -26,7 +28,8 @@ type Module =
   | AccordionFragment
   | HeroFeaturedProductFragment
   | HeroImageMultiTextFragment
-  | TextBlockFragment;
+  | TextBlockFragment
+  | BannerStepsFragment;
 
 interface ModuleRendererProps {
   modules: Module[];
@@ -109,6 +112,14 @@ export default function ModuleRenderer({
               <TextBlock
                 key={module.id || index}
                 reference={module as TextBlockFragment}
+              />
+            );
+
+            case 'banner_steps':
+            return (
+              <BannerSteps
+                key={module.id || index}
+                reference={module as BannerStepsFragment}
               />
             );
 

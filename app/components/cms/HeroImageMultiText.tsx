@@ -27,6 +27,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
           data={background_image?.reference?.image ?? undefined}
           className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
+          sizes='80vh'
 
         />
       )}
@@ -66,7 +67,14 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         {texts?.references?.nodes?.map((block, i) => {
           const text = block.text?.value;
           const label = block.label?.value;
-          if (!text && !label) return null;
+          const listItems: string[] = (() => {
+            try {
+              return block.listing?.value ? JSON.parse(block.listing?.value) : [];
+            } catch {
+              return [];
+            }
+          })();
+          if (!text && !label && !listItems) return null;
 
           const position = block.position?.value ?? 'center';
           let fontSize = block.font_size?.value ?? 'text-xl';
@@ -119,13 +127,26 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
           return (
             <div key={i} className={`absolute z-10 ${positionClass} ${textColor}`}>
 
-              <Tag className={`${alignmentClass} ${fontSize} ${fontWeight}  max-w-xs md:max-w-sm`}>
+              <Tag className={`${alignmentClass} ${fontSize} ${fontWeight}  max-w-xs md:max-w-sm lg:max-w-lg`}>
                 {label && (
                   <span className="block text-sm mb-1">
                     {label}
                   </span>
                 )}
                 <span dangerouslySetInnerHTML={{ __html: text }} />
+
+                {/* Listing pills */}
+                {listItems.length > 0 && (
+                  <ul className="mt-3 ">
+                    {listItems.map((item, idx) => (
+                      <li key={idx} className='py-2'>
+                        <span className={`px-3 py-1 border rounded-full`}>
+                          {item}
+                        </span></li>
+                    ))}
+                  </ul>
+                )}
+
               </Tag>
             </div>
           );

@@ -576,6 +576,7 @@ fragment HeroImageMultiText on Metaobject {
           text_color: field(key: "text_color") { value }
           tag: field(key: "tag") { value }
           label: field(key: "label") { value }
+          listing: field(key: "listing") { value }
         }
       }
     }
@@ -583,7 +584,6 @@ fragment HeroImageMultiText on Metaobject {
 }
 `;
 
-// ModuleFragments.ts
 export const TEXT_BLOCK_FRAGMENT = `#graphql
 fragment TextBlock on Metaobject {
   id
@@ -603,6 +603,59 @@ fragment TextBlock on Metaobject {
   footer: field(key: "footer") {
     value
   }
+}
+`;
+
+export const BANNER_STEPS_FRAGMENT = `#graphql
+fragment BannerSteps on Metaobject {
+  id
+  type
+  title: field(key: "title") {
+    value
+  }
+  title_position: field(key: "title_position") {
+    value
+  }
+  footer: field(key: "footer") {
+    value
+  }
+  footer_position: field(key: "footer_position") {
+    value
+  }
+  position: field(key: "position") {
+    value
+  }
+  text_color: field(key: "text_color") {
+    value
+  }
+  tag: field(key: "tag") {
+    value
+  }
+  background_image: field(key: "background_image") {
+    reference {
+      ... on MediaImage {
+        image {
+          url
+          altText
+        }
+      }
+    }
+  }
+  steps: field(key: "steps") {
+    references(first: 10) {
+      nodes {
+        ... on Metaobject {
+          step: field(key: "step") { value }
+          step_text_color: field(key: "step_text_color") { value }
+          step_body_color: field(key: "step_body_color") { value }
+          description: field(key: "description") { value }
+          description_text_color: field(key: "description_text_color") { value }
+          description_body_color: field(key: "description_body_color") { value }
+        }
+      }
+    }
+  }
+
 }
 `;
 

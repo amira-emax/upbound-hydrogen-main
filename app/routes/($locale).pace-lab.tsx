@@ -60,15 +60,15 @@ export default function LabPage() {
     const { paceLabPage } = useLoaderData<typeof loader>();
 
     console.log('sini', paceLabPage);
-    const joinModules = paceLabPage.join?.reference
-        ? [paceLabPage.join.reference]
+    const joinModules = paceLabPage?.join?.reference
+        ? [paceLabPage?.join?.reference]
         : [];
     const questionModules = paceLabPage.question_title?.reference
-        ? [paceLabPage.question_title.reference]
+        ? [paceLabPage?.question_title.reference]
         : [];
 
     const galleryRows =
-        paceLabPage.schedule?.references?.nodes?.map((row) => ({
+        paceLabPage?.schedule?.references?.nodes?.map((row) => ({
             label: row.label?.value,
             title: row.title?.value,
             image: row.image?.reference?.image
@@ -122,14 +122,14 @@ export default function LabPage() {
             <ModuleRenderer modules={joinModules} />
 
             <div className='text-center p-20'>
-                <p className="mt-2 text-xl">{paceLabPage?.header_feature?.value}</p>
+                 <h1 className="text-3xl font-bold text-center">{paceLabPage?.header_feature?.value}</h1>
             </div>
 
             <GalleryRows reference={galleryRows} />
 
 
             <div className='text-center p-20'>
-                <p className="mt-2 text-2xl py-10">Community Proof</p>
+                 <h1 className="text-3xl font-bold mb-12 text-center">Community Proof</h1>
                 <p className="mt-2 text-xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
 
                 <Gallery reference={paceLabPage?.proof?.references?.nodes} />

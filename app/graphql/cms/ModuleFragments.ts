@@ -606,6 +606,31 @@ fragment TextBlock on Metaobject {
 }
 `;
 
+export const GALLERY_ROWS_FRAGMENT = `#graphql
+fragment GalleryRows on Metaobject {
+  id
+  type
+
+  image: field(key: "image") {
+    reference {
+      ... on MediaImage {
+        image {
+          url
+          altText
+        }
+      }
+    }
+  }
+
+  title: field(key: "title") {
+    value
+  }
+  label: field(key: "label") {
+    value
+  }
+}
+`;
+
 export const BANNER_STEPS_FRAGMENT = `#graphql
 fragment BannerSteps on Metaobject {
   id

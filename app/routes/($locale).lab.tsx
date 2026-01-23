@@ -6,6 +6,8 @@ import HeroAccordion from '~/components/cms/HeroAccordion';
 import HeroImageMultiText from '~/components/cms/HeroImageMultiText';
 import TextBlock from '~/components/cms/TextBlock';
 import BannerSteps from '~/components/cms/BannerSteps';
+import GalleryRows from '~/components/cms/GalleryRows';
+import Gallery from '~/components/Gallery';
 
 
 export const meta: MetaFunction = () => {
@@ -64,6 +66,19 @@ export default function LabPage() {
     const questionModules = paceLabPage.question_title?.reference
         ? [paceLabPage.question_title.reference]
         : [];
+
+    const galleryRows =
+        paceLabPage.schedule?.references?.nodes?.map((row) => ({
+            label: row.label?.value,
+            title: row.title?.value,
+            image: row.image?.reference?.image
+                ? {
+                    url: row.image.reference.image.url,
+                    alt: row.image.reference.image.altText ?? '',
+                }
+                : undefined,
+        })) ?? [];
+
     return (
 
         <div className="paceLab">
@@ -88,7 +103,9 @@ export default function LabPage() {
                 )}
             </div>
 
-            
+            {paceLabPage?.banner?.reference && (
+                <HeroImageMultiText reference={paceLabPage?.banner.reference} />
+            )}
 
             {/* <ModuleRenderer modules={paceLabPage?.banner?.references?.nodes ?? []} /> */}
 
@@ -104,11 +121,28 @@ export default function LabPage() {
 
             <ModuleRenderer modules={joinModules} />
 
-            <div>
+            <div className='text-center p-20'>
                 <p className="mt-2 text-xl">{paceLabPage?.header_feature?.value}</p>
             </div>
 
-            <ModuleRenderer modules={questionModules} />
+            <GalleryRows reference={galleryRows} />
+
+
+            <div className='text-center p-20'>
+                <p className="mt-2 text-2xl py-10">Community Proof</p>
+                <p className="mt-2 text-xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
+
+                <Gallery reference={paceLabPage?.proof?.references?.nodes} />
+
+            </div>
+
+            <div >
+                <h1 className="text-3xl font-bold mb-12 text-center">Any questions? We got you</h1>
+                <ModuleRenderer
+                    modules={questionModules}
+                    accordionClassName="mb-6 mt-0"
+                />
+            </div>
 
             {/* {joinModules && (
                 <HeroAccordion reference={joinModules} className="mt-0" />

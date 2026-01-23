@@ -8,7 +8,8 @@ import {
   HERO_IMAGE_MULTI_TEXT_FRAGMENT,
   TEXT_BLOCK_FRAGMENT,
   GALLERY_IMAGE_CARD_FRAGMENT,
-  BANNER_STEPS_FRAGMENT
+  BANNER_STEPS_FRAGMENT,
+  GALLERY_ROWS_FRAGMENT
 
 } from './ModuleFragments';
 
@@ -23,6 +24,7 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
     ${TEXT_BLOCK_FRAGMENT}
     ${GALLERY_IMAGE_CARD_FRAGMENT}
     ${BANNER_STEPS_FRAGMENT}
+    ${GALLERY_ROWS_FRAGMENT}
 
   query LabPageCms {
     paceLabPage: metaobject(
@@ -102,6 +104,30 @@ export const LAB_PAGE_CMS_QUERY = `#graphql
          reference {
           ... on Metaobject {
             ...BannerSteps
+          }
+        }
+      }
+
+      schedule: field(key: "schedule") {
+        references(first: 20) {
+          nodes {
+            ... on Metaobject {
+              id
+              type
+              ...GalleryRows
+            }
+          }
+        }
+      }
+
+      proof: field(key: "proof") {
+        references(first: 20) {
+          nodes {
+            ... on Metaobject {
+              id
+              type
+              ...GalleryImageCard
+            }
           }
         }
       }

@@ -17,7 +17,6 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
 
   // Background image URL
   const bgUrl = background_image?.reference?.image?.url;
-  const bgAlt = background_image?.reference?.image?.altText ?? '';
 
   return (
     <div className="w-full relative h-[80vh] md:h-[80vh] p-10">
@@ -52,7 +51,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
               <Image
                 key={i}
                 data={logos.image.reference.image}
-                className="h-20"
+                className="lg:h-20"
                 draggable={false}
                 sizes="100vw"
                 alt={img.altText ?? ''}
@@ -62,95 +61,91 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         </div>
       )}
 
-      <div className="relative w-full h-full p-8">
-        {/* Text blocks */}
-        {texts?.references?.nodes?.map((block, i) => {
-          const text = block.text?.value;
-          const label = block.label?.value;
-          const listItems: string[] = (() => {
-            try {
-              return block.listing?.value ? JSON.parse(block.listing?.value) : [];
-            } catch {
-              return [];
-            }
-          })();
-          if (!text && !label && !listItems) return null;
+      <div className="relative z-10 w-full h-full ">
 
-          const position = block.position?.value ?? 'center';
-          let fontSize = block.font_size?.value ?? 'text-xl';
-          const fontWeight = block.font_weight?.value ?? 'font-normal';
-          const textColor = block.text_color?.value ?? 'text-black';
-          const Tag = block.tag?.value ?? 'div';
-
-          if (Tag !== 'div') fontSize = '';
-
-          // Determine positioning classes
-          let positionClass = '';
-          let alignmentClass = '';
-
-          switch (position) {
-            case 'center':
-              positionClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-              alignmentClass = 'text-center';
-              break;
-            case 'top-left':
-              positionClass = 'top-4 left-4';
-              alignmentClass = 'text-left';
-              break;
-            case 'top-right':
-              positionClass = 'top-4 right-4';
-              alignmentClass = 'text-right';
-              break;
-            case 'center-left':
-              positionClass = 'top-1/2 left-4 -translate-y-1/2';
-              alignmentClass = 'text-left';
-              break;
-            case 'center-right':
-              positionClass = 'top-1/2 right-4 -translate-y-1/2';
-              alignmentClass = 'text-right';
-              break;
-            case 'bottom-left':
-              positionClass = 'bottom-8 left-8';
-              alignmentClass = 'text-left';
-              break;
-            case 'bottom-right':
-              positionClass = 'bottom-8 right-8';
-              alignmentClass = 'text-right';
-              break;
-            default:
-              // fallback to center
-              positionClass = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
-              alignmentClass = 'text-center';
-          }
+        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 h-full">
 
 
-          return (
-            <div key={i} className={`absolute z-10 ${positionClass} ${textColor}`}>
 
-              <Tag className={`${alignmentClass} ${fontSize} ${fontWeight}  max-w-xs md:max-w-sm lg:max-w-lg`}>
-                {label && (
-                  <span className="block text-sm mb-1">
-                    {label}
-                  </span>
-                )}
-                <span dangerouslySetInnerHTML={{ __html: text }} />
+          {/* Text blocks */}
+          {texts?.references?.nodes?.map((block, i) => {
+            const text = block.text?.value;
+            const label = block.label?.value;
 
-                {/* Listing pills */}
-                {listItems.length > 0 && (
-                  <ul className="mt-3 ">
-                    {listItems.map((item, idx) => (
-                      <li key={idx} className='py-2'>
-                        <span className={`px-3 py-1 border rounded-full`}>
-                          {item}
-                        </span></li>
-                    ))}
-                  </ul>
-                )}
+            const listItems: string[] = (() => {
+              try {
+                return block.listing?.value ? JSON.parse(block.listing?.value) : [];
+              } catch {
+                return [];
+              }
+            })();
 
-              </Tag>
-            </div>
-          );
-        })}
+            if (!text && !label && listItems.length === 0) return null;
+
+
+            const POSITION_GRID_MAP: Record<
+              string,
+              { col: string; row: string; align: string }
+            > = {
+              'top-left': { col: 'md:col-start-1', row: 'md:row-start-1 md:justify-start', align: 'md:text-left' },
+              'top-center': { col: 'md:col-start-2', row: 'md:row-start-1', align: 'text-center' },
+              'top-right': { col: 'md:col-start-3', row: 'md:row-start-1 md:justify-end', align: 'md:text-right' },
+
+              'center-left': { col: 'md:col-start-1', row: 'md:row-start-2 md:justify-start', align: 'md:text-left' },
+              'center': { col: 'md:col-start-2', row: 'md:row-start-2', align: 'text-center' },
+              'center-right': { col: 'md:col-start-3', row: 'md:row-start-2 md:justify-end', align: 'md:text-right' },
+
+              'bottom-left': { col: 'md:col-start-1', row: 'md:row-start-3 md:justify-start', align: 'md:text-left' },
+              'bottom-center': { col: 'md:col-start-2', row: 'md:row-start-3', align: 'text-center' },
+              'bottom-right': { col: 'md:col-start-3', row: 'md:row-start-3 md:justify-end', align: 'md:text-right' },
+            };
+
+            const position = block.position?.value ?? 'center';
+            let fontSize = block.font_size?.value ?? 'text-xl';
+            const fontWeight = block.font_weight?.value ?? 'font-normal';
+            const textColor = block.text_color?.value ?? 'text-black';
+            const Tag = block.tag?.value ?? 'div';
+
+            if (Tag !== 'div') fontSize = '';
+
+            const grid = POSITION_GRID_MAP[position] ?? POSITION_GRID_MAP.center;
+
+            return (
+
+              <div
+                key={i}
+                className={`${textColor} ${grid.col} ${grid.row} flex items-center justify-center`}
+              >
+                <Tag
+                  className={`${grid.align} ${fontSize} ${fontWeight} text-center max-w-xs md:max-w-sm lg:max-w-lg `}>
+                  {label && (
+                    <span className="block text-sm mb-1 opacity-70">
+                      {label}
+                    </span>
+                  )}
+
+                  <span dangerouslySetInnerHTML={{ __html: text }} />
+
+                  {listItems.length > 0 && (
+                    <ul className="mt-3 flex flex-wrap gap-2 justify-center md:justify-end">
+                      {listItems.map((item, idx) => (
+                        <li key={idx}>
+                          <span className="px-3 py-1 border rounded-full text-sm">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Tag>
+              </div>
+
+              
+            );
+          })}
+
+        </div>
+
       </div>
 
     </div>

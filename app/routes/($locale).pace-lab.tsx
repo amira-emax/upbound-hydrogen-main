@@ -8,6 +8,7 @@ import TextBlock from '~/components/cms/TextBlock';
 import BannerSteps from '~/components/cms/BannerSteps';
 import GalleryRows from '~/components/cms/GalleryRows';
 import Gallery from '~/components/Gallery';
+import CtaButton from '~/components/CtaButton';
 
 
 export const meta: MetaFunction = () => {
@@ -60,10 +61,8 @@ export default function LabPage() {
     const { paceLabPage } = useLoaderData<typeof loader>();
 
     console.log('sini', paceLabPage);
-    const joinModules = paceLabPage?.join?.reference
-        ? [paceLabPage?.join?.reference]
-        : [];
-    const questionModules = paceLabPage.question_title?.reference
+
+    const questionModules = paceLabPage?.question_title?.reference
         ? [paceLabPage?.question_title.reference]
         : [];
 
@@ -97,6 +96,7 @@ export default function LabPage() {
 
 
 
+
             <div className='text-center p-20'>
                 {paceLabPage?.text?.reference && (
                     <TextBlock reference={paceLabPage.text.reference} />
@@ -119,22 +119,39 @@ export default function LabPage() {
                 <BannerSteps reference={paceLabPage?.steps.reference} />
             )}
 
-            <ModuleRenderer modules={joinModules} />
 
             <div className='text-center p-20'>
-                 <h1 className="text-3xl font-bold text-center">{paceLabPage?.header_feature?.value}</h1>
+                <h1 className="text-3xl font-bold text-center">{paceLabPage?.header_feature?.value}</h1>
             </div>
 
             <GalleryRows reference={galleryRows} />
 
 
             <div className='text-center p-20'>
-                 <h1 className="text-3xl font-bold mb-12 text-center">Community Proof</h1>
+                <h1 className="text-3xl font-bold mb-12 text-center">Community Proof</h1>
                 <p className="mt-2 text-xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
 
                 <Gallery reference={paceLabPage?.proof?.references?.nodes} />
 
             </div>
+
+            <div className='text-center p-20'>
+                <button className="text-xl px-6 py-3 bg-[#b9db9b] text-black rounded-full 
+               hover:bg-black hover:text-white transition duration-300 uppercas font-semibold">
+                    Sign Up Here
+                </button>
+
+                <p className="mt-4 text-2xl">
+                    Join Upbound Pace Lab
+                </p>
+                <p className="mt-1 text-lg">
+                    26 Jan Ciphr Performance
+                </p>
+
+                <hr className="w-full mt-10 border-t border-black"></hr>
+            </div>
+
+
 
             <div >
                 <h1 className="text-3xl font-bold mb-12 text-center">Any questions? We got you</h1>

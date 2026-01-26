@@ -80,7 +80,7 @@ export default function LabPage() {
 
     return (
 
-        <div className="paceLab">
+        <div className="paceLab font-(--font-whyte)">
 
             {/* <header className="text-center my-8">
                 {paceLabPage?.header_feature?.value && (
@@ -94,7 +94,7 @@ export default function LabPage() {
                 <HeroImageMultiText reference={paceLabPage?.hero_with_text.reference} />
             )}
 
-            <div className='text-center p-10 md:p-20'>
+            <div className='text-center p-10 md:p-20 bg-[#F2F2F2]'>
                 {paceLabPage?.text?.reference && (
                     <TextBlock reference={paceLabPage.text.reference} />
                 )}
@@ -106,15 +106,17 @@ export default function LabPage() {
 
             {/* <ModuleRenderer modules={paceLabPage?.banner?.references?.nodes ?? []} /> */}
 
-            <div className='text-center p-10 md:p-20'>
+            <div className='text-center p-10 md:p-20 bg-[#F2F2F2]'>
                 {paceLabPage?.description?.reference && (
                     <TextBlock reference={paceLabPage.description.reference} />
                 )}
             </div>
 
-            {paceLabPage?.steps?.reference && (
+            <div>
+                {paceLabPage?.steps?.reference && (
                 <BannerSteps reference={paceLabPage?.steps.reference} />
             )}
+            </div>
 
 
             <div className='text-center p-10 md:p-20'>
@@ -145,10 +147,10 @@ export default function LabPage() {
                 </a>
 
 
-                <p className="mt-4 text-2xl">
+                <p className="mt-4 text-xl">
                     {paceLabPage?.sign_up?.reference?.description?.value || 'Join Upbound Pace Lab'}
                 </p>
-                <p className="mt-1 text-lg">
+                <p className="mt-1 text-2xl font-bold">
                     {paceLabPage?.sign_up?.reference?.title?.value || '26 Jan Ciphr Performance'}
                 </p>
 

@@ -18,7 +18,30 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
   // Background image URL
   const bgUrl = background_image?.reference?.image?.url;
 
+  const items = texts?.references?.nodes ?? [];
+  
+  const minItems = 3;
+  const paddedItems =
+    items.length <= minItems
+      ? [
+        
+        {
+          id: 'placeholder-top-center',
+          position: { value: 'top-center' },
+          text: { value: '&nbsp;' },
+          label: { value: '' },
+          listing: { value: '[]' },
+          font_size: { value: 'text-xl' },
+          font_weight: { value: 'font-normal' },
+          text_color: { value: 'text-black' },
+          tag: { value: 'div' },
+        },
+        ...items,
+      ]
+      : items;
+
   return (
+
     <div className="w-full relative h-[80vh] md:h-[80vh] p-10">
       {/* Background Image */}
       {bgUrl && (
@@ -66,9 +89,9 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 h-full">
 
 
-
           {/* Text blocks */}
-          {texts?.references?.nodes?.map((block, i) => {
+
+          {paddedItems.map((block, i) => {
             const text = block.text?.value;
             const label = block.label?.value;
 
@@ -140,7 +163,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
                 </Tag>
               </div>
 
-              
+
             );
           })}
 

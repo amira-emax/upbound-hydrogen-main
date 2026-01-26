@@ -34,6 +34,7 @@ export function Header({
   isBannerOpened,
 }: HeaderProps) {
   const {shop, menu} = header;
+  console.log('sini header', header);
 
   return (
     <header className={cn('header', isBannerOpened && 'mt-10 md:mt-7')}>

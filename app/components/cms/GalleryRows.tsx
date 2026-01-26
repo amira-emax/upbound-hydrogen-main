@@ -6,17 +6,12 @@ interface GalleryRowsProps {
 }
 
 function GalleryRows({ reference }: GalleryRowsProps) {
-  
+
   if (!reference) return null;
 
-
-  
-
   return (
-    <section className="">
-
+    <section>
       {reference.map((row, index) => {
-        
         if (!row) return null;
 
         const image = row.image;
@@ -27,9 +22,14 @@ function GalleryRows({ reference }: GalleryRowsProps) {
             key={row.id ?? index}
             className="grid grid-cols-1 md:grid-cols-5 items-stretch"
           >
-            {/* Image LEFT */}
-            {isImageLeft && image && (
-              <div className="md:col-span-3 h-full">
+            {/* IMAGE */}
+            {image && (
+              <div
+                className={`
+              md:col-span-3 h-full
+              ${isImageLeft ? 'md:order-1 order-2' : 'md:order-3 order-2'}
+            `}
+              >
                 <Image
                   data={image}
                   className="w-full h-full object-cover"
@@ -38,38 +38,30 @@ function GalleryRows({ reference }: GalleryRowsProps) {
               </div>
             )}
 
-            {/* Text */}
-            <div className="md:col-span-2 flex flex-col justify-center p-20 h-full" style={{ backgroundColor: '#e7e6e9' }}>
+            {/* TEXT */}
+            <div
+              className={`
+            md:col-span-2 flex flex-col justify-center p-10 h-full
+            ${isImageLeft ? 'md:order-3 order-1' : 'md:order-1 order-1'}
+          `}
+              style={{ backgroundColor: '#e7e6e9' }}
+            >
               {row.label && (
-                <p className="text-sm tracking-wide">
-                  {row.label}
-                </p>
+                <p className="text-sm tracking-wide">{row.label}</p>
               )}
 
               {row.title && (
                 <h2
                   className="font-semibold"
-                  dangerouslySetInnerHTML={{
-                    __html: row.title,
-                  }}
+                  dangerouslySetInnerHTML={{ __html: row.title }}
                 />
               )}
             </div>
-
-            {/* Image RIGHT */}
-            {!isImageLeft && image && (
-              <div className="md:col-span-3 h-full">
-                <Image
-                  data={image}
-                  className="w-full h-full object-cover"
-                  sizes="(min-width: 768px) 60vw, 100vw"
-                />
-              </div>
-            )}
           </div>
         );
       })}
     </section>
+
   );
 }
 

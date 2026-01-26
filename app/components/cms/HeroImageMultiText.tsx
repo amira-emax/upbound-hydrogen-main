@@ -59,7 +59,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         <div
           className="absolute inset-0 bg-black"
           style={{
-            opacity: Number(overlay_opacity?.value ?? 40) / 100,
+            opacity: Number(overlay_opacity?.value ?? 60) / 100,
           }}
         />
       )}
@@ -141,11 +141,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
               >
                 <Tag
                   className={`${grid.align} ${fontSize} ${fontWeight} text-center max-w-xs md:max-w-sm lg:max-w-lg `}>
-                  {label && (
-                    <span className="block text-sm mb-1 opacity-70">
-                      {label}
-                    </span>
-                  )}
+                  {label}
 
                   <span dangerouslySetInnerHTML={{ __html: text }} />
 

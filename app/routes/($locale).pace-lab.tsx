@@ -120,15 +120,15 @@ export default function LabPage() {
 
 
             <div className='text-center p-10 md:p-20'>
-                <h1 className="text-3xl font-bold text-center">{paceLabPage?.header_feature?.value}</h1>
+                <h1 className="typo-header text-center">{paceLabPage?.header_feature?.value}</h1>
             </div>
 
             <GalleryRows reference={galleryRows} />
 
 
             <div className='text-center p-10 md:p-20'>
-                <h1 className="text-3xl font-bold mb-12 text-center">Community Proof</h1>
-                <p className="mt-2 text-xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
+                <h1 className="typo-header mb-12 text-center">Community Proof</h1>
+                <p className="mt-2 text-xl md:text-2xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
 
                 <Gallery reference={paceLabPage?.proof?.references?.nodes} />
 
@@ -160,7 +160,7 @@ export default function LabPage() {
 
 
             <div >
-                <h1 className="text-3xl font-bold mb-12 text-center">Any questions? We got you</h1>
+                <h1 className="typo-header mb-12 text-center">Any questions? We got you</h1>
                 <ModuleRenderer
                     modules={questionModules}
                     accordionClassName="mb-6 mt-0"

@@ -31,7 +31,7 @@ function StepsBanner({ reference }: BannerStepsProps) {
 
   return (
     <div
-      className={`w-full h-full relative p-10 ${text_color?.value ?? 'text-black'}`}
+      className={`w-full h-full min-h-[65vw] relative p-10 ${text_color?.value ?? 'text-black'}`}
     >
       {/* Background Image */}
       {background_image?.reference?.image?.url && (

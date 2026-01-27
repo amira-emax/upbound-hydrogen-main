@@ -19,12 +19,12 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
   const bgUrl = background_image?.reference?.image?.url;
 
   const items = texts?.references?.nodes ?? [];
-  
+
   const minItems = 3;
   const paddedItems =
     items.length <= minItems
       ? [
-        
+
         {
           id: 'placeholder-top-center',
           position: { value: 'top-center' },
@@ -66,7 +66,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
 
       {/* Logos (top center) */}
       {logo?.references?.nodes?.length > 0 && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4 z-10 pt-[5rem]">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4  pt-[5rem]">
           {logo.references.nodes.map((logos, i) => {
             const img = logos.image?.reference?.image;
             if (!img) return null;
@@ -84,7 +84,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         </div>
       )}
 
-      <div className="relative z-10 w-full h-full ">
+      <div className="relative w-full h-full ">
 
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 h-full">
 
@@ -158,8 +158,6 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
                   )}
                 </Tag>
               </div>
-
-
             );
           })}
 

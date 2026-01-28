@@ -41,6 +41,12 @@ export const BLOG_ARTICLE_QUERY = `#graphql
         author: authorV2 {
           name
         }
+        author_name: metafield(
+          key: "author_name"
+          namespace: "custom"
+        ) {
+          value
+        }
         image {
           id
           altText

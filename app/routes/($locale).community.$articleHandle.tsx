@@ -84,6 +84,7 @@ export default function CommunityArticle() {
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
+  
  const authorName =
   article.author_name?.value || '';
   return (

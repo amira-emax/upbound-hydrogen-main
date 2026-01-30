@@ -149,6 +149,7 @@ export default function Product() {
 
   return (
     <div className="page-py max-w-content">
+      <div className="subscriptions_app_embed_block"></div>
       <MobileProductImage
         // TODO: listen to selected variant
         // selectedVariantImage={selectedVariant?.image}

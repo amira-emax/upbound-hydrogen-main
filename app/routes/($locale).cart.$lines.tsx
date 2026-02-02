@@ -19,6 +19,8 @@ import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
  * ```
  */
 export async function loader({request, context, params}: LoaderFunctionArgs) {
+  console.log('sini 5');
+  
   const {cart} = context;
   const {lines} = params;
   if (!lines) return redirect('/cart');

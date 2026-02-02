@@ -346,10 +346,7 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
 
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
-   console.log('sini originalCart', originalCart);
   const cart = useOptimisticCart(originalCart);
-  console.log('sini cart', cart);
-  
   return <CartBadge count={cart?.totalQuantity ?? 0} />;
 }
 

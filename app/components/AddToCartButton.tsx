@@ -43,6 +43,8 @@ export function AddToCartButton({
   const { shop } = useAnalytics();
   const currencyCode = shop?.currency || 'MYR';
 
+  console.log('sini lines', lines);
+  
   return (
     <div className={cn('', containerClassName)}>
       <CartForm

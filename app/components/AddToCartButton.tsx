@@ -49,7 +49,7 @@ export function AddToCartButton({
 
   const dummyLines: OptimisticCartLineInput[] = [
   {
-    merchandiseId: 'gid://shopify/ProductVariant/1234567890', // must be ProductVariant GID
+    merchandiseId: "gid://shopify/ProductVariant/49563338899649", // must be ProductVariant GID
     quantity: 1,
   },
 ];

@@ -22,6 +22,9 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   // The useOptimisticCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
 
+  if (!originalCart) {
+    return <CartEmpty hidden={false} layout={layout} />;
+  }
   console.log('sini CartMain originalCart', originalCart);
   
   const cart = useOptimisticCart(originalCart);

@@ -22,7 +22,6 @@ import { cn } from '~/lib/utils';
 import Banner from './cms/Banner';
 import NewsletterPopup from './cms/NewsletterPopup';
 import Logo from './icons/Logo';
-import {createEmptyCart} from '@shopify/hydrogen';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -161,7 +160,6 @@ function IOSSafariScrollFix() {
 
 function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
   const [quantity, setQuantity] = useState(0);
-  const emptyCart = createEmptyCart();
 
   return (
     <Aside
@@ -174,12 +172,12 @@ function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
     >
       <Suspense fallback={<p>Loading cart ...</p>}>
         <Await resolve={cart}>
-          {(cart) => {
+          {(resolvedCart) => {
             useEffect(() => {
-              setQuantity(cart?.totalQuantity ?? 0);
-            }, [cart?.totalQuantity]);
+              setQuantity(resolvedCart?.totalQuantity ?? 0);
+            }, [resolvedCart?.totalQuantity]);
 
-            return <CartMain cart={cart ?? emptyCart} layout="aside" />;
+            return <CartMain cart={resolvedCart} layout="aside" />;
           }}
         </Await>
       </Suspense>

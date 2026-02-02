@@ -47,18 +47,18 @@ export function AddToCartButton({
 
   const isValidLines = Boolean(lines?.[0]?.merchandiseId);
 
+  const dummyLines: OptimisticCartLineInput[] = [
+  {
+    merchandiseId: 'gid://shopify/ProductVariant/1234567890', // must be ProductVariant GID
+    quantity: 1,
+  },
+];
+
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
         route="/cart"
-        inputs={{
-        lines: [
-          {
-            merchandiseId: 'gid://shopify/ProductVariant/49563338899649',
-            quantity: 3,
-          },
-        ]
-      }}
+        inputs={{ lines: dummyLines }}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {

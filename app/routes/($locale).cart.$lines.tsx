@@ -27,6 +27,8 @@ export async function loader({request, context, params}: LoaderFunctionArgs) {
     const variantId = lineDetails[0];
     const quantity = parseInt(lineDetails[1], 10);
 
+    console.log('sini 4');
+    
     return {
       merchandiseId: `gid://shopify/ProductVariant/${variantId}`,
       quantity,

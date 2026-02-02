@@ -21,7 +21,8 @@ export function AddToCartButton({
   openCartOnSubmit = true,
   productData,
   quantity,
-  page
+  page,
+  selectedVariant
 }: {
   analytics?: unknown;
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export function AddToCartButton({
   productData?: Record<string, any>;
   quantity?: number;
   page?: string;
+  selectedVariant?: any;
 } & VariantProps<typeof buttonVariants> & {
   asChild?: boolean;
 }) {
@@ -47,18 +49,13 @@ export function AddToCartButton({
 
   const isValidLines = Boolean(lines?.[0]?.merchandiseId);
 
-  const dummyLines: OptimisticCartLineInput[] = [
-  {
-    merchandiseId: "gid://shopify/ProductVariant/49563338899649", // must be ProductVariant GID
-    quantity: 1,
-  },
-];
+
 
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
         route="/cart"
-        inputs={{ lines: dummyLines }}
+        inputs={{ lines }}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {
@@ -117,6 +114,11 @@ export function AddToCartButton({
 
           return (
             <div>
+              <input 
+                type="hidden" 
+                name="selectedVariant" 
+                value={JSON.stringify(selectedVariant)} 
+              />
               <input
                 name="analytics"
                 type="hidden"

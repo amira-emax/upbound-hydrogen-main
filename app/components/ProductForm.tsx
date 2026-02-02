@@ -131,6 +131,7 @@ export function ProductForm({
               ]
               : []
           }
+          selectedVariant={selectedVariant}
 
           buttonClassName="rounded-none w-full"
           containerClassName="flex-1"

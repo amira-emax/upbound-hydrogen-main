@@ -76,7 +76,6 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function CommunityArticle() {
   const {article} = useLoaderData<typeof loader>();
-
   const {title, image, contentHtml, author} = article;
 
   const publishedDate = new Intl.DateTimeFormat('en-US', {
@@ -85,6 +84,9 @@ export default function CommunityArticle() {
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
+  
+ const authorName =
+  article.author_name?.value || '';
   return (
     <div>
       <Image
@@ -94,6 +96,15 @@ export default function CommunityArticle() {
         sizes="100vw"
       />
       <div className="max-w-5xl mx-auto page-py page-px">
+
+        <div className="max-w-5xl mx-auto px-6 mb-6 text-sm text-center">
+        {authorName && (
+          <p className="uppercase tracking-wide">
+            By <span className="">{authorName}</span>
+          </p>
+        )}
+        {/* <p>{publishedDate}</p> */}
+      </div>
         {/* Article Content */}
         <article className="prose prose-invert prose-lg max-w-none">
           <HtmlContentBlock contentHtml={contentHtml} />

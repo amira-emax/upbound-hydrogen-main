@@ -18,7 +18,30 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
   // Background image URL
   const bgUrl = background_image?.reference?.image?.url;
 
+  const items = texts?.references?.nodes ?? [];
+
+  const minItems = 3;
+  const paddedItems =
+    items.length <= minItems
+      ? [
+
+        {
+          id: 'placeholder-top-center',
+          position: { value: 'top-center' },
+          text: { value: '&nbsp;' },
+          label: { value: '' },
+          listing: { value: '[]' },
+          font_size: { value: 'text-xl' },
+          font_weight: { value: 'font-normal' },
+          text_color: { value: 'text-black' },
+          tag: { value: 'div' },
+        },
+        ...items,
+      ]
+      : items;
+
   return (
+
     <div className="w-full relative h-[80vh] md:h-[80vh] p-10">
       {/* Background Image */}
       {bgUrl && (
@@ -36,14 +59,14 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         <div
           className="absolute inset-0 bg-black"
           style={{
-            opacity: Number(overlay_opacity?.value ?? 40) / 100,
+            opacity: Number(overlay_opacity?.value ?? 60) / 100,
           }}
         />
       )}
 
       {/* Logos (top center) */}
       {logo?.references?.nodes?.length > 0 && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4 z-10 pt-[5rem]">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4  pt-[5rem]">
           {logo.references.nodes.map((logos, i) => {
             const img = logos.image?.reference?.image;
             if (!img) return null;
@@ -61,14 +84,14 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
         </div>
       )}
 
-      <div className="relative z-10 w-full h-full ">
+      <div className="relative w-full h-full ">
 
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 h-full">
 
 
-
           {/* Text blocks */}
-          {texts?.references?.nodes?.map((block, i) => {
+
+          {paddedItems.map((block, i) => {
             const text = block.text?.value;
             const label = block.label?.value;
 
@@ -118,11 +141,7 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
               >
                 <Tag
                   className={`${grid.align} ${fontSize} ${fontWeight} text-center max-w-xs md:max-w-sm lg:max-w-lg `}>
-                  {label && (
-                    <span className="block text-sm mb-1 opacity-70">
-                      {label}
-                    </span>
-                  )}
+                  {label}
 
                   <span dangerouslySetInnerHTML={{ __html: text }} />
 
@@ -139,8 +158,6 @@ function HeroImageMultiText({ reference }: HeroImageMultiTextProps) {
                   )}
                 </Tag>
               </div>
-
-              
             );
           })}
 

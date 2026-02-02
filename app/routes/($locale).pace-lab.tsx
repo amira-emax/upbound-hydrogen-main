@@ -79,7 +79,7 @@ export default function LabPage() {
 
     return (
 
-        <div className="paceLab">
+        <div className="paceLab font-(--font-whyte)">
 
             {/* <header className="text-center my-8">
                 {paceLabPage?.header_feature?.value && (
@@ -93,10 +93,7 @@ export default function LabPage() {
                 <HeroImageMultiText reference={paceLabPage?.hero_with_text.reference} />
             )}
 
-
-
-
-            <div className='text-center p-20'>
+            <div className='text-center p-10 md:p-20 bg-[#F2F2F2]'>
                 {paceLabPage?.text?.reference && (
                     <TextBlock reference={paceLabPage.text.reference} />
                 )}
@@ -108,43 +105,52 @@ export default function LabPage() {
 
             {/* <ModuleRenderer modules={paceLabPage?.banner?.references?.nodes ?? []} /> */}
 
-            <div className='text-center p-20'>
+            <div className='text-center p-10 md:p-20 bg-[#F2F2F2]'>
                 {paceLabPage?.description?.reference && (
                     <TextBlock reference={paceLabPage.description.reference} />
                 )}
             </div>
 
-            {paceLabPage?.steps?.reference && (
+            <div>
+                {paceLabPage?.steps?.reference && (
                 <BannerSteps reference={paceLabPage?.steps.reference} />
             )}
+            </div>
 
 
-            <div className='text-center p-20'>
-                <h1 className="text-3xl font-bold text-center">{paceLabPage?.header_feature?.value}</h1>
+            <div className='text-center p-10 md:p-20'>
+                <h1 className="typo-header text-center">{paceLabPage?.header_feature?.value}</h1>
             </div>
 
             <GalleryRows reference={galleryRows} />
 
 
-            <div className='text-center p-20'>
-                <h1 className="text-3xl font-bold mb-12 text-center">Community Proof</h1>
-                <p className="mt-2 text-xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
+            <div className='text-center p-10 md:p-20'>
+                <h1 className="typo-header mb-12 text-center">Community Proof</h1>
+                <p className="mt-2 text-xl md:text-2xl">Loved by runners and powered by a  growing community that values consistency and progress, both on the track and in how they show up for each other.</p>
 
                 <Gallery reference={paceLabPage?.proof?.references?.nodes} />
 
             </div>
 
-            <div className='text-center p-20'>
-                <button className="text-xl px-6 py-3 bg-[#b9db9b] text-black rounded-full 
-               hover:bg-black hover:text-white transition duration-300 uppercas font-semibold">
-                    Sign Up Here
-                </button>
+            <div className='text-center p-10 md:p-20'>
+                <a
+                    href={paceLabPage?.sign_up?.reference?.cta?.reference?.internalUrl?.value || '#'}
+                    target="_blank" // optional: opens in new tab
+                    rel="noopener noreferrer"
+                >
+                    <button className="text-xl px-6 py-3 bg-[#b9db9b] text-black rounded-full 
+                    hover:bg-black hover:text-white transition duration-300 uppercas font-semibold">
+                        {paceLabPage?.sign_up?.reference?.cta?.reference?.label?.value || 'Sign Up Here'}
+                    </button>
+                </a>
 
-                <p className="mt-4 text-2xl">
-                    Join Upbound Pace Lab
+
+                <p className="mt-4 text-xl">
+                    {paceLabPage?.sign_up?.reference?.description?.value || 'Join Upbound Pace Lab'}
                 </p>
-                <p className="mt-1 text-lg">
-                    26 Jan Ciphr Performance
+                <p className="mt-1 text-2xl font-bold">
+                    {paceLabPage?.sign_up?.reference?.title?.value || '26 Jan Ciphr Performance'}
                 </p>
 
                 <hr className="w-full mt-10 border-t border-black"></hr>
@@ -153,7 +159,7 @@ export default function LabPage() {
 
 
             <div >
-                <h1 className="text-3xl font-bold mb-12 text-center">Any questions? We got you</h1>
+                <h1 className="typo-header mb-12 text-center">Any questions? We got you</h1>
                 <ModuleRenderer
                     modules={questionModules}
                     accordionClassName="mb-6 mt-0"

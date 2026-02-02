@@ -50,6 +50,9 @@ export type BlogArticleQuery = {
           author?: StorefrontAPI.Maybe<
             Pick<StorefrontAPI.ArticleAuthor, 'name'>
           >;
+          author_name?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Metafield, 'value'>
+          >;
           image?: StorefrontAPI.Maybe<
             Pick<
               StorefrontAPI.Image,
@@ -2759,7 +2762,7 @@ interface GeneratedQueryTypes {
     return: BlogPostsByHandleQuery;
     variables: BlogPostsByHandleQueryVariables;
   };
-  '#graphql\n  query BlogArticle(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n        tags\n        excerpt\n        caption: metafield(key: "caption", namespace: "custom") {\n          type\n          value\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query BlogArticle(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        author_name: metafield(\n          key: "author_name"\n          namespace: "custom"\n        ) {\n          value\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n        tags\n        excerpt\n        caption: metafield(key: "caption", namespace: "custom") {\n          type\n          value\n        }\n      }\n    }\n  }\n': {
     return: BlogArticleQuery;
     variables: BlogArticleQueryVariables;
   };

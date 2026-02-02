@@ -276,6 +276,21 @@
   }
 }
 
+@utility typo-header {
+  font-family: var(--font-whyte);
+  font-size: 30px;
+  line-height: var(--text-h1-mobile--line-height);
+  letter-spacing: var(--text-h1-mobile--letter-spacing);
+  font-weight: 500; /* Regular on mobile */
+
+  @media (min-width: 768px) {
+    font-size: var(--text-h1-desktop);
+    line-height: var(--text-h1-desktop--line-height);
+    letter-spacing: var(--text-h1-desktop--letter-spacing);
+    font-weight: 500; /* Light on desktop */
+  }
+}
+
 @utility typo-h1 {
   font-family: var(--font-whyte);
   font-size: var(--text-h1-mobile);

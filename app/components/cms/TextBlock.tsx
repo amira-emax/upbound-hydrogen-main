@@ -32,12 +32,12 @@ function TextBlock({ reference }: TextBlockProps) {
             }
 
             {description?.value &&
-                <p className="mt-2 text-xl" dangerouslySetInnerHTML={{ __html: description?.value }} />}
+                <p className="mt-2 text-xl md:text-2xl" dangerouslySetInnerHTML={{ __html: description?.value }} />}
 
             {listItems.length > 0 && (
                 <ul className="mt-4  pl-5 space-y-1">
                     {listItems.map((item, i) => (
-                        <li key={i}><span className='text-2xl'>{item}</span></li>
+                        <li key={i}><span className='text-xl md:text-2xl'>{item}</span></li>
                     ))}
                 </ul>
             )}

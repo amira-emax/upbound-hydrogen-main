@@ -1,5 +1,5 @@
 import { Image } from '@shopify/hydrogen';
-import {BannerStepsFragment} from 'types/storefrontapi.generated';
+import { BannerStepsFragment } from 'types/storefrontapi.generated';
 
 interface BannerStepsProps {
   reference: BannerStepsFragment;
@@ -11,14 +11,14 @@ const ALIGNMENT_CLASSES: Record<string, string> = {
   right: 'text-right',
 };
 
-function StepsBanner({reference}: BannerStepsProps) {
+function StepsBanner({ reference }: BannerStepsProps) {
   const {
     title,
     footer,
     steps,
-    position = {value: 'center'},
-    text_color = {value: 'text-black'},
-    tag = {value: 'div'},
+    position = { value: 'center' },
+    text_color = { value: 'text-black' },
+    tag = { value: 'div' },
     title_position,
     footer_position,
     background_image,
@@ -30,28 +30,27 @@ function StepsBanner({reference}: BannerStepsProps) {
     ALIGNMENT_CLASSES[position ?? 'center'] ?? 'text-center';
 
   return (
-    <div className={`w-full relative h-[80vh] md:h-[80vh] p-10 ${
-              text_color?.value ?? 'text-black'
-            }`}>
+    <div
+      className={`w-full h-full min-h-[65vw] relative p-10 ${text_color?.value ?? 'text-black'}`}
+    >
       {/* Background Image */}
       {background_image?.reference?.image?.url && (
         <Image
           data={background_image.reference.image}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-right md:object-bottom"
           draggable={false}
-          sizes='80vh'
+          sizes="150vw"
         />
       )}
-      
 
-      {/* Overlay container for padding */}
-      <div className="absolute inset-0 p-8 flex flex-col gap-6">
+      {/* Overlay content */}
+      <div className="relative z-10 max-w-5xl py-10 flex flex-col gap-10">
         {/* Title */}
         {title?.value && (
           <Tag
             key="title"
-            className={`${getAlignment(title_position?.value)} text-2xl`}
-            dangerouslySetInnerHTML={{__html: title.value}}
+            className={`${getAlignment(title_position?.value)} text-lg md:text-2xl`}
+            dangerouslySetInnerHTML={{ __html: title.value }}
           />
         )}
 
@@ -62,28 +61,23 @@ function StepsBanner({reference}: BannerStepsProps) {
               if (!stepItem) return null;
               return (
                 <div
-                  key={stepItem.step?.value ?? i} // fallback if ID not available
+                  key={stepItem.step?.value ?? i}
                   className="flex flex-col gap-1"
                 >
-                  {/* Step title */}
                   {stepItem.step?.value && (
                     <div
-                      className={`self-start font-semibold px-3 py-2 rounded-full inline-block
-                        ${
-                        stepItem.step_text_color?.value ?? 'text-black'
-                      }`}
+                      className={`text-base md:text-2xl self-start font-medium px-3 py-2 rounded-full inline-block
+                  ${stepItem.step_text_color?.value ?? 'text-black'}`}
                       style={{ backgroundColor: '#b9db9b' }}
                     >
                       {stepItem.step.value}
                     </div>
                   )}
 
-                  {/* Step description */}
                   {stepItem.description?.value && (
-                    <span
-                      className={`opacity-90 ${
-                        stepItem.description_text_color?.value ?? 'text-gray-700'
-                      }`}
+                    <div
+                      className={`text-sm md:text-2xl opacity-90 ${stepItem.description_text_color?.value ?? 'text-gray-700'
+                        }`}
                       dangerouslySetInnerHTML={{
                         __html: stepItem.description.value,
                       }}
@@ -99,12 +93,13 @@ function StepsBanner({reference}: BannerStepsProps) {
         {footer?.value && (
           <div
             key="footer"
-            className={`${getAlignment(footer_position?.value)} `}
-            dangerouslySetInnerHTML={{__html: footer.value}}
+            className={`text-lg md:text-2xl ${getAlignment(footer_position?.value)}`}
+            dangerouslySetInnerHTML={{ __html: footer.value }}
           />
         )}
       </div>
     </div>
+
   );
 }
 

@@ -3,6 +3,22 @@ import { Image } from '@shopify/hydrogen';
 interface GalleryProps {
   reference?: Array<{
     id?: string;
+    desktopImage?: {
+      reference?: {
+        image?: {
+          url: string;
+          altText?: string;
+        };
+      };
+    };
+    mobileImage?: {
+      reference?: {
+        image?: {
+          url: string;
+          altText?: string;
+        };
+      };
+    };
     image?: {
       reference?: {
         image?: {
@@ -16,25 +32,29 @@ interface GalleryProps {
   }>;
 }
 
+
 function Gallery({ reference }: GalleryProps) {
+  
   if (!reference) reference = [];
 
   // Maximum of 6 default squares
   const totalSquares = Math.max(6, reference.length);
 
   return (
-    <section className="grid grid-cols-3 gap-4 py-10">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-4 py-10">
+
       {Array.from({ length: totalSquares }).map((_, i) => {
         const item = reference[i];
 
+        let image = item?.desktopImage?.reference?.image || item?.mobileImage?.reference?.image;        
         return (
           <div
             key={item?.id ?? `placeholder-${i}`}
             className="relative w-full aspect-square bg-[#e7e6e9] rounded-lg overflow-hidden flex items-center justify-center"
           >
-            {item?.image?.reference?.image ? (
+            {image ? (
               <Image
-                data={item.image.reference.image}
+                data={image}
                 className="w-full h-full object-cover"
               />
             ) : (

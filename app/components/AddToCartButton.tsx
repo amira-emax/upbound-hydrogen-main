@@ -45,11 +45,13 @@ export function AddToCartButton({
 
   console.log('sini lines', lines);
 
+  const isValidLines = Boolean(lines?.[0]?.merchandiseId);
+
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
         route="/cart"
-        inputs={{ lines }}
+        inputs={isValidLines ? {lines} : {lines: []}}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {
@@ -104,34 +106,34 @@ export function AddToCartButton({
             fetcher.state === 'submitting';
 
           console.log('sini check line', lines);
+          console.log('sini check line merchandiseId', lines[0]?.merchandiseId);
 
-          if (!lines?.length || !lines[0]?.merchandiseId) {
-            return (
-              <div>
-                <input
-                  name="analytics"
-                  type="hidden"
-                  value={JSON.stringify(analytics)}
-                />
-                <Button
-                  type="submit"
-                  variant={variant ?? 'gray-mint'}
-                  size={size}
-                  disabled={disabled || isLoading}
-                  className={cn('', buttonClassName)}
-                >
-                  {isLoading
-                    ? (loadingChildren ?? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Adding Item...
-                      </div>
-                    ))
-                    : children}
-                </Button>
-              </div>
-            );
-          }
+          return (
+            <div>
+              <input
+                name="analytics"
+                type="hidden"
+                value={JSON.stringify(analytics)}
+              />
+              <Button
+                type="submit"
+                variant={variant ?? 'gray-mint'}
+                size={size}
+                disabled={disabled || isLoading || !isValidLines}
+                className={cn('', buttonClassName)}
+              >
+                {isLoading
+                  ? (loadingChildren ?? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Adding Item...
+                    </div>
+                  ))
+                  : children}
+              </Button>
+            </div>
+          );
+
 
         }}
       </CartForm>

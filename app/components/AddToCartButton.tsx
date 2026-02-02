@@ -103,6 +103,8 @@ export function AddToCartButton({
             fetcher.state === 'loading' ||
             fetcher.state === 'submitting';
 
+            console.log('sini check line', lines);
+            
           return (
             <div>
               <input

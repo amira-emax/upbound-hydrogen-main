@@ -51,7 +51,14 @@ export function AddToCartButton({
     <div className={cn('', containerClassName)}>
       <CartForm
         route="/cart"
-        inputs={{ lines }}
+        inputs={{
+        lines: [
+          {
+            merchandiseId: 'gid://shopify/ProductVariant/49563338899649',
+            quantity: 3,
+          },
+        ]
+      }}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {

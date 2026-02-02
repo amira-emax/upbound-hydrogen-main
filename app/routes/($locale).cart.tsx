@@ -19,6 +19,7 @@ export async function action({request, context}: ActionFunctionArgs) {
   const {cart} = context;
 
   const formData = await request.formData();
+   console.log('sini formData', formData);
 
   const {action, inputs} = CartForm.getFormInput(formData);
 
@@ -26,7 +27,7 @@ export async function action({request, context}: ActionFunctionArgs) {
     throw new Error('No action provided');
   }
 
-  console.log('sini input', inputs);
+ 
   
 
   let status = 200;

@@ -23,6 +23,8 @@ export function ProductForm({
   const { open } = useAside();
 
   const [quantity, setQuantity] = useState(1);
+  console.log('sini 1');
+  
 
   return (
     <div className="product-form">

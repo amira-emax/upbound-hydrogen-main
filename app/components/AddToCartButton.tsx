@@ -57,7 +57,8 @@ export function AddToCartButton({
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
-        inputs={{ lines }}
+        route="/cart"
+        inputs={{ lines: dummyLines }}
         action={CartForm.ACTIONS.LinesAdd}
       >
         {(fetcher: FetcherWithComponents<any>) => {

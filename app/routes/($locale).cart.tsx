@@ -26,6 +26,9 @@ export async function action({request, context}: ActionFunctionArgs) {
     throw new Error('No action provided');
   }
 
+  console.log('sini input', inputs);
+  
+
   let status = 200;
   let result: CartQueryDataReturn;
 

@@ -44,7 +44,7 @@ export function AddToCartButton({
   const currencyCode = shop?.currency || 'MYR';
 
   console.log('sini lines', lines);
-  
+
   return (
     <div className={cn('', containerClassName)}>
       <CartForm
@@ -103,33 +103,36 @@ export function AddToCartButton({
             fetcher.state === 'loading' ||
             fetcher.state === 'submitting';
 
-            console.log('sini check line', lines);
-            
-          return (
-            <div>
-              <input
-                name="analytics"
-                type="hidden"
-                value={JSON.stringify(analytics)}
-              />
-              <Button
-                type="submit"
-                variant={variant ?? 'gray-mint'}
-                size={size}
-                disabled={disabled || isLoading}
-                className={cn('', buttonClassName)}
-              >
-                {isLoading
-                  ? (loadingChildren ?? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Adding Item...
-                    </div>
-                  ))
-                  : children}
-              </Button>
-            </div>
-          );
+          console.log('sini check line', lines);
+
+          if (!lines?.length || !lines[0]?.merchandiseId) {
+            return (
+              <div>
+                <input
+                  name="analytics"
+                  type="hidden"
+                  value={JSON.stringify(analytics)}
+                />
+                <Button
+                  type="submit"
+                  variant={variant ?? 'gray-mint'}
+                  size={size}
+                  disabled={disabled || isLoading}
+                  className={cn('', buttonClassName)}
+                >
+                  {isLoading
+                    ? (loadingChildren ?? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Adding Item...
+                      </div>
+                    ))
+                    : children}
+                </Button>
+              </div>
+            );
+          }
+
         }}
       </CartForm>
     </div>

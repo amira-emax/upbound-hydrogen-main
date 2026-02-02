@@ -80,14 +80,6 @@ export function AddToCartButton({
                 quantity: info.quantity
               });
 
-              console.log('sini datalayer', {
-                event: 'add_to_cart',
-                eventPage: page ?? 'unknown',
-                details: info,
-                product_id: info.id,
-                currency: info.currency,
-                quantity: info.quantity
-              });
             }
 
             if (openCartOnSubmit) open('cart');

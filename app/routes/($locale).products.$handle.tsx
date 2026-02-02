@@ -81,20 +81,6 @@ async function loadCriticalData({
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
-  const selectedOptions = getSelectedProductOptions(request);
-
-  const selectedVariant = product.variants.nodes.find((v: any) =>
-    v.selectedOptions.every(
-      (option: any) =>
-        selectedOptions.some(
-          (sel: any) => sel.name === option.name && sel.value === option.value
-        )
-    )
-  );
-
-  const variantType = selectedVariant?.metafield?.value;
-  product.variantType = variantType;
-
   return {
     product,
   };
@@ -131,6 +117,14 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
+  
+  const variant = product?.variants?.nodes?.find(
+  (variant) =>
+    variant.id === product?.selectedOrFirstAvailableVariant?.id
+);
+
+const variantType = variant?.metafield?.value || '';
+
 
   const {
     title,
@@ -143,7 +137,7 @@ export default function Product() {
     productEndorsements,
     tags,
     images,
-    variantType
+    
   } = product;
   const certifiedLogosArray = certifiedLogos?.references?.nodes || [];
 

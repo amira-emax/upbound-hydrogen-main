@@ -45,8 +45,6 @@ export function AddToCartButton({
   const { shop } = useAnalytics();
   const currencyCode = shop?.currency || 'MYR';
 
-  console.log('sini lines', lines);
-
   const isValidLines = Boolean(lines?.[0]?.merchandiseId);
 
 
@@ -68,35 +66,35 @@ export function AddToCartButton({
             setIsLocalLoading(false);
 
             // GA Add to Cart event (Shopify Google & YouTube app)
-            // if (typeof window !== 'undefined' && window.dataLayer) {
+            if (typeof window !== 'undefined' && window.dataLayer) {
 
-            //   const info = {
-            //     id: productData?.id ?? 0,
-            //     name: productData?.name ?? productData?.product?.title ?? productData?.title ?? '',
-            //     variant: productData?.variant ?? productData?.productType ?? productData?.title ?? productData?.sku ?? '',
-            //     price: productData?.selectedOrFirstAvailableVariant?.price?.amount ?? productData?.price?.amount ?? productData?.priceRange?.minVariantPrice?.amount ?? '0',
-            //     quantity: quantity ?? productData?.quantity ?? 1,
-            //     currency: productData?.price?.currencyCode ?? currencyCode ?? 'MYR',
-            //   };
+              const info = {
+                id: productData?.id ?? 0,
+                name: productData?.name ?? productData?.product?.title ?? productData?.title ?? '',
+                variant: productData?.variant ?? productData?.productType ?? productData?.title ?? productData?.sku ?? '',
+                price: productData?.selectedOrFirstAvailableVariant?.price?.amount ?? productData?.price?.amount ?? productData?.priceRange?.minVariantPrice?.amount ?? '0',
+                quantity: quantity ?? productData?.quantity ?? 1,
+                currency: productData?.price?.currencyCode ?? currencyCode ?? 'MYR',
+              };
 
-            //   window.dataLayer.push({
-            //     event: 'add_to_cart',
-            //     eventPage: page ?? 'unknown',
-            //     details: info,
-            //     product_id: info.id,
-            //     currency: info.currency,
-            //     quantity: info.quantity
-            //   });
+              window.dataLayer.push({
+                event: 'add_to_cart',
+                eventPage: page ?? 'unknown',
+                details: info,
+                product_id: info.id,
+                currency: info.currency,
+                quantity: info.quantity
+              });
 
-            //   console.log('sini datalayer', {
-            //     event: 'add_to_cart',
-            //     eventPage: page ?? 'unknown',
-            //     details: info,
-            //     product_id: info.id,
-            //     currency: info.currency,
-            //     quantity: info.quantity
-            //   });
-            // }
+              console.log('sini datalayer', {
+                event: 'add_to_cart',
+                eventPage: page ?? 'unknown',
+                details: info,
+                product_id: info.id,
+                currency: info.currency,
+                quantity: info.quantity
+              });
+            }
 
             if (openCartOnSubmit) open('cart');
           }
@@ -108,9 +106,6 @@ export function AddToCartButton({
             isLocalLoading ||
             fetcher.state === 'loading' ||
             fetcher.state === 'submitting';
-
-          console.log('sini check line', lines);
-          console.log('sini check line merchandiseId', lines[0]?.merchandiseId);
 
           return (
             <div>

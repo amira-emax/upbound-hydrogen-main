@@ -19,7 +19,6 @@ export async function action({request, context}: ActionFunctionArgs) {
   const {cart} = context;
 
   const formData = await request.formData();
-   console.log('sini formData', formData);
 
   const {action, inputs} = CartForm.getFormInput(formData);
 
@@ -110,10 +109,7 @@ export async function loader({context}: LoaderFunctionArgs) {
 }
 
 export default function Cart() {
-  const cart = useLoaderData<typeof loader>();
-
-  console.log('sini cart hmm', cart);
-  
+  const cart = useLoaderData<typeof loader>();  
 
   return (
     <div className="cart">

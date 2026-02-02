@@ -25,10 +25,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   if (!originalCart) {
     return <CartEmpty hidden={false} layout={layout} />;
   }
-  console.log('sini CartMain originalCart', originalCart);
   
   const cart = useOptimisticCart(originalCart);
-  console.log('sini CartMain cart', cart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const withDiscount =

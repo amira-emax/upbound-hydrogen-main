@@ -60,7 +60,6 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
 export default function LabPage() {
     const { paceLabPage } = useLoaderData<typeof loader>();
 
-    console.log('sini', paceLabPage);
 
     const questionModules = paceLabPage?.question_title?.reference
         ? [paceLabPage?.question_title.reference]

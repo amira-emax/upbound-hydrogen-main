@@ -22,9 +22,7 @@ export function ProductForm({
   const navigate = useNavigate();
   const { open } = useAside();
 
-  const [quantity, setQuantity] = useState(1);
-  console.log('sini 1');
-  
+  const [quantity, setQuantity] = useState(1);  
 
   return (
     <div className="product-form">

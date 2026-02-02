@@ -19,7 +19,6 @@ import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
  * ```
  */
 export async function loader({request, context, params}: LoaderFunctionArgs) {
-  console.log('sini 5');
   
   const {cart} = context;
   const {lines} = params;
@@ -29,7 +28,6 @@ export async function loader({request, context, params}: LoaderFunctionArgs) {
     const variantId = lineDetails[0];
     const quantity = parseInt(lineDetails[1], 10);
 
-    console.log('sini 4');
     
     return {
       merchandiseId: `gid://shopify/ProductVariant/${variantId}`,

@@ -117,9 +117,7 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  console.log('sini product', product);
-  console.log('sini selectedVariant', selectedVariant);
-  
+ 
   const variant = product?.variants?.nodes?.find(
   (variant) =>
     variant.id === product?.selectedOrFirstAvailableVariant?.id

@@ -52,8 +52,6 @@ export function PageLayout({
   const [isVisible, _] = useCooldown(STORAGE_KEY, COOLDOWN_MINUTES);
   const [isBannerOpened, setIsBannerOpened] = useState(isVisible);
 
-  console.log('sini 2');
-
   return (
     <Aside.Provider>
       <IOSSafariScrollFix />

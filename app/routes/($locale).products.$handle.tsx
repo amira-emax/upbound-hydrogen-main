@@ -132,6 +132,7 @@ export default function Product() {
   });
 
   console.log('sini product', product);
+  console.log('sini selectedVariant', selectedVariant);
   
 
   const {

@@ -112,6 +112,9 @@ export async function loader({context}: LoaderFunctionArgs) {
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
 
+  console.log('sini cart hmm', cart);
+  
+
   return (
     <div className="cart">
       <h1>Cart</h1>

@@ -27,6 +27,11 @@ export function ProductItem({
   );
   const soldOut = !product?.selectedOrFirstAvailableVariant?.availableForSale;
 
+  console.log('sini 3');
+  console.log('sini productItem', product?.selectedOrFirstAvailableVariant?.id );
+  
+  
+
   return (
     <div className="product-item flex flex-col gap-5 text-center max-w-[400px]">
       <Link

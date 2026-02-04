@@ -70,7 +70,7 @@ export function Footer({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-12 border-t pt-4">
         <div>
           <p className="typo-caption-responsive-uppercase flex-1 pb-2">
-            © {DateTime.now().year} UpBound international sdn . bhd
+            © {DateTime.now().year} OMNI LABS WELLNESS SDN BHD
           </p>
           <div className="flex gap-2">
             {[ApplyPaySvg, GooglePaySvg, VisaSvg, MastercardSvg, PaypalSvg].map(

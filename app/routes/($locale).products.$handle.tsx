@@ -78,10 +78,15 @@ async function loadCriticalData({
     throw new Response(null, { status: 404 });
   }
 
-  if (
-    product.tags?.includes('Staging') &&
-    process.env.NODE_ENV === 'production'
-  ) {
+  // Hide staging products in production
+  const isStagingProduct = product.tags?.some(
+    (tag) => tag.toLowerCase() === 'staging'
+  );
+
+  const isProduction =
+    process.env.NODE_ENV === 'production';
+
+  if (isStagingProduct && isProduction) {
     throw new Response(null, { status: 404 });
   }
   // The API handle might be localized, so redirect to the localized handle

@@ -7,6 +7,7 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import {Button} from '~/components/ui/button';
 import {EmptyResult} from '~/components/EmptyResult';
+import { filterStagingProducts } from '~/lib/productVisibility';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Upbound | Products`}];
@@ -37,7 +38,9 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
-  return {products};
+ return {
+   products: filterStagingProducts(products),
+};
 }
 
 /**
@@ -179,6 +182,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    tags
     featuredImage {
       id
       altText

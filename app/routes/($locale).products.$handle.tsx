@@ -117,7 +117,7 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
- 
+  
   const variant = product?.variants?.nodes?.find(
   (variant) =>
     variant.id === product?.selectedOrFirstAvailableVariant?.id

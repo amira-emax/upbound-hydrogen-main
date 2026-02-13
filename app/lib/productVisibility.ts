@@ -1,7 +1,6 @@
 export function isProductionEnvironment() {
   return (
-    process.env.PUBLIC_APP_ENV === 'production' ||
-    process.env.NODE_ENV === 'production'
+    process.env.PUBLIC_APP_ENV === 'production'
   );
 }
 
@@ -14,6 +13,11 @@ export function isStagingProduct(product: { tags?: string[] }) {
 export function filterStagingProducts(products: {
   nodes?: Array<{ tags?: string[] }>;
 }) {
+
+    console.log('sini',isProductionEnvironment() );
+    console.log('sini', isStagingProduct);
+    
+    
   if (!isProductionEnvironment()) return products;
 
   if (!products?.nodes) return products;

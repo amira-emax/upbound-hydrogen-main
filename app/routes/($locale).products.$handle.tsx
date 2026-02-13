@@ -78,6 +78,12 @@ async function loadCriticalData({
     throw new Response(null, { status: 404 });
   }
 
+  if (
+    product.tags?.includes('Staging') &&
+    process.env.NODE_ENV === 'production'
+  ) {
+    throw new Response(null, { status: 404 });
+  }
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
@@ -117,13 +123,13 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  
-  const variant = product?.variants?.nodes?.find(
-  (variant) =>
-    variant.id === product?.selectedOrFirstAvailableVariant?.id
-);
 
-const variantType = variant?.metafield?.value || '';
+  const variant = product?.variants?.nodes?.find(
+    (variant) =>
+      variant.id === product?.selectedOrFirstAvailableVariant?.id
+  );
+
+  const variantType = variant?.metafield?.value || '';
 
 
   const {
@@ -137,7 +143,7 @@ const variantType = variant?.metafield?.value || '';
     productEndorsements,
     tags,
     images,
-    
+
   } = product;
   const certifiedLogosArray = certifiedLogos?.references?.nodes || [];
 

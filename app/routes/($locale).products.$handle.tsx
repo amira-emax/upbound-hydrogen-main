@@ -78,23 +78,6 @@ async function loadCriticalData({
     throw new Response(null, { status: 404 });
   }
 
-  // Hide staging products in production
-  const isStagingProduct = product.tags?.some(
-    (tag) => tag.toLowerCase() === 'staging'
-  );
-
-  console.log('sini id', product?.id);
-   console.log('sini tag', product.tags);
-
-   console.log('sini isStagingProduct', isStagingProduct);
-   
-
-  const isProduction =
-    process.env.NODE_ENV === 'production';
-console.log('sini isProduction', isProduction);
-  if (isStagingProduct && isProduction) {
-    throw new Response(null, { status: 404 });
-  }
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 

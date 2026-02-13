@@ -13,11 +13,7 @@ export function isStagingProduct(product: { tags?: string[] }) {
 export function filterStagingProducts(products: {
   nodes?: Array<{ tags?: string[] }>;
 }) {
-
-    console.log('sini',isProductionEnvironment() );
-    console.log('sini', isStagingProduct);
-    
-    
+ 
   if (!isProductionEnvironment()) return products;
 
   if (!products?.nodes) return products;

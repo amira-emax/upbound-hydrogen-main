@@ -1,6 +1,7 @@
 export function isProductionEnvironment() {
   return (
-    process.env.PUBLIC_APP_ENV === 'production'
+    process.env.PUBLIC_APP_ENV === 'production' ||
+    process.env.NODE_ENV === 'production'
   );
 }
 

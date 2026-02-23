@@ -1,0 +1,46 @@
+.selling-plan-group {
+  margin-bottom: 1.5rem;
+}
+
+.selling-plan-group-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.selling-plan-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.selling-plan-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  border: 1.5px solid #e5e7eb;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.selling-plan-card:hover {
+  border-color: #9ca3af;
+  background-color: #f9fafb;
+}
+
+.selling-plan-card.selected {
+  border-color: var(--mint);
+  background-color: var(--mint);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.plan-text {
+  line-height: 1;
+}

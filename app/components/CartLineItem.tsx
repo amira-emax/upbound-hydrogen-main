@@ -1,15 +1,15 @@
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
-import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
-import {MinusIcon, PlusIcon, Trash} from 'lucide-react';
-import React, {useEffect} from 'react';
-import {FetcherWithComponents, Link} from 'react-router';
-import type {CartApiQueryFragment} from 'types/storefrontapi.generated';
-import type {CartLayout} from '~/components/CartMain';
-import {useVariantUrl} from '~/lib/variants';
-import {useAside} from './Aside';
-import {useCartLine} from './CartLineContext';
-import {ProductPrice} from './ProductPrice';
-import {Button} from './ui/button';
+import { CartForm, Image, type OptimisticCartLine } from '@shopify/hydrogen';
+import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types';
+import { MinusIcon, PlusIcon, Trash } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { FetcherWithComponents, Link } from 'react-router';
+import type { CartApiQueryFragment } from 'types/storefrontapi.generated';
+import type { CartLayout } from '~/components/CartMain';
+import { useVariantUrl } from '~/lib/variants';
+import { useAside } from './Aside';
+import { useCartLine } from './CartLineContext';
+import { ProductPrice } from './ProductPrice';
+import { Button } from './ui/button';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -24,11 +24,11 @@ export function CartLineItem({
   layout: CartLayout;
   line: CartLine;
 }) {
-  const {id, merchandise, isOptimistic} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+  const { id, merchandise, isOptimistic, sellingPlanAllocation } = line;
+  const { product, title, image, selectedOptions } = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const {close} = useAside();
-  const {loadingLineIds} = useCartLine();
+  const { close } = useAside();
+  const { loadingLineIds } = useCartLine();
   const isLineLoading = loadingLineIds.has(id);
 
   return (
@@ -60,6 +60,12 @@ export function CartLineItem({
           </Link>
 
           <ul>
+
+            {sellingPlanAllocation && (
+              <li key={sellingPlanAllocation.sellingPlan.name}>
+                <small>{sellingPlanAllocation.sellingPlan.name}</small>
+              </li>
+            )}
             {selectedOptions.map((option) => (
               <li key={option.name}>
                 <p>
@@ -86,15 +92,15 @@ export function CartLineItem({
  * These controls are disabled when the line item is new, and the server
  * hasn't yet responded that it was successfully added to the cart.
  */
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({ line }: { line: CartLine }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
+  const { id: lineId, quantity, isOptimistic } = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
     <div className="flex w-fit items-center bg-default-grey gap-2 md:gap-[14px]">
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+      <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <Button
           aria-label="Decrease quantity"
           disabled={quantity <= 1 || !!isOptimistic}
@@ -108,7 +114,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
       <div className="text-center">
         <p>{quantity}</p>
       </div>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+      <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
         <Button
           aria-label="Increase quantity"
           name="increase-quantity"
@@ -141,7 +147,7 @@ function CartLineRemoveButton({
         fetcherKey={getUpdateKey(lineIds)}
         route="/cart"
         action={CartForm.ACTIONS.LinesRemove}
-        inputs={{lineIds}}
+        inputs={{ lineIds }}
       >
         <Button disabled={disabled} type="submit" variant="ghost" size="icon">
           <Trash />
@@ -159,14 +165,14 @@ function CartLineUpdateButton({
   lines: CartLineUpdateInput[];
 }) {
   const lineIds = lines.map((line) => line.id);
-  const {setLineLoading} = useCartLine();
+  const { setLineLoading } = useCartLine();
 
   return (
     <CartForm
       fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{lines}}
+      inputs={{ lines }}
     >
       {(fetcher: FetcherWithComponents<any>) => {
         // Set loading state based on fetcher state

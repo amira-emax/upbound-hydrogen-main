@@ -30,6 +30,15 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { Image as ShopifyImage } from '@shopify/hydrogen/storefront-api-types';
 import ProductEndorsementCard from '~/components/ProductEndorsementCard';
 
+import type { ProductFragment, SellingPlanFragment } from 'types/storefrontapi.generated';
+
+import sellingPlanStyle from '~/styles/selling-plan.css?url';
+
+export const links: Route.LinksFunction = () => [
+  {rel: 'stylesheet', href: sellingPlanStyle},
+];
+
+
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
     { title: `Upbound | ${data?.product.title ?? ''}` },
@@ -81,8 +90,34 @@ async function loadCriticalData({
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
+  // Initialize the selectedSellingPlan to null
+  let selectedSellingPlan = null;
+
+  // Get the selected selling plan id from the request url
+  const selectedSellingPlanId =
+    new URL(request.url).searchParams.get('selling_plan') ?? null;
+
+  // Get the selected selling plan bsed on the selectedSellingPlanId
+  if (selectedSellingPlanId) {
+    const selectedSellingPlanGroup =
+      product.sellingPlanGroups.nodes?.find((sellingPlanGroup) => {
+        return sellingPlanGroup.sellingPlans.nodes?.find(
+          (sellingPlan: SellingPlanFragment) =>
+            sellingPlan.id === selectedSellingPlanId,
+        );
+      }) ?? null;
+
+    if (selectedSellingPlanGroup) {
+      selectedSellingPlan =
+        selectedSellingPlanGroup.sellingPlans.nodes.find((sellingPlan) => {
+          return sellingPlan.id === selectedSellingPlanId;
+        }) ?? null;
+    }
+  }
+
   return {
     product,
+    selectedSellingPlan,
   };
 }
 
@@ -99,7 +134,7 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 }
 
 export default function Product() {
-  const { product } = useLoaderData<typeof loader>();
+  const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -137,6 +172,7 @@ export default function Product() {
     productEndorsements,
     tags,
     images,
+    sellingPlanGroups
 
   } = product;
   const certifiedLogosArray = certifiedLogos?.references?.nodes || [];
@@ -164,10 +200,14 @@ export default function Product() {
               compareAtPrice={selectedVariant?.compareAtPrice}
               priceClassName="!typo-h2"
               className="typo-h2"
+              selectedSellingPlan={selectedSellingPlan}
+              selectedVariant={selectedVariant}
             />
             <ProductForm
               productOptions={productOptions}
               selectedVariant={selectedVariant}
+              selectedSellingPlan={selectedSellingPlan}
+              sellingPlanGroups={sellingPlanGroups}
             />
             <Accordion
               type="multiple"
@@ -379,8 +419,84 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       amount
       currencyCode
     }
+    sellingPlanAllocations(first: 10) {
+      nodes {
+        sellingPlan {
+          id
+        }
+      }
+    }
   }
 ` as const;
+
+
+const SELLING_PLAN_FRAGMENT = `#graphql
+  fragment SellingPlanMoney on MoneyV2 {
+    amount
+    currencyCode
+  }
+  fragment SellingPlan on SellingPlan {
+    id
+    options {
+      name
+      value
+    }
+    priceAdjustments {
+      adjustmentValue {
+        ... on SellingPlanFixedAmountPriceAdjustment {
+          __typename
+          adjustmentAmount {
+            ... on MoneyV2 {
+               ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanFixedPriceAdjustment {
+          __typename
+          price {
+            ... on MoneyV2 {
+              ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanPercentagePriceAdjustment {
+          __typename
+          adjustmentPercentage
+        }
+      }
+      orderCount
+    }
+    recurringDeliveries
+    checkoutCharge {
+      type
+      value {
+        ... on MoneyV2 {
+          ...SellingPlanMoney
+        }
+        ... on SellingPlanCheckoutChargePercentageValue {
+          percentage
+        }
+      }
+    }
+ }
+` as const;
+
+const SELLING_PLAN_GROUP_FRAGMENT = `#graphql
+  fragment SellingPlanGroup on SellingPlanGroup {
+    name
+    options {
+      name
+      values
+    }
+    sellingPlans(first:10) {
+      nodes {
+        ...SellingPlan
+      }
+    }
+  }
+  ${SELLING_PLAN_FRAGMENT}
+` as const;
+
 
 const PRODUCT_FRAGMENT = `#graphql
   fragment Product on Product {
@@ -419,6 +535,11 @@ const PRODUCT_FRAGMENT = `#graphql
         altText
       }
     }
+    sellingPlanGroups(first:10) {
+      nodes {
+        ...SellingPlanGroup
+      }
+    }
     selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
       ...ProductVariant
     }
@@ -430,6 +551,7 @@ const PRODUCT_FRAGMENT = `#graphql
       title
     }
   }
+  ${SELLING_PLAN_GROUP_FRAGMENT}
   ${PRODUCT_VARIANT_FRAGMENT}
 ` as const;
 

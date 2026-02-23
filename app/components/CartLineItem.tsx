@@ -161,6 +161,8 @@ function CartLineUpdateButton({
   const lineIds = lines.map((line) => line.id);
   const {setLineLoading} = useCartLine();
 
+  console.log('sini lines', lines);
+  
   return (
     <CartForm
       fetcherKey={getUpdateKey(lineIds)}

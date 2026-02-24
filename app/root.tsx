@@ -177,8 +177,7 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
   };
 }
 
-export function Layout({ children }: { children?: React.ReactNode }) {
-  const nonce = useNonce();
+export function Layout({ children, nonce }: { children?: React.ReactNode; nonce: string; }) {
   console.log('sini nonce', nonce);
   
   const data = useRouteLoaderData<RootLoader>('root');
@@ -186,11 +185,20 @@ export function Layout({ children }: { children?: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script
-    async
-    src="https://www.googletagmanager.com/gtm.js?id=GTM-KDL9ZLTD"
-    nonce={nonce}
-  />
+          <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+var n=d.querySelector('script[nonce]');n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));
+f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KDL9ZLTD');
+      `,
+          }}
+        />
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={reactMediumImageZoom}></link>
@@ -226,7 +234,6 @@ export function Layout({ children }: { children?: React.ReactNode }) {
         )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
-      
       </body>
     </html>
   );

@@ -4,7 +4,6 @@ import { isbot } from 'isbot';
 import { renderToReadableStream } from 'react-dom/server';
 import { createContentSecurityPolicy } from '@shopify/hydrogen';
 import type { EntryContext } from 'react-router';
-import { Layout } from './root';
 
 export default async function handleRequest(
   request: Request,
@@ -46,9 +45,13 @@ export default async function handleRequest(
   });
 
   const body = await renderToReadableStream(
-    <Layout nonce={nonce}>
-  <ServerRouter context={reactRouterContext} url={request.url} />
-</Layout> ,
+    <NonceProvider>
+      <ServerRouter
+        context={reactRouterContext}
+        url={request.url}
+        nonce={nonce}
+      />
+    </NonceProvider>,
     {
       nonce,
       signal: request.signal,

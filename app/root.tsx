@@ -199,7 +199,13 @@ export function Layout({ children }: { children?: React.ReactNode }) {
          <script
           nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            __html: `
+            // 1. ADD THIS: Push the nonce into the dataLayer immediately
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({'csp_nonce': '${nonce}'}); 
+
+            // 2. Your existing GTM code
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;

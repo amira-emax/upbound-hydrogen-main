@@ -19,6 +19,7 @@ export default async function handleRequest(
       'https://*.googletagmanager.com',
       'https://*.google-analytics.com',
       'https://connect.facebook.net',
+      "'sha256-HSqsF0AqO4Au0siH0PmBAIJZrNYC4UQlwQCJy/WhzZ8='",
     ],
     imgSrc: [
       "'self'",

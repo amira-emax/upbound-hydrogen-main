@@ -1,4 +1,4 @@
-import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
+import { Analytics, getShopAnalytics, useNonce, Script } from '@shopify/hydrogen';
 import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import {
   isRouteErrorResponse,
@@ -20,6 +20,7 @@ import { FOOTER_MENU_CMS_QUERY } from './graphql/cms/FooterMenuQuery';
 import { GLOBAL_BANNER_CMS_QUERY } from './graphql/cms/GlobalBannerQuery';
 import { GLOBAL_NEWSLETTER_POPUP_CMS_QUERY } from './graphql/cms/GlobalNewsletterPopupQuery';
 import tailwindCss from './styles/tailwind.css?url';
+import {GoogleTagManager} from '~/components/GoogleTagManager';
 
 export type RootLoader = typeof loader;
 
@@ -186,11 +187,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script
-    async
-    src="https://www.googletagmanager.com/gtm.js?id=GTM-KDL9ZLTD"
-    nonce={nonce}
-  />
+ 
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={reactMediumImageZoom}></link>
@@ -198,20 +195,38 @@ export function Layout({ children }: { children?: React.ReactNode }) {
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
-      </head>
-      <body>
-        <noscript
+
+         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
-              <iframe
-                src="https://www.googletagmanager.com/ns.html?id=GTM-KDL9ZLTD"
-                height="0"
-                width="0"
-                style="display:none;visibility:hidden"
-              ></iframe>
-            `,
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({'csp_nonce': '${nonce}'}); 
+
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;
+            var n=d.querySelector('[nonce]');
+            n&&(j.setAttribute('nonce',n.nonce||n.getAttribute('nonce')));
+            f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KDL9ZLTD');`,
           }}
-        />
+        ></script>
+      </head>
+      <body>
+        <noscript>
+          <iframe
+            title="Google Tag Manager"
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KDL9ZLTD"
+            height="0"
+            width="0"
+            style={{
+              display: 'none',
+              visibility: 'hidden',
+            }}
+          ></iframe>
+        </noscript>
 
         {data ? (
           <Analytics.Provider
@@ -220,6 +235,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
             consent={data.consent}
           >
             <PageLayout {...data}>{children}</PageLayout>
+            <GoogleTagManager />
           </Analytics.Provider>
         ) : (
           children

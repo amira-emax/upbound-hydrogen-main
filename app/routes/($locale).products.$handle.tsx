@@ -7,7 +7,7 @@ import {
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { redirect, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { useLoaderData, type MetaFunction } from 'react-router';
 import { ProductForm } from '~/components/ProductForm';
 import {
@@ -31,12 +31,12 @@ import { Image as ShopifyImage } from '@shopify/hydrogen/storefront-api-types';
 import ProductEndorsementCard from '~/components/ProductEndorsementCard';
 
 import type { ProductFragment, SellingPlanFragment } from 'types/storefrontapi.generated';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import sellingPlanStyle from '~/styles/selling-plan.css?url';
 
 export const links: Route.LinksFunction = () => [
-  {rel: 'stylesheet', href: sellingPlanStyle},
+  { rel: 'stylesheet', href: sellingPlanStyle },
 ];
 
 
@@ -88,6 +88,25 @@ async function loadCriticalData({
     throw new Response(null, { status: 404 });
   }
 
+  // Check if the user landed here without selecting a specific variant
+  const selectedOptions = getSelectedProductOptions(request);
+
+  if (selectedOptions.length === 0) {
+    // Find the first variant that has a subscription attached
+    const firstSubVariant = product.variants.nodes.find(
+      (v) => v.sellingPlanAllocations?.nodes?.length > 0
+    );
+
+    // If we found one, and it's not already the default, redirect to it!
+    if (firstSubVariant && firstSubVariant.id !== product.selectedOrFirstAvailableVariant?.id) {
+      const url = new URL(request.url);
+      firstSubVariant.selectedOptions.forEach((option) => {
+        url.searchParams.set(option.name, option.value);
+      });
+      throw redirect(url.toString(), 302);
+    }
+  }
+
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
@@ -136,14 +155,27 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 
 export default function Product() {
   const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
-
-  const [purchaseType, setPurchaseType] = useState<'one-time' | 'subscription'>('one-time');
-
-  // Optimistically selects a variant with given available variant information
+  
+// Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
   );
+
+  const [purchaseType, setPurchaseType] = useState<'one-time' | 'subscription'>(() => {
+    return selectedVariant?.sellingPlanAllocations?.nodes?.length > 0
+      ? 'subscription'
+      : 'one-time';
+  });
+
+  useEffect(() => {
+    const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
+    
+    if (!hasSubscription && purchaseType === 'subscription') {
+      setPurchaseType('one-time');
+    }
+  }, [selectedVariant, purchaseType]);
+
 
   // Sets the search param to the selected variant without navigation
   // only when no search params are set in the url
@@ -595,6 +627,13 @@ const PRODUCT_QUERY = `#graphql
           metafield(key: "variant_type", namespace: "custom") {
             type
             value
+          }
+          sellingPlanAllocations(first: 1) {
+            nodes {
+              sellingPlan {
+                id
+              }
+            }
           }
         }
       }

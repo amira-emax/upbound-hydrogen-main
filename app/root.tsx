@@ -180,7 +180,6 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
 
 export function Layout({ children }: { children?: React.ReactNode }) {
   const nonce = useNonce();
-  console.log('sini nonce', nonce);
   
   const data = useRouteLoaderData<RootLoader>('root');
 

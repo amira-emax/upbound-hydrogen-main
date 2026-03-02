@@ -1,8 +1,7 @@
-import {Money} from '@shopify/hydrogen';
-import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
-import {cn} from '~/lib/utils';
+import { Money } from '@shopify/hydrogen';
+import type { MoneyV2 } from '@shopify/hydrogen/storefront-api-types';
+import { cn } from '~/lib/utils';
 import type { ProductFragment, SellingPlanFragment } from 'types/storefrontapi.generated';
-
 
 export function ProductPrice({
   price,
@@ -13,6 +12,7 @@ export function ProductPrice({
   isLoading = false,
   selectedSellingPlan,
   selectedVariant,
+  purchaseType, // 👇 ADDED THIS PROP
 }: {
   price?: MoneyV2;
   compareAtPrice?: MoneyV2 | null;
@@ -22,6 +22,7 @@ export function ProductPrice({
   isLoading?: boolean;
   selectedVariant?: ProductFragment['selectedOrFirstAvailableVariant'];
   selectedSellingPlan?: SellingPlanFragment | null;
+  purchaseType?: 'one-time' | 'subscription'; // 👇 ADDED THIS TYPE
 }) {
   if (isLoading) {
     return (
@@ -36,115 +37,46 @@ export function ProductPrice({
     );
   }
 
-   if (selectedSellingPlan) {
-    return (
-      <SellingPlanPrice
-        selectedSellingPlan={selectedSellingPlan}
-        selectedVariant={selectedVariant}
-      />
-    );
-  }
+  // 1. Safely extract the pre-calculated subscription price from Shopify
+  const subPrice = selectedVariant?.sellingPlanAllocations?.nodes?.[0]?.priceAdjustments?.[0]?.price;
+
+  // 2. Determine if we should show the subscription price
+  // It only triggers if "Subscribe" is selected AND a subscription actually exists for this variant
+  const isSubscriptionActive = purchaseType === 'subscription' && subPrice;
+
+  // 3. Swap the prices dynamically
+  const activePrice = isSubscriptionActive ? subPrice : price;
+  const activeCompareAtPrice = isSubscriptionActive ? price : compareAtPrice;
 
   return (
     <div className={cn('product-price', className)}>
-      {compareAtPrice ? (
-        <div className="product-price-on-sale">
-          {price ? (
+      {activeCompareAtPrice ? (
+        <div className="product-price-on-sale flex items-center gap-2">
+          {activePrice ? (
             <div className={cn('text-orange typo-paragraph', priceClassName)}>
               RM
-              <Money withoutCurrency data={price} className="inline" />
+              <Money withoutCurrency data={activePrice} className="inline" />
             </div>
           ) : null}
           <s>
-            <span className={compareAtPriceClassName}>
+            <span className={cn('text-gray-400', compareAtPriceClassName)}>
               RM
               <Money
                 withoutCurrency
-                data={compareAtPrice}
+                data={activeCompareAtPrice}
                 className={'inline'}
               />
             </span>
           </s>
         </div>
-      ) : price ? (
+      ) : activePrice ? (
         <div className={cn('typo-paragraph', priceClassName)}>
           RM
-          <Money withoutCurrency data={price} className={'inline'} />
+          <Money withoutCurrency data={activePrice} className={'inline'} />
         </div>
       ) : (
         <p>&nbsp;</p>
       )}
-    </div>
-  );
-}
-
-type SellingPlanPrice = {
-  amount: number;
-  currencyCode: 'MYR';
-};
-
-/*
-  Render the selected selling plan price is available
-*/
-function SellingPlanPrice({
-  selectedSellingPlan,
-  selectedVariant,
-}: {
-  selectedSellingPlan: SellingPlanFragment;
-  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
-}) {
-  if (!selectedVariant) {
-    return null;
-  }
-
-  const sellingPlanPriceAdjustments = selectedSellingPlan?.priceAdjustments;
-
-  if (!sellingPlanPriceAdjustments?.length) {
-    return selectedVariant ? <Money data={selectedVariant.price} /> : null;
-  }
-
-  const selectedVariantPrice: SellingPlanPrice = {
-    amount: parseFloat(selectedVariant.price.amount),
-    currencyCode: selectedVariant.price.currencyCode,
-  };
-
-  const sellingPlanPrice: SellingPlanPrice = sellingPlanPriceAdjustments.reduce(
-    (acc, adjustment) => {
-      switch (adjustment.adjustmentValue.__typename) {
-        case 'SellingPlanFixedAmountPriceAdjustment':
-          return {
-            amount:
-              acc.amount +
-              parseFloat(adjustment.adjustmentValue.adjustmentAmount.amount),
-            currencyCode: acc.currencyCode,
-          };
-        case 'SellingPlanFixedPriceAdjustment':
-          return {
-            amount: parseFloat(adjustment.adjustmentValue.price.amount),
-            currencyCode: acc.currencyCode,
-          };
-        case 'SellingPlanPercentagePriceAdjustment':
-          return {
-            amount:
-              acc.amount *
-              (1 - adjustment.adjustmentValue.adjustmentPercentage / 100),
-            currencyCode: acc.currencyCode,
-          };
-        default:
-          return acc;
-      }
-    },
-    selectedVariantPrice,
-  );
-
-  return (
-    <div className="selling-plan-price">
-      <Money
-        data={{
-          amount: `${sellingPlanPrice.amount}`,
-          currencyCode: sellingPlanPrice.currencyCode,
-        }}
-      />
     </div>
   );
 }

@@ -3,8 +3,8 @@ import type {
   SellingPlanGroupFragment,
   SellingPlanFragment,
 } from 'types/storefrontapi.generated';
-import { useEffect, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useMemo } from 'react';
+import { useLocation } from 'react-router';
 
 /* Enriched sellingPlan type including isSelected and url */
 export type SellingPlan = SellingPlanFragment & {
@@ -22,18 +22,6 @@ export type SellingPlanGroup = Omit<
   };
 };
 
-/**
- * A component that simplifies selecting sellingPlans subscription options
- * @example Example use
- * ```ts
- *   <SellingPlanSelector
- *     sellingPlanGroups={sellingPlanGroups}
- *     selectedSellingPlanId={selectedSellingPlanId}
- *   >
- *     {({sellingPlanGroup}) => ( ...your sellingPlanGroup component )}
- *  </SellingPlanSelector>
- *  ```
- **/
 export function SellingPlanSelector({
   sellingPlanGroups,
   selectedSellingPlan,
@@ -52,54 +40,14 @@ export function SellingPlanSelector({
 }) {
   const { search, pathname } = useLocation();
   const params = new URLSearchParams(search);
-  const navigate = useNavigate();
 
   const planAllocationIds: string[] =
-    selectedVariant?.sellingPlanAllocations.nodes.map(
+    selectedVariant?.sellingPlanAllocations?.nodes?.map(
       (node) => node.sellingPlan.id,
     ) ?? [];
 
-  useEffect(() => {
-    if (!sellingPlanGroups?.nodes?.length || !selectedVariant) return;
-
-    const planAllocationIds: string[] =
-      selectedVariant?.sellingPlanAllocations.nodes.map(
-        (node) => node.sellingPlan.id,
-      ) ?? [];
-
-    const validGroups = sellingPlanGroups.nodes.filter((group) =>
-      group.sellingPlans.nodes.some((sellingPlan) =>
-        planAllocationIds.includes(sellingPlan.id),
-      ),
-    );
-
-    const validPlans = validGroups.flatMap((group) =>
-      group.sellingPlans.nodes.filter((plan) =>
-        planAllocationIds.includes(plan.id),
-      ),
-    );
-
-    // 🔥 AUTO SELECT if only 1 plan and nothing selected
-    if (validPlans.length === 1 && !selectedSellingPlan) {
-      const singlePlan = validPlans[0];
-
-      const newParams = new URLSearchParams(search);
-      newParams.set(paramKey, singlePlan.id);
-
-      navigate(`${pathname}?${newParams.toString()}`, {
-        replace: true,
-        preventScrollReset: true,
-      });
-    }
-  }, [
-    sellingPlanGroups,
-    selectedVariant,
-    selectedSellingPlan,
-    navigate,
-    pathname,
-    search,
-    paramKey,
-  ]);
+  // 🔥 We removed the `useEffect` auto-select loop here! 
+  // We no longer need it because the CartForm uses the local fallback data.
 
   return useMemo(
     () =>
@@ -121,10 +69,6 @@ export function SellingPlanSelector({
                 return null;
               }
 
-              if (!sellingPlan.id) {
-                return null;
-              }
-
               params.set(paramKey, sellingPlan.id);
               sellingPlan.isSelected =
                 selectedSellingPlan?.id === sellingPlan.id;
@@ -132,10 +76,10 @@ export function SellingPlanSelector({
               return sellingPlan;
             })
             .filter(Boolean) as SellingPlan[];
+            
           sellingPlanGroup.sellingPlans.nodes = sellingPlans;
           return children({ sellingPlanGroup, selectedSellingPlan });
         }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       sellingPlanGroups,
       children,
@@ -143,6 +87,7 @@ export function SellingPlanSelector({
       paramKey,
       pathname,
       selectedVariant,
+      planAllocationIds // Added this to dependencies to keep useMemo happy
     ],
   );
 }

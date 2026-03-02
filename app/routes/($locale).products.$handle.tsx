@@ -31,6 +31,7 @@ import { Image as ShopifyImage } from '@shopify/hydrogen/storefront-api-types';
 import ProductEndorsementCard from '~/components/ProductEndorsementCard';
 
 import type { ProductFragment, SellingPlanFragment } from 'types/storefrontapi.generated';
+import { useState } from 'react';
 
 import sellingPlanStyle from '~/styles/selling-plan.css?url';
 
@@ -136,6 +137,8 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 export default function Product() {
   const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
 
+  const [purchaseType, setPurchaseType] = useState<'one-time' | 'subscription'>('one-time');
+
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -202,12 +205,15 @@ export default function Product() {
               className="typo-h2"
               selectedSellingPlan={selectedSellingPlan}
               selectedVariant={selectedVariant}
+              purchaseType={purchaseType}
             />
             <ProductForm
               productOptions={productOptions}
               selectedVariant={selectedVariant}
               selectedSellingPlan={selectedSellingPlan}
               sellingPlanGroups={sellingPlanGroups}
+              purchaseType={purchaseType}
+              setPurchaseType={setPurchaseType}
             />
             <Accordion
               type="multiple"

@@ -21,17 +21,20 @@ export function ProductForm({
   selectedVariant,
   sellingPlanGroups,
   selectedSellingPlan,
+  purchaseType,    
+  setPurchaseType,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
   selectedSellingPlan: SellingPlanFragment | null;
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
+  purchaseType: 'one-time' | 'subscription';
+  setPurchaseType: (type: 'one-time' | 'subscription') => void;
 }) {
   const navigate = useNavigate();
   const { open } = useAside();
 
   const [quantity, setQuantity] = useState(1);
-  const [purchaseType, setPurchaseType] = useState<'one-time' | 'subscription'>('one-time');
 
   const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
 
@@ -42,21 +45,22 @@ export function ProductForm({
   }, [hasSubscription]);
 
 
-  console.log('sini', selectedVariant);
+  const firstAllocation = selectedVariant?.sellingPlanAllocations?.nodes?.[0];
 
-  const subscriptionAllocation =
-    selectedVariant?.sellingPlanAllocations.nodes.find(
-      (node) => node.sellingPlan.id === selectedSellingPlan?.id
-    );
+  const subPrice = firstAllocation?.priceAdjustments?.[0]?.price;
+  const originalPrice = selectedVariant?.price;
 
-  const subscriptionPrice = subscriptionAllocation?.price;
-  const subscriptionCompareAt = subscriptionAllocation?.compareAtPrice;
+  // Calculate the discount safely
+  const discountPercent = subPrice && originalPrice
+    ? Math.round(
+      ((parseFloat(originalPrice.amount) - parseFloat(subPrice.amount)) /
+        parseFloat(originalPrice.amount)) * 100
+    )
+    : 0;
 
-  const hasSubscriptionDiscount =
-    subscriptionCompareAt &&
-    parseFloat(subscriptionCompareAt.amount) >
-    parseFloat(subscriptionPrice?.amount || '0');
-
+  const activeSellingPlanId =
+    selectedSellingPlan?.id ||
+    selectedVariant?.sellingPlanAllocations?.nodes?.[0]?.sellingPlan?.id;
 
   return (
     <div className="product-form">
@@ -154,7 +158,7 @@ export function ProductForm({
           disabled={
             !selectedVariant ||
             !selectedVariant.availableForSale ||
-            (purchaseType === 'subscription' && !selectedSellingPlan)
+            (purchaseType === 'subscription' && !activeSellingPlanId)
           }
           lines={
             selectedVariant
@@ -162,9 +166,8 @@ export function ProductForm({
                 {
                   merchandiseId: selectedVariant.id,
                   quantity,
-                  ...(purchaseType === 'subscription' &&
-                    selectedSellingPlan && {
-                    sellingPlanId: selectedSellingPlan.id,
+                  ...(purchaseType === 'subscription' && activeSellingPlanId && {
+                    sellingPlanId: activeSellingPlanId,
                   }),
                 },
               ]
@@ -260,44 +263,26 @@ export function ProductForm({
 
                   {/* RIGHT SIDE (SUBSCRIPTION PRICE) */}
                   <div className="text-right">
-                    {selectedVariant?.sellingPlanAllocations?.nodes?.length > 0 ? (
-                      (() => {
-                        const allocation = selectedVariant.sellingPlanAllocations.nodes[0];
+                    {subPrice ? (
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-2">
+                          {/* Slashed Original Price */}
+                          <s className="text-gray-400 text-sm">
+                            RM <Money withoutCurrency data={originalPrice} className="inline" />
+                          </s>
+                          {/* New Subscription Price */}
+                          <span className="font-bold text-black">
+                            RM <Money withoutCurrency data={subPrice} className="inline" />
+                          </span>
+                        </div>
 
-                        const subPrice = allocation?.priceAdjustments?.[0]?.price;
-                        const originalPrice = selectedVariant.price;
-
-                        // Safe fallback if the query hasn't updated yet
-                        if (!subPrice) return null;
-
-                        // Calculate discount percentage: (Original - Sub) / Original * 100
-                        const discountPercent = Math.round(
-                          ((parseFloat(originalPrice.amount) - parseFloat(subPrice.amount)) /
-                            parseFloat(originalPrice.amount)) * 100
-                        );
-
-                        return (
-                          <div className="flex flex-col items-end">
-                            <div className="flex items-center gap-2">
-                              {/* Slashed Original Price */}
-                              <s className="text-gray-400 text-sm">
-                                RM <Money withoutCurrency data={originalPrice} className="inline" />
-                              </s>
-                              {/* New Subscription Price */}
-                              <span className="font-bold text-black">
-                                RM <Money withoutCurrency data={subPrice} className="inline" />
-                              </span>
-                            </div>
-
-                            {/* Save % Badge */}
-                            {discountPercent > 0 && (
-                              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase">
-                                Save {discountPercent}%
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })()
+                        {/* Save % Badge */}
+                        {discountPercent > 0 && (
+                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase">
+                            Save {discountPercent}%
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       /* Fallback if no allocations found */
                       <span className="font-medium">
@@ -311,13 +296,15 @@ export function ProductForm({
                 {purchaseType === 'subscription' && (
                   <div className="mt-4 flex flex-col gap-2 pl-7 text-sm text-gray-600">
 
-                    {/* Benefit 1: Recurring */}
-                    <div className="flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-black">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                      </svg>
-                      <span>10% off every order</span>
-                    </div>
+                    {/* Benefit 1: Dynamic Recurring Discount */}
+                    {discountPercent > 0 && (
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-black">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        <span>{discountPercent}% off every order</span>
+                      </div>
+                    )}
 
                     {/* Benefit 2: Delivery */}
                     <div className="flex items-center gap-2">
@@ -338,7 +325,7 @@ export function ProductForm({
                   </div>
                 )}
 
-                {/* SELLING PLAN SELECTOR (Keep this active for the logic to work!) */}
+                {/* SELLING PLAN SELECTOR */}
                 <div className="mt-3">
                   {purchaseType === 'subscription' && (
                     <SellingPlanSelector

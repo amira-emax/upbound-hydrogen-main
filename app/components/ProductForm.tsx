@@ -21,7 +21,7 @@ export function ProductForm({
   selectedVariant,
   sellingPlanGroups,
   selectedSellingPlan,
-  purchaseType,    
+  purchaseType,
   setPurchaseType,
 }: {
   productOptions: MappedProductOptions[];
@@ -257,7 +257,18 @@ export function ProductForm({
                       readOnly
                     />
                     <div className="flex flex-col">
-                      <span className="font-medium uppercase">Subscribe & Save</span>
+
+                      {/* TITLE & BADGE ROW */}
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium uppercase">Subscribe & Save</span>
+
+                        {/* Save % Badge */}
+                        {discountPercent > 0 && (
+                          <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                            Save {discountPercent}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -276,12 +287,7 @@ export function ProductForm({
                           </span>
                         </div>
 
-                        {/* Save % Badge */}
-                        {discountPercent > 0 && (
-                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase">
-                            Save {discountPercent}%
-                          </span>
-                        )}
+
                       </div>
                     ) : (
                       /* Fallback if no allocations found */

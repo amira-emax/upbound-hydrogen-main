@@ -424,6 +424,20 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
         sellingPlan {
           id
         }
+        priceAdjustments {
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+          price {
+            amount
+            currencyCode
+          }
+          perDeliveryPrice {
+            amount
+            currencyCode
+          }
+        }
       }
     }
   }

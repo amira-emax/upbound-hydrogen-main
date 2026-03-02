@@ -3,8 +3,8 @@ import type {
   SellingPlanGroupFragment,
   SellingPlanFragment,
 } from 'types/storefrontapi.generated';
-import {useMemo} from 'react';
-import {useLocation} from 'react-router';
+import { useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 /* Enriched sellingPlan type including isSelected and url */
 export type SellingPlan = SellingPlanFragment & {
@@ -50,13 +50,56 @@ export function SellingPlanSelector({
     selectedSellingPlan: SellingPlanFragment | null;
   }) => React.ReactNode;
 }) {
-  const {search, pathname} = useLocation();
+  const { search, pathname } = useLocation();
   const params = new URLSearchParams(search);
+  const navigate = useNavigate();
 
   const planAllocationIds: string[] =
     selectedVariant?.sellingPlanAllocations.nodes.map(
       (node) => node.sellingPlan.id,
     ) ?? [];
+
+  useEffect(() => {
+    if (!sellingPlanGroups?.nodes?.length || !selectedVariant) return;
+
+    const planAllocationIds: string[] =
+      selectedVariant?.sellingPlanAllocations.nodes.map(
+        (node) => node.sellingPlan.id,
+      ) ?? [];
+
+    const validGroups = sellingPlanGroups.nodes.filter((group) =>
+      group.sellingPlans.nodes.some((sellingPlan) =>
+        planAllocationIds.includes(sellingPlan.id),
+      ),
+    );
+
+    const validPlans = validGroups.flatMap((group) =>
+      group.sellingPlans.nodes.filter((plan) =>
+        planAllocationIds.includes(plan.id),
+      ),
+    );
+
+    // 🔥 AUTO SELECT if only 1 plan and nothing selected
+    if (validPlans.length === 1 && !selectedSellingPlan) {
+      const singlePlan = validPlans[0];
+
+      const newParams = new URLSearchParams(search);
+      newParams.set(paramKey, singlePlan.id);
+
+      navigate(`${pathname}?${newParams.toString()}`, {
+        replace: true,
+        preventScrollReset: true,
+      });
+    }
+  }, [
+    sellingPlanGroups,
+    selectedVariant,
+    selectedSellingPlan,
+    navigate,
+    pathname,
+    search,
+    paramKey,
+  ]);
 
   return useMemo(
     () =>
@@ -90,7 +133,7 @@ export function SellingPlanSelector({
             })
             .filter(Boolean) as SellingPlan[];
           sellingPlanGroup.sellingPlans.nodes = sellingPlans;
-          return children({sellingPlanGroup, selectedSellingPlan});
+          return children({ sellingPlanGroup, selectedSellingPlan });
         }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [

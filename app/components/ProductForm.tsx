@@ -1,4 +1,4 @@
-import { type MappedProductOptions } from '@shopify/hydrogen';
+import { type MappedProductOptions, Money } from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
@@ -10,7 +10,7 @@ import { useAside } from './Aside';
 import { ProductQuantityControl } from './ProductQuantityControl';
 import { Button } from './ui/button';
 import { cn } from '~/lib/utils';
-import { useState, useEffect  } from 'react';
+import { useState, useEffect } from 'react';
 import {
   SellingPlanSelector,
   type SellingPlanGroup,
@@ -35,11 +35,28 @@ export function ProductForm({
 
   const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
 
-useEffect(() => {
-  if (!hasSubscription) {
-    setPurchaseType('one-time');
-  }
-}, [hasSubscription]);
+  useEffect(() => {
+    if (!hasSubscription) {
+      setPurchaseType('one-time');
+    }
+  }, [hasSubscription]);
+
+
+  console.log('sini', selectedVariant);
+
+  const subscriptionAllocation =
+    selectedVariant?.sellingPlanAllocations.nodes.find(
+      (node) => node.sellingPlan.id === selectedSellingPlan?.id
+    );
+
+  const subscriptionPrice = subscriptionAllocation?.price;
+  const subscriptionCompareAt = subscriptionAllocation?.compareAtPrice;
+
+  const hasSubscriptionDiscount =
+    subscriptionCompareAt &&
+    parseFloat(subscriptionCompareAt.amount) >
+    parseFloat(subscriptionPrice?.amount || '0');
+
 
   return (
     <div className="product-form">
@@ -165,7 +182,7 @@ useEffect(() => {
       </div>
 
       <div>
-         {selectedVariant?.availableForSale && hasSubscription && sellingPlanGroups.nodes.length > 0 && (
+        {selectedVariant?.availableForSale && hasSubscription && sellingPlanGroups.nodes.length > 0 && (
           <div className="mt-6 border-t pt-6">
             <p className="typo-caption-responsive-uppercase pb-4">
               Purchase Options
@@ -183,19 +200,39 @@ useEffect(() => {
                     : 'border-gray-200'
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    checked={purchaseType === 'one-time'}
-                    readOnly
-                  />
-                  <div className="flex flex-col">
+                <div className="flex items-start justify-between w-full">
+
+                  {/* LEFT SIDE */}
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      checked={purchaseType === 'one-time'}
+                      readOnly
+                    />
+
+                    <div className="flex flex-col">
+                      <span className="font-medium uppercase">
+                        ONE TIME
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* RIGHT SIDE (PRICE) */}
+                  <div className="text-right">
                     <span className="font-medium">
-                      One-time purchase
+                      RM
+                      <Money withoutCurrency data={selectedVariant?.price} className="inline" />
                     </span>
-                    <span className="text-sm text-gray-500">
-                      Pay once. No commitment.
-                    </span>
+                    {selectedVariant?.compareAtPrice ? (<s>
+                      <span className="typo-h2">
+                        RM
+                        <Money
+                          withoutCurrency
+                          data={selectedVariant?.compareAtPrice ?? undefined}
+                          className={'inline'}
+                        />
+                      </span>
+                    </s>) : null}
                   </div>
                 </div>
               </div>
@@ -205,45 +242,118 @@ useEffect(() => {
                 onClick={() => setPurchaseType('subscription')}
                 className={cn(
                   'border p-4 cursor-pointer transition-all',
-                  purchaseType === 'subscription'
-                    ? 'border-black'
-                    : 'border-gray-200'
+                  purchaseType === 'subscription' ? 'border-black' : 'border-gray-200'
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    checked={purchaseType === 'subscription'}
-                    readOnly
-                  />
-                  <div className="flex flex-col w-full">
-                    <span className="font-medium">
-                      Subscribe
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Auto-delivery. Cancel anytime.
-                    </span>
-
-                    {/* Keep space consistent */}
-                    <div className="mt-3">
-                      {purchaseType === 'subscription' ? (
-                        <SellingPlanSelector
-                          sellingPlanGroups={sellingPlanGroups}
-                          selectedSellingPlan={selectedSellingPlan}
-                          selectedVariant={selectedVariant}
-                        >
-                          {({ sellingPlanGroup }) => (
-                            <SellingPlanGroup
-                              key={sellingPlanGroup.name}
-                              sellingPlanGroup={sellingPlanGroup}
-                            />
-                          )}
-                        </SellingPlanSelector>
-                      ) : (
-                        <div className="h-10" />
-                      )}
+                <div className="flex items-start justify-between w-full">
+                  {/* LEFT SIDE */}
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      checked={purchaseType === 'subscription'}
+                      readOnly
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-medium uppercase">Subscribe & Save</span>
                     </div>
                   </div>
+
+                  {/* RIGHT SIDE (SUBSCRIPTION PRICE) */}
+                  <div className="text-right">
+                    {selectedVariant?.sellingPlanAllocations?.nodes?.length > 0 ? (
+                      (() => {
+                        const allocation = selectedVariant.sellingPlanAllocations.nodes[0];
+
+                        const subPrice = allocation?.priceAdjustments?.[0]?.price;
+                        const originalPrice = selectedVariant.price;
+
+                        // Safe fallback if the query hasn't updated yet
+                        if (!subPrice) return null;
+
+                        // Calculate discount percentage: (Original - Sub) / Original * 100
+                        const discountPercent = Math.round(
+                          ((parseFloat(originalPrice.amount) - parseFloat(subPrice.amount)) /
+                            parseFloat(originalPrice.amount)) * 100
+                        );
+
+                        return (
+                          <div className="flex flex-col items-end">
+                            <div className="flex items-center gap-2">
+                              {/* Slashed Original Price */}
+                              <s className="text-gray-400 text-sm">
+                                RM <Money withoutCurrency data={originalPrice} className="inline" />
+                              </s>
+                              {/* New Subscription Price */}
+                              <span className="font-bold text-black">
+                                RM <Money withoutCurrency data={subPrice} className="inline" />
+                              </span>
+                            </div>
+
+                            {/* Save % Badge */}
+                            {discountPercent > 0 && (
+                              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase">
+                                Save {discountPercent}%
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      /* Fallback if no allocations found */
+                      <span className="font-medium">
+                        RM <Money withoutCurrency data={selectedVariant?.price} className="inline" />
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* SUBSCRIPTION BENEFITS LIST */}
+                {purchaseType === 'subscription' && (
+                  <div className="mt-4 flex flex-col gap-2 pl-7 text-sm text-gray-600">
+
+                    {/* Benefit 1: Recurring */}
+                    <div className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                      </svg>
+                      <span>10% off every order</span>
+                    </div>
+
+                    {/* Benefit 2: Delivery */}
+                    <div className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                      </svg>
+                      <span>Auto Delivery</span>
+                    </div>
+
+                    {/* Benefit 3: Cancel Anytime */}
+                    <div className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Cancel anytime</span>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* SELLING PLAN SELECTOR (Keep this active for the logic to work!) */}
+                <div className="mt-3">
+                  {purchaseType === 'subscription' && (
+                    <SellingPlanSelector
+                      sellingPlanGroups={sellingPlanGroups}
+                      selectedSellingPlan={selectedSellingPlan}
+                      selectedVariant={selectedVariant}
+                    >
+                      {({ sellingPlanGroup }) => (
+                        <SellingPlanGroup
+                          key={sellingPlanGroup.name}
+                          sellingPlanGroup={sellingPlanGroup}
+                        />
+                      )}
+                    </SellingPlanSelector>
+                  )}
                 </div>
               </div>
 
@@ -286,32 +396,35 @@ function SellingPlanGroup({
 }: {
   sellingPlanGroup: SellingPlanGroup;
 }) {
-  return (
-  <div className="selling-plan-group" key={sellingPlanGroup.name}>
-    <p className="selling-plan-group-title">
-      {sellingPlanGroup.name}
-    </p>
+  const plans = sellingPlanGroup.sellingPlans.nodes;
 
-    <div className="selling-plan-options">
-      {sellingPlanGroup.sellingPlans.nodes.map((sellingPlan) => {
-        return (
-          <Link
-            key={sellingPlan.id}
-            prefetch="intent"
-            to={sellingPlan.url}
-            preventScrollReset
-            replace
-            className={`selling-plan-card ${
-              sellingPlan.isSelected ? 'selected' : ''
-            }`}
-          >
-            <span className="plan-text">
-              {sellingPlan.options.map((option) => option.value).join(' ')}
-            </span>
-          </Link>
-        );
-      })}
+  // If there is only 1 plan, hide the UI, but let the logic keep running
+  if (plans.length <= 1) return null;
+  return (
+    <div className="selling-plan-group" key={sellingPlanGroup.name}>
+      <p className="selling-plan-group-title">
+        {sellingPlanGroup.name}
+      </p>
+
+      <div className="selling-plan-options">
+        {sellingPlanGroup.sellingPlans.nodes.map((sellingPlan) => {
+          return (
+            <Link
+              key={sellingPlan.id}
+              prefetch="intent"
+              to={sellingPlan.url}
+              preventScrollReset
+              replace
+              className={`selling-plan-card ${sellingPlan.isSelected ? 'selected' : ''
+                }`}
+            >
+              <span className="plan-text">
+                {sellingPlan.options.map((option) => option.value).join(' ')}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
 }

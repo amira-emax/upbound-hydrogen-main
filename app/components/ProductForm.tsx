@@ -249,7 +249,7 @@ export function ProductForm({
                 )}
               >
                 <div className="absolute -top-3 right-4 bg-mint text-[10px] font-bold uppercase tracking-wide px-3 py-1 rounded-full">
-                  Most Popular
+                  Most Chosen
                 </div>
                 <div className="flex items-start justify-between w-full">
                   {/* LEFT SIDE */}

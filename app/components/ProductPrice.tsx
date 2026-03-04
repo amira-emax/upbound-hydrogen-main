@@ -81,7 +81,7 @@ export function ProductPrice({
 
               {/* 👇 Conditionally render the dynamic badge */}
               {discountPercent > 0 && (
-                <span className="bg-mint px-3 py-0.5 rounded-full text-[15px] uppercase">
+                <span className="bg-red-500 text-white px-3 py-0.5 rounded-full text-[15px] uppercase">
                   Save {discountPercent}%
                 </span>
               )}

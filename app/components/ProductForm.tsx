@@ -267,7 +267,7 @@ export function ProductForm({
 
                         {/* Save % Badge */}
                         {discountPercent > 0 && (
-                          <span className="bg-mint px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-center">
+                          <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-center">
                             Save {discountPercent}%
                           </span>
                         )}

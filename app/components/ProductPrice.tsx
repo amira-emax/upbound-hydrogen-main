@@ -74,14 +74,14 @@ export function ProductPrice({
             </span>
           </s>
           {activePrice ? (
-            <div className={cn('text-mint typo-header flex items-center gap-3')}>
+            <div className={cn('typo-header flex items-center gap-3')}>
               <div>
                 RM <Money withoutCurrency data={activePrice} className="inline" />
               </div>
 
               {/* 👇 Conditionally render the dynamic badge */}
               {discountPercent > 0 && (
-                <span className="bg-red-500 text-white px-3 py-0.5 rounded-full text-[15px] uppercase">
+                <span className="bg-mint px-3 py-0.5 rounded-full text-[15px] uppercase">
                   Save {discountPercent}%
                 </span>
               )}

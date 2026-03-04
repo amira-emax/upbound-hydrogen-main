@@ -7,7 +7,7 @@ import {
   useOptimisticVariant,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { redirect, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { useLoaderData, type MetaFunction } from 'react-router';
 import { ProductForm } from '~/components/ProductForm';
 import {
@@ -29,6 +29,16 @@ import {
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { Image as ShopifyImage } from '@shopify/hydrogen/storefront-api-types';
 import ProductEndorsementCard from '~/components/ProductEndorsementCard';
+
+import type { ProductFragment, SellingPlanFragment } from 'types/storefrontapi.generated';
+import { useState, useEffect } from 'react';
+
+import sellingPlanStyle from '~/styles/selling-plan.css?url';
+
+export const links: Route.LinksFunction = () => [
+  { rel: 'stylesheet', href: sellingPlanStyle },
+];
+
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
@@ -78,11 +88,56 @@ async function loadCriticalData({
     throw new Response(null, { status: 404 });
   }
 
+  // Check if the user landed here without selecting a specific variant
+  const selectedOptions = getSelectedProductOptions(request);
+
+  if (selectedOptions.length === 0) {
+    // Find the first variant that has a subscription attached
+    const firstSubVariant = product.variants.nodes.find(
+      (v) => v.sellingPlanAllocations?.nodes?.length > 0
+    );
+
+    // If we found one, and it's not already the default, redirect to it!
+    if (firstSubVariant && firstSubVariant.id !== product.selectedOrFirstAvailableVariant?.id) {
+      const url = new URL(request.url);
+      firstSubVariant.selectedOptions.forEach((option) => {
+        url.searchParams.set(option.name, option.value);
+      });
+      throw redirect(url.toString(), 302);
+    }
+  }
+
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
+  // Initialize the selectedSellingPlan to null
+  let selectedSellingPlan = null;
+
+  // Get the selected selling plan id from the request url
+  const selectedSellingPlanId =
+    new URL(request.url).searchParams.get('selling_plan') ?? null;
+
+  // Get the selected selling plan bsed on the selectedSellingPlanId
+  if (selectedSellingPlanId) {
+    const selectedSellingPlanGroup =
+      product.sellingPlanGroups.nodes?.find((sellingPlanGroup) => {
+        return sellingPlanGroup.sellingPlans.nodes?.find(
+          (sellingPlan: SellingPlanFragment) =>
+            sellingPlan.id === selectedSellingPlanId,
+        );
+      }) ?? null;
+
+    if (selectedSellingPlanGroup) {
+      selectedSellingPlan =
+        selectedSellingPlanGroup.sellingPlans.nodes.find((sellingPlan) => {
+          return sellingPlan.id === selectedSellingPlanId;
+        }) ?? null;
+    }
+  }
+
   return {
     product,
+    selectedSellingPlan,
   };
 }
 
@@ -99,13 +154,28 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 }
 
 export default function Product() {
-  const { product } = useLoaderData<typeof loader>();
-
-  // Optimistically selects a variant with given available variant information
+  const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
+  
+// Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
   );
+
+  const [purchaseType, setPurchaseType] = useState<'one-time' | 'subscription'>(() => {
+    return selectedVariant?.sellingPlanAllocations?.nodes?.length > 0
+      ? 'subscription'
+      : 'one-time';
+  });
+
+  useEffect(() => {
+    const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
+    
+    if (!hasSubscription && purchaseType === 'subscription') {
+      setPurchaseType('one-time');
+    }
+  }, [selectedVariant, purchaseType]);
+
 
   // Sets the search param to the selected variant without navigation
   // only when no search params are set in the url
@@ -117,13 +187,13 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  
-  const variant = product?.variants?.nodes?.find(
-  (variant) =>
-    variant.id === product?.selectedOrFirstAvailableVariant?.id
-);
 
-const variantType = variant?.metafield?.value || '';
+  const variant = product?.variants?.nodes?.find(
+    (variant) =>
+      variant.id === product?.selectedOrFirstAvailableVariant?.id
+  );
+
+  const variantType = variant?.metafield?.value || '';
 
 
   const {
@@ -137,7 +207,8 @@ const variantType = variant?.metafield?.value || '';
     productEndorsements,
     tags,
     images,
-    
+    sellingPlanGroups
+
   } = product;
   const certifiedLogosArray = certifiedLogos?.references?.nodes || [];
 
@@ -164,10 +235,17 @@ const variantType = variant?.metafield?.value || '';
               compareAtPrice={selectedVariant?.compareAtPrice}
               priceClassName="!typo-h2"
               className="typo-h2"
+              selectedSellingPlan={selectedSellingPlan}
+              selectedVariant={selectedVariant}
+              purchaseType={purchaseType}
             />
             <ProductForm
               productOptions={productOptions}
               selectedVariant={selectedVariant}
+              selectedSellingPlan={selectedSellingPlan}
+              sellingPlanGroups={sellingPlanGroups}
+              purchaseType={purchaseType}
+              setPurchaseType={setPurchaseType}
             />
             <Accordion
               type="multiple"
@@ -379,8 +457,98 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       amount
       currencyCode
     }
+    sellingPlanAllocations(first: 10) {
+      nodes {
+        sellingPlan {
+          id
+        }
+        priceAdjustments {
+          compareAtPrice {
+            amount
+            currencyCode
+          }
+          price {
+            amount
+            currencyCode
+          }
+          perDeliveryPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
   }
 ` as const;
+
+
+const SELLING_PLAN_FRAGMENT = `#graphql
+  fragment SellingPlanMoney on MoneyV2 {
+    amount
+    currencyCode
+  }
+  fragment SellingPlan on SellingPlan {
+    id
+    options {
+      name
+      value
+    }
+    priceAdjustments {
+      adjustmentValue {
+        ... on SellingPlanFixedAmountPriceAdjustment {
+          __typename
+          adjustmentAmount {
+            ... on MoneyV2 {
+               ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanFixedPriceAdjustment {
+          __typename
+          price {
+            ... on MoneyV2 {
+              ...SellingPlanMoney
+            }
+          }
+        }
+        ... on SellingPlanPercentagePriceAdjustment {
+          __typename
+          adjustmentPercentage
+        }
+      }
+      orderCount
+    }
+    recurringDeliveries
+    checkoutCharge {
+      type
+      value {
+        ... on MoneyV2 {
+          ...SellingPlanMoney
+        }
+        ... on SellingPlanCheckoutChargePercentageValue {
+          percentage
+        }
+      }
+    }
+ }
+` as const;
+
+const SELLING_PLAN_GROUP_FRAGMENT = `#graphql
+  fragment SellingPlanGroup on SellingPlanGroup {
+    name
+    options {
+      name
+      values
+    }
+    sellingPlans(first:10) {
+      nodes {
+        ...SellingPlan
+      }
+    }
+  }
+  ${SELLING_PLAN_FRAGMENT}
+` as const;
+
 
 const PRODUCT_FRAGMENT = `#graphql
   fragment Product on Product {
@@ -419,6 +587,11 @@ const PRODUCT_FRAGMENT = `#graphql
         altText
       }
     }
+    sellingPlanGroups(first:10) {
+      nodes {
+        ...SellingPlanGroup
+      }
+    }
     selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
       ...ProductVariant
     }
@@ -430,6 +603,7 @@ const PRODUCT_FRAGMENT = `#graphql
       title
     }
   }
+  ${SELLING_PLAN_GROUP_FRAGMENT}
   ${PRODUCT_VARIANT_FRAGMENT}
 ` as const;
 
@@ -453,6 +627,13 @@ const PRODUCT_QUERY = `#graphql
           metafield(key: "variant_type", namespace: "custom") {
             type
             value
+          }
+          sellingPlanAllocations(first: 1) {
+            nodes {
+              sellingPlan {
+                id
+              }
+            }
           }
         }
       }

@@ -1,7 +1,7 @@
-import {Image} from '@shopify/hydrogen';
-import {DateTime} from 'luxon';
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import { Image } from '@shopify/hydrogen';
+import { DateTime } from 'luxon';
+import { Suspense } from 'react';
+import { Await, NavLink } from 'react-router';
 import type {
   CustomMenuItemFragment,
   FooterMenuCmsQuery,
@@ -14,7 +14,7 @@ import MastercardSvg from '~/assets/payment/mastercard.svg';
 import PaypalSvg from '~/assets/payment/paypal.svg';
 import VisaSvg from '~/assets/payment/visa.svg';
 import FooterNewsletterForm from './FooterNewsletterForm';
-import {Button} from './ui/button';
+import { Button } from './ui/button';
 
 interface FooterProps {
   footer: Promise<FooterMenuCmsQuery | null>;
@@ -94,7 +94,7 @@ export function Footer({
   );
 }
 
-function FooterMenu({title, items}: FooterMenuGroupProps) {
+function FooterMenu({ title, items }: FooterMenuGroupProps) {
   if (items.length <= 0) return null;
 
   return (
@@ -147,6 +147,28 @@ function FooterMenu({title, items}: FooterMenuGroupProps) {
           </NavLink>
         );
       })}
+
+      {title === 'About' && (
+        <NavLink
+          key="subscription"
+          to={'https://shopify.com/83887620289/account/pages/6971b1a1-27f6-4c27-b8b0-3009fd3b921d'}
+          end
+          style={activeLinkStyle}
+          className="last:pb-4 pb-1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button
+            size="sm"
+            variant="glass-default"
+            className="w-full md:w-fit group"
+          >
+            Subscription Management
+          </Button>
+        </NavLink>
+      )}
+
+
     </nav>
   );
 }

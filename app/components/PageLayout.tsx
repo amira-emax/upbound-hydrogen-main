@@ -1,5 +1,5 @@
-import {Suspense, useId, useState, useEffect} from 'react';
-import {Await, Link, NavLink} from 'react-router';
+import { Suspense, useId, useState, useEffect } from 'react';
+import { Await, Link, NavLink } from 'react-router';
 import type {
   CartApiQueryFragment,
   FooterMenuCmsQuery,
@@ -8,17 +8,17 @@ import type {
   GlobalNewsletterPopupCmsQuery,
   HeaderQuery,
 } from 'types/storefrontapi.generated';
-import {Aside, useAside} from '~/components/Aside';
-import {CartMain} from '~/components/CartMain';
-import {Footer} from '~/components/Footer';
-import {Header} from '~/components/Header';
+import { Aside, useAside } from '~/components/Aside';
+import { CartMain } from '~/components/CartMain';
+import { Footer } from '~/components/Footer';
+import { Header } from '~/components/Header';
 import {
   SEARCH_ENDPOINT,
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
-import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
-import {useCooldown} from '~/lib/hooks/useCooldown';
-import {cn} from '~/lib/utils';
+import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
+import { useCooldown } from '~/lib/hooks/useCooldown';
+import { cn } from '~/lib/utils';
 import Banner from './cms/Banner';
 import NewsletterPopup from './cms/NewsletterPopup';
 import Logo from './icons/Logo';
@@ -102,7 +102,7 @@ export function PageLayout({
 
 // iOS Safari scroll prevention component using PQINA approach
 function IOSSafariScrollFix() {
-  const {type: asideType} = useAside();
+  const { type: asideType } = useAside();
 
   useEffect(() => {
     // Sync window height for iOS Safari
@@ -156,7 +156,7 @@ function IOSSafariScrollFix() {
   return null;
 }
 
-function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
+function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
   const [quantity, setQuantity] = useState(0);
 
   return (
@@ -187,7 +187,7 @@ function SearchAside() {
       <div className="predictive-search">
         <br />
         <SearchFormPredictive>
-          {({fetchResults, goToSearch, inputRef}) => (
+          {({ fetchResults, goToSearch, inputRef }) => (
             <>
               <input
                 name="q"
@@ -205,8 +205,8 @@ function SearchAside() {
         </SearchFormPredictive>
 
         <SearchResultsPredictive>
-          {({items, total, term, state, closeSearch}) => {
-            const {articles, collections, pages, products, queries} = items;
+          {({ items, total, term, state, closeSearch }) => {
+            const { articles, collections, pages, products, queries } = items;
 
             if (state === 'loading' && term.current) {
               return <div>Loading...</div>;

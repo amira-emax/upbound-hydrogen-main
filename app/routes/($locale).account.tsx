@@ -87,6 +87,9 @@ function AccountMenu() {
       >
         Addresses
       </NavLink>
+      <NavLink to="/account/subscriptions" style={isActiveStyle}>
+        &nbsp; Subscriptions &nbsp;
+      </NavLink>
       <Logout />
     </nav>
   );

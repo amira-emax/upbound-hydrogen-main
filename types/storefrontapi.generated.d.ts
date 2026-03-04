@@ -1657,6 +1657,9 @@ export type CartLineFragment = Pick<
       Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
     >;
   };
+  sellingPlanAllocation?: StorefrontAPI.Maybe<{
+    sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+  }>;
 };
 
 export type CartLineComponentFragment = Pick<
@@ -1687,6 +1690,9 @@ export type CartLineComponentFragment = Pick<
       Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
     >;
   };
+  sellingPlanAllocation?: StorefrontAPI.Maybe<{
+    sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+  }>;
 };
 
 export type CartApiQueryFragment = Pick<
@@ -1745,6 +1751,9 @@ export type CartApiQueryFragment = Pick<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
           };
+          sellingPlanAllocation?: StorefrontAPI.Maybe<{
+            sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+          }>;
         })
       | (Pick<StorefrontAPI.ComponentizableCartLine, 'id' | 'quantity'> & {
           attributes: Array<Pick<StorefrontAPI.Attribute, 'key' | 'value'>>;
@@ -1780,6 +1789,9 @@ export type CartApiQueryFragment = Pick<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
           };
+          sellingPlanAllocation?: StorefrontAPI.Maybe<{
+            sellingPlan: Pick<StorefrontAPI.SellingPlan, 'name'>;
+          }>;
         })
     >;
   };
@@ -2209,6 +2221,90 @@ export type ProductVariantFragment = Pick<
   unitPrice?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
   >;
+  sellingPlanAllocations: {
+    nodes: Array<{sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>}>;
+  };
+};
+
+export type SellingPlanMoneyFragment = Pick<
+  StorefrontAPI.MoneyV2,
+  'amount' | 'currencyCode'
+>;
+
+export type SellingPlanFragment = Pick<
+  StorefrontAPI.SellingPlan,
+  'id' | 'recurringDeliveries'
+> & {
+  options: Array<Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>>;
+  priceAdjustments: Array<
+    Pick<StorefrontAPI.SellingPlanPriceAdjustment, 'orderCount'> & {
+      adjustmentValue:
+        | ({__typename: 'SellingPlanFixedAmountPriceAdjustment'} & {
+            adjustmentAmount: Pick<
+              StorefrontAPI.MoneyV2,
+              'amount' | 'currencyCode'
+            >;
+          })
+        | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          })
+        | ({__typename: 'SellingPlanPercentagePriceAdjustment'} & Pick<
+            StorefrontAPI.SellingPlanPercentagePriceAdjustment,
+            'adjustmentPercentage'
+          >);
+    }
+  >;
+  checkoutCharge: Pick<StorefrontAPI.SellingPlanCheckoutCharge, 'type'> & {
+    value:
+      | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+      | Pick<
+          StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
+          'percentage'
+        >;
+  };
+};
+
+export type SellingPlanGroupFragment = Pick<
+  StorefrontAPI.SellingPlanGroup,
+  'name'
+> & {
+  options: Array<Pick<StorefrontAPI.SellingPlanGroupOption, 'name' | 'values'>>;
+  sellingPlans: {
+    nodes: Array<
+      Pick<StorefrontAPI.SellingPlan, 'id' | 'recurringDeliveries'> & {
+        options: Array<Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>>;
+        priceAdjustments: Array<
+          Pick<StorefrontAPI.SellingPlanPriceAdjustment, 'orderCount'> & {
+            adjustmentValue:
+              | ({__typename: 'SellingPlanFixedAmountPriceAdjustment'} & {
+                  adjustmentAmount: Pick<
+                    StorefrontAPI.MoneyV2,
+                    'amount' | 'currencyCode'
+                  >;
+                })
+              | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
+                  price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+                })
+              | ({__typename: 'SellingPlanPercentagePriceAdjustment'} & Pick<
+                  StorefrontAPI.SellingPlanPercentagePriceAdjustment,
+                  'adjustmentPercentage'
+                >);
+          }
+        >;
+        checkoutCharge: Pick<
+          StorefrontAPI.SellingPlanCheckoutCharge,
+          'type'
+        > & {
+          value:
+            | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+            | Pick<
+                StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
+                'percentage'
+              >;
+        };
+      }
+    >;
+  };
 };
 
 export type ProductFragment = Pick<
@@ -2250,6 +2346,11 @@ export type ProductFragment = Pick<
               unitPrice?: StorefrontAPI.Maybe<
                 Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
               >;
+              sellingPlanAllocations: {
+                nodes: Array<{
+                  sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>;
+                }>;
+              };
             }
           >;
           swatch?: StorefrontAPI.Maybe<
@@ -2268,6 +2369,58 @@ export type ProductFragment = Pick<
   images: {
     nodes: Array<
       Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+    >;
+  };
+  sellingPlanGroups: {
+    nodes: Array<
+      Pick<StorefrontAPI.SellingPlanGroup, 'name'> & {
+        options: Array<
+          Pick<StorefrontAPI.SellingPlanGroupOption, 'name' | 'values'>
+        >;
+        sellingPlans: {
+          nodes: Array<
+            Pick<StorefrontAPI.SellingPlan, 'id' | 'recurringDeliveries'> & {
+              options: Array<
+                Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>
+              >;
+              priceAdjustments: Array<
+                Pick<StorefrontAPI.SellingPlanPriceAdjustment, 'orderCount'> & {
+                  adjustmentValue:
+                    | ({__typename: 'SellingPlanFixedAmountPriceAdjustment'} & {
+                        adjustmentAmount: Pick<
+                          StorefrontAPI.MoneyV2,
+                          'amount' | 'currencyCode'
+                        >;
+                      })
+                    | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
+                        price: Pick<
+                          StorefrontAPI.MoneyV2,
+                          'amount' | 'currencyCode'
+                        >;
+                      })
+                    | ({
+                        __typename: 'SellingPlanPercentagePriceAdjustment';
+                      } & Pick<
+                        StorefrontAPI.SellingPlanPercentagePriceAdjustment,
+                        'adjustmentPercentage'
+                      >);
+                }
+              >;
+              checkoutCharge: Pick<
+                StorefrontAPI.SellingPlanCheckoutCharge,
+                'type'
+              > & {
+                value:
+                  | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+                  | Pick<
+                      StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
+                      'percentage'
+                    >;
+              };
+            }
+          >;
+        };
+      }
     >;
   };
   selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
@@ -2292,6 +2445,9 @@ export type ProductFragment = Pick<
       unitPrice?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
       >;
+      sellingPlanAllocations: {
+        nodes: Array<{sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>}>;
+      };
     }
   >;
   adjacentVariants: Array<
@@ -2316,6 +2472,9 @@ export type ProductFragment = Pick<
       unitPrice?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
       >;
+      sellingPlanAllocations: {
+        nodes: Array<{sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>}>;
+      };
     }
   >;
   seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
@@ -2462,6 +2621,11 @@ export type ProductQuery = {
                   unitPrice?: StorefrontAPI.Maybe<
                     Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
                   >;
+                  sellingPlanAllocations: {
+                    nodes: Array<{
+                      sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>;
+                    }>;
+                  };
                 }
               >;
               swatch?: StorefrontAPI.Maybe<
@@ -2480,6 +2644,66 @@ export type ProductQuery = {
       images: {
         nodes: Array<
           Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+        >;
+      };
+      sellingPlanGroups: {
+        nodes: Array<
+          Pick<StorefrontAPI.SellingPlanGroup, 'name'> & {
+            options: Array<
+              Pick<StorefrontAPI.SellingPlanGroupOption, 'name' | 'values'>
+            >;
+            sellingPlans: {
+              nodes: Array<
+                Pick<
+                  StorefrontAPI.SellingPlan,
+                  'id' | 'recurringDeliveries'
+                > & {
+                  options: Array<
+                    Pick<StorefrontAPI.SellingPlanOption, 'name' | 'value'>
+                  >;
+                  priceAdjustments: Array<
+                    Pick<
+                      StorefrontAPI.SellingPlanPriceAdjustment,
+                      'orderCount'
+                    > & {
+                      adjustmentValue:
+                        | ({
+                            __typename: 'SellingPlanFixedAmountPriceAdjustment';
+                          } & {
+                            adjustmentAmount: Pick<
+                              StorefrontAPI.MoneyV2,
+                              'amount' | 'currencyCode'
+                            >;
+                          })
+                        | ({__typename: 'SellingPlanFixedPriceAdjustment'} & {
+                            price: Pick<
+                              StorefrontAPI.MoneyV2,
+                              'amount' | 'currencyCode'
+                            >;
+                          })
+                        | ({
+                            __typename: 'SellingPlanPercentagePriceAdjustment';
+                          } & Pick<
+                            StorefrontAPI.SellingPlanPercentagePriceAdjustment,
+                            'adjustmentPercentage'
+                          >);
+                    }
+                  >;
+                  checkoutCharge: Pick<
+                    StorefrontAPI.SellingPlanCheckoutCharge,
+                    'type'
+                  > & {
+                    value:
+                      | Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+                      | Pick<
+                          StorefrontAPI.SellingPlanCheckoutChargePercentageValue,
+                          'percentage'
+                        >;
+                  };
+                }
+              >;
+            };
+          }
         >;
       };
       selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
@@ -2504,6 +2728,9 @@ export type ProductQuery = {
           unitPrice?: StorefrontAPI.Maybe<
             Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
           >;
+          sellingPlanAllocations: {
+            nodes: Array<{sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>}>;
+          };
         }
       >;
       adjacentVariants: Array<
@@ -2528,6 +2755,9 @@ export type ProductQuery = {
           unitPrice?: StorefrontAPI.Maybe<
             Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
           >;
+          sellingPlanAllocations: {
+            nodes: Array<{sellingPlan: Pick<StorefrontAPI.SellingPlan, 'id'>}>;
+          };
         }
       >;
       seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
@@ -2841,7 +3071,7 @@ interface GeneratedQueryTypes {
     return: PolicyQuery;
     variables: PolicyQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n      variants(first: 100) {\n        nodes {\n          id\n          title\n          selectedOptions {\n            name\n            value\n          }\n          metafield(key: "variant_type", namespace: "custom") {\n            type\n            value\n          }\n        }\n      }\n\n      howToConsume: metafield(key: "how_to_consume", namespace: "custom") {\n        type\n        value\n      }\n      ingredients: metafield(key: "ingredients", namespace: "custom") {\n        type\n        value\n      }\n      certifiedLogos: metafield(key: "certified_logos", namespace: "custom") {\n        references(first: 5) {\n          nodes {\n            ... on MediaImage {\n              image {\n                height\n                width\n                url\n                altText\n              }\n            }\n          }\n        }\n      }\n      accordion: metafield(key: "accordion_content", namespace: "custom") {\n        type\n        reference {\n          ...Accordion\n        }\n      }\n      productEndorsements: metafield(key: "product_endorsements", namespace: "custom") {\n        type\n        references(first: 10) {\n          nodes {\n            ...ProductEndorsementCard\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    handle\n    title\n    productType\n    tags\n    vendor\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    images(first: 10) {\n      nodes {\n        height\n        width\n        url\n        altText\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n  #graphql\n  fragment Accordion on Metaobject {\n    id\n    type\n    title: field(key: "title") {\n      value\n    }\n    collapsible: field(key: "collapsible") {\n      value\n    }\n    iconVariant: field(key: "icon_variant") {\n      value\n    }\n    numberedContent: field(key: "numbered_content") {\n      value\n    }\n    variant: field(key: "variant") {\n      value\n    }\n    content: field(key: "content") {\n      references(first: 20) {\n        nodes {\n          ... on Metaobject {\n            title: field(key: "title") {\n              value\n            }\n            description: field(key: "description") {\n              value\n            }\n          }\n        }\n      }\n    }\n  }\n\n  #graphql\n  fragment ProductEndorsementCard on Metaobject {\n    id\n    type\n    description: field(key: "description") {\n      value\n    }\n    name: field(key: "name") {\n      value\n    }\n    position: field(key: "position") {\n      value\n    }\n    image: field(key: "image") {\n      reference {\n        ... on MediaImage {\n          image {\n            height\n            width\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n      variants(first: 100) {\n        nodes {\n          id\n          title\n          selectedOptions {\n            name\n            value\n          }\n          metafield(key: "variant_type", namespace: "custom") {\n            type\n            value\n          }\n        }\n      }\n\n      howToConsume: metafield(key: "how_to_consume", namespace: "custom") {\n        type\n        value\n      }\n      ingredients: metafield(key: "ingredients", namespace: "custom") {\n        type\n        value\n      }\n      certifiedLogos: metafield(key: "certified_logos", namespace: "custom") {\n        references(first: 5) {\n          nodes {\n            ... on MediaImage {\n              image {\n                height\n                width\n                url\n                altText\n              }\n            }\n          }\n        }\n      }\n      accordion: metafield(key: "accordion_content", namespace: "custom") {\n        type\n        reference {\n          ...Accordion\n        }\n      }\n      productEndorsements: metafield(key: "product_endorsements", namespace: "custom") {\n        type\n        references(first: 10) {\n          nodes {\n            ...ProductEndorsementCard\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    handle\n    title\n    productType\n    tags\n    vendor\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    images(first: 10) {\n      nodes {\n        height\n        width\n        url\n        altText\n      }\n    }\n    sellingPlanGroups(first:10) {\n      nodes {\n        ...SellingPlanGroup\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment SellingPlanGroup on SellingPlanGroup {\n    name\n    options {\n      name\n      values\n    }\n    sellingPlans(first:10) {\n      nodes {\n        ...SellingPlan\n      }\n    }\n  }\n  #graphql\n  fragment SellingPlanMoney on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment SellingPlan on SellingPlan {\n    id\n    options {\n      name\n      value\n    }\n    priceAdjustments {\n      adjustmentValue {\n        ... on SellingPlanFixedAmountPriceAdjustment {\n          __typename\n          adjustmentAmount {\n            ... on MoneyV2 {\n               ...SellingPlanMoney\n            }\n          }\n        }\n        ... on SellingPlanFixedPriceAdjustment {\n          __typename\n          price {\n            ... on MoneyV2 {\n              ...SellingPlanMoney\n            }\n          }\n        }\n        ... on SellingPlanPercentagePriceAdjustment {\n          __typename\n          adjustmentPercentage\n        }\n      }\n      orderCount\n    }\n    recurringDeliveries\n    checkoutCharge {\n      type\n      value {\n        ... on MoneyV2 {\n          ...SellingPlanMoney\n        }\n        ... on SellingPlanCheckoutChargePercentageValue {\n          percentage\n        }\n      }\n    }\n }\n\n\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n    sellingPlanAllocations(first: 10) {\n      nodes {\n        sellingPlan {\n          id\n        }\n      }\n    }\n  }\n\n\n  #graphql\n  fragment Accordion on Metaobject {\n    id\n    type\n    title: field(key: "title") {\n      value\n    }\n    collapsible: field(key: "collapsible") {\n      value\n    }\n    iconVariant: field(key: "icon_variant") {\n      value\n    }\n    numberedContent: field(key: "numbered_content") {\n      value\n    }\n    variant: field(key: "variant") {\n      value\n    }\n    content: field(key: "content") {\n      references(first: 20) {\n        nodes {\n          ... on Metaobject {\n            title: field(key: "title") {\n              value\n            }\n            description: field(key: "description") {\n              value\n            }\n          }\n        }\n      }\n    }\n  }\n\n  #graphql\n  fragment ProductEndorsementCard on Metaobject {\n    id\n    type\n    description: field(key: "description") {\n      value\n    }\n    name: field(key: "name") {\n      value\n    }\n    position: field(key: "position") {\n      value\n    }\n    image: field(key: "image") {\n      reference {\n        ... on MediaImage {\n          image {\n            height\n            width\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

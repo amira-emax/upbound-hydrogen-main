@@ -74,7 +74,7 @@ export function ProductPrice({
             </span>
           </s>
           {activePrice ? (
-            <div className={cn('text-secondary-green typo-header flex items-center gap-3')}>
+            <div className={cn('text-mint typo-header flex items-center gap-3')}>
               <div>
                 RM <Money withoutCurrency data={activePrice} className="inline" />
               </div>

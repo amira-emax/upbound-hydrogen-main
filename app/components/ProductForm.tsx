@@ -206,7 +206,7 @@ export function ProductForm({
                 <div className="flex items-start justify-between w-full">
 
                   {/* LEFT SIDE */}
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-3">
                     <input
                       type="radio"
                       checked={purchaseType === 'one-time'}
@@ -250,7 +250,7 @@ export function ProductForm({
               >
                 <div className="flex items-start justify-between w-full">
                   {/* LEFT SIDE */}
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-3">
                     <input
                       type="radio"
                       checked={purchaseType === 'subscription'}

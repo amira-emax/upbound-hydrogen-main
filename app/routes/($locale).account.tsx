@@ -87,8 +87,11 @@ function AccountMenu() {
       >
         Addresses
       </NavLink>
-      <NavLink to="/account/subscriptions" style={isActiveStyle}>
-        &nbsp; Subscriptions &nbsp;
+      <NavLink 
+      to="/account/subscriptions" 
+      style={isActiveStyle}
+      className="typo-caption-responsive text-mid-grey">
+        Subscriptions
       </NavLink>
       <Logout />
     </nav>

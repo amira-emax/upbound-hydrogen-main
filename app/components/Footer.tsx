@@ -50,7 +50,6 @@ export function Footer({
             <Suspense>
               <Await resolve={footerPromise}>
                 {(footer) => {
-                  console.log(footer);
                   return footer?.footerMenu?.groups?.references?.nodes?.map(
                     (group, index) => (
                       <FooterMenu

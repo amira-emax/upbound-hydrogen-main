@@ -334,6 +334,7 @@ export const HERO_FEATURED_PRODUCT_FRAGMENT = `#graphql
       reference {
         ... on Product {
           id
+          handle
           title
           description
           productType

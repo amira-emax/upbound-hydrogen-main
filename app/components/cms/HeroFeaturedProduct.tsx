@@ -1,6 +1,8 @@
 import { Image } from '@shopify/hydrogen';
 import type { HeroFeaturedProductFragment } from 'types/storefrontapi.generated';
 import { AddToCartButton } from '~/components/AddToCartButton';
+import { useVariantUrl } from '~/lib/variants';
+import { Link } from 'react-router';
 
 interface HeroFeaturedProductProps {
   reference: HeroFeaturedProductFragment;
@@ -9,6 +11,7 @@ interface HeroFeaturedProductProps {
 function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
   const platformLogos = reference?.platformLogos?.references?.nodes || [];
   const product = reference?.featuredProduct?.reference;
+  const variantUrl = useVariantUrl(product?.handle);
   const { desktopImage, mobileImage, title } = reference ?? {};
 
   if (!product) return null;
@@ -54,38 +57,47 @@ function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
         {/* Bottom section with product */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-16 items-center mt-auto">
           {/* Product image */}
-          <div className="relative">
-            {(desktopImage?.reference?.image || product.featuredImage) && (
-              <Image
-                data={{
-                  altText:
+          <Link
+            className="flex-1"
+            key={product.id}
+            prefetch="intent"
+            to={variantUrl}
+          >
+
+            <div className="relative">
+              {(desktopImage?.reference?.image || product.featuredImage) && (
+                <Image
+                  data={{
+                    altText:
+                      desktopImage?.reference?.image?.altText ||
+                      product.featuredImage?.altText ||
+                      product.title,
+                    url:
+                      desktopImage?.reference?.image?.url ||
+                      product.featuredImage?.url ||
+                      '',
+                    width:
+                      desktopImage?.reference?.image?.width ||
+                      product.featuredImage?.width ||
+                      0,
+                    height:
+                      desktopImage?.reference?.image?.height ||
+                      product.featuredImage?.height ||
+                      0,
+                    id: product.featuredImage?.id || '',
+                  }}
+                  alt={
                     desktopImage?.reference?.image?.altText ||
                     product.featuredImage?.altText ||
-                    product.title,
-                  url:
-                    desktopImage?.reference?.image?.url ||
-                    product.featuredImage?.url ||
-                    '',
-                  width:
-                    desktopImage?.reference?.image?.width ||
-                    product.featuredImage?.width ||
-                    0,
-                  height:
-                    desktopImage?.reference?.image?.height ||
-                    product.featuredImage?.height ||
-                    0,
-                  id: product.featuredImage?.id || '',
-                }}
-                alt={
-                  desktopImage?.reference?.image?.altText ||
-                  product.featuredImage?.altText ||
-                  product.title
-                }
-                className="w-full rounded-xl md:rounded-none px-4 md:px-0 aspect-square md:aspect-auto md:h-[800px] object-cover"
-                sizes="(min-width: 768px) 50vw, 100vw"
-              />
-            )}
-          </div>
+                    product.title
+                  }
+                  className="w-full rounded-xl md:rounded-none px-4 md:px-0 aspect-square md:aspect-auto md:h-[800px] object-cover"
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                />
+              )}
+            </div>
+          </Link>
+
 
           {/* Product details */}
           <div className="flex flex-col justify-center items-stretch md:items-center lg:items-start space-y-4 md:space-y-6 p-4 lg:p-8">

@@ -2,7 +2,8 @@ import { Image } from '@shopify/hydrogen';
 import type { HeroFeaturedProductFragment } from 'types/storefrontapi.generated';
 import { AddToCartButton } from '~/components/AddToCartButton';
 import { useVariantUrl } from '~/lib/variants';
-import { Link } from 'react-router';
+import { Link, useNavigation } from 'react-router';
+import { Button } from '~/components/ui/button';
 
 interface HeroFeaturedProductProps {
   reference: HeroFeaturedProductFragment;
@@ -13,6 +14,8 @@ function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
   const product = reference?.featuredProduct?.reference;
   const variantUrl = useVariantUrl(product?.handle);
   const { desktopImage, mobileImage, title } = reference ?? {};
+  const navigation = useNavigation();
+  const isLoading = navigation.state === 'loading';
 
   if (!product) return null;
 
@@ -107,8 +110,28 @@ function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
             <p className="typo-p-large text-neutral-200 mix-blend-difference">
               {product.description}
             </p>
+            <Link
+              className="flex-1"
+              key={product.id}
+              prefetch="none"
+              to={variantUrl}
+            >
 
-            <AddToCartButton
+              <Button
+                type="submit"
+                variant="black-mint"
+                size="lg"
+                disabled={
+                  !product?.selectedOrFirstAvailableVariant?.availableForSale
+                }
+                className="rounded-none w-full md:w-fit"
+              >
+                {isLoading ? "Loading..." : "DISCOVER"}
+              </Button>
+
+            </Link>
+
+            {/* <AddToCartButton
               size="lg"
               variant="black-mint"
               disabled={
@@ -131,7 +154,7 @@ function HeroFeaturedProduct({ reference }: HeroFeaturedProductProps) {
               page="Hero Featured Product"
             >
               ADD TO CART
-            </AddToCartButton>
+            </AddToCartButton> */}
           </div>
         </div>
       </div>

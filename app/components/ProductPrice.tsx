@@ -13,6 +13,8 @@ export function ProductPrice({
   selectedSellingPlan,
   selectedVariant,
   purchaseType, // 👇 ADDED THIS PROP
+  unitCount,
+  unitLabel = 'can',
 }: {
   price?: MoneyV2;
   compareAtPrice?: MoneyV2 | null;
@@ -23,6 +25,8 @@ export function ProductPrice({
   selectedVariant?: ProductFragment['selectedOrFirstAvailableVariant'];
   selectedSellingPlan?: SellingPlanFragment | null;
   purchaseType?: 'one-time' | 'subscription'; // 👇 ADDED THIS TYPE
+  unitCount?: number;
+  unitLabel?: string;
 }) {
   if (isLoading) {
     return (
@@ -95,6 +99,11 @@ export function ProductPrice({
         </div>
       ) : (
         <p>&nbsp;</p>
+      )}
+      {unitCount && unitCount > 0 && activePrice && (
+        <p className="typo-p-small text-mid-grey">
+          RM {(parseFloat(activePrice.amount) / unitCount).toFixed(2)} per {unitLabel}
+        </p>
       )}
     </div>
   );

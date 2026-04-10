@@ -221,6 +221,7 @@ export default function Product() {
         mediaImages={(images.nodes ?? []) as ShopifyImage[]}
       />
       <div className="page-px">
+        sini
         <div className="product">
           <DesktopProductImage
             // TODO: listen to selected variant
@@ -228,8 +229,9 @@ export default function Product() {
             mediaImages={(images.nodes ?? []) as ShopifyImage[]}
           />
           <div className="product-main space-y-6 col-span-6">
-            <h2>{title}</h2>
+            <h2>{title}2222</h2>
             <p className="typo-p-small text-mid-grey">{variantType}</p>
+            <p className="typo-p-small">Hydration + focus support without the energy drink crash</p>
             <ProductPrice
               price={selectedVariant?.price}
               compareAtPrice={selectedVariant?.compareAtPrice}
@@ -238,6 +240,7 @@ export default function Product() {
               selectedSellingPlan={selectedSellingPlan}
               selectedVariant={selectedVariant}
               purchaseType={purchaseType}
+              unitCount={Number((selectedVariant as any)?.unitsPerPack?.value) || undefined}
             />
             <ProductForm
               productOptions={productOptions}
@@ -247,6 +250,7 @@ export default function Product() {
               purchaseType={purchaseType}
               setPurchaseType={setPurchaseType}
             />
+            
             <Accordion
               type="multiple"
               defaultValue={['description', 'how-to-consume', 'ingredient']}
@@ -256,12 +260,21 @@ export default function Product() {
                 className="border-neutral-900 border-t border-b-0"
               >
                 <AccordionTrigger className="typo-caption-responsive-uppercase pt-[12px] md:pt-[24px] data-[state=closed]:pb-[24px] data-[state=open]:pb-[12px]">
-                  Description
+                  Description 12
                 </AccordionTrigger>
                 <AccordionContent className="typo-p">
                   <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                 </AccordionContent>
               </AccordionItem>
+
+               {/* product additional components */}
+        {accordion?.reference && (
+          <HeroAccordion
+            reference={accordion.reference}
+            className="mt-10 mb-0 max-w-full"
+          />
+        )}
+
               {ingredients && (
                 <AccordionItem
                   value="ingredient"
@@ -456,6 +469,9 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
     unitPrice {
       amount
       currencyCode
+    }
+    unitsPerPack: metafield(key: "units_per_pack", namespace: "custom") {
+      value
     }
     sellingPlanAllocations(first: 10) {
       nodes {

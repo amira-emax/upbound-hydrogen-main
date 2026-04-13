@@ -221,7 +221,6 @@ export default function Product() {
         mediaImages={(images.nodes ?? []) as ShopifyImage[]}
       />
       <div className="page-px">
-        sini
         <div className="product">
           <DesktopProductImage
             // TODO: listen to selected variant
@@ -229,7 +228,7 @@ export default function Product() {
             mediaImages={(images.nodes ?? []) as ShopifyImage[]}
           />
           <div className="product-main space-y-6 col-span-6">
-            <h2>{title}2222</h2>
+            <h2>{title}</h2>
             <p className="typo-p-small text-mid-grey">{variantType}
               <span><p className="typo-p-small text-black">Hydration + focus support without the energy drink crash</p>
               </span>
@@ -255,7 +254,7 @@ export default function Product() {
 
             <Accordion
               type="multiple"
-              defaultValue={['description', 'how-to-consume', 'ingredient']}
+              defaultValue={['description', 'how-to-consume', 'ingredient', 'benefit']}
             >
               <AccordionItem
                 value="description"

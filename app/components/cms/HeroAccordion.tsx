@@ -60,7 +60,7 @@ function HeroAccordion({reference, className, size = 'default'}: HeroAccordionPr
             variant?.value === 'faq' && 'text-center',
           )}
         >
-          {title.value} siniiiii
+          {title.value}
         </p>
       )}
 

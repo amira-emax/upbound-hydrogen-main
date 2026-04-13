@@ -155,8 +155,8 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 
 export default function Product() {
   const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
-  
-// Optimistically selects a variant with given available variant information
+
+  // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
@@ -170,7 +170,7 @@ export default function Product() {
 
   useEffect(() => {
     const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
-    
+
     if (!hasSubscription && purchaseType === 'subscription') {
       setPurchaseType('one-time');
     }
@@ -230,8 +230,10 @@ export default function Product() {
           />
           <div className="product-main space-y-6 col-span-6">
             <h2>{title}2222</h2>
-            <p className="typo-p-small text-mid-grey">{variantType}</p>
-            <p className="typo-p-small">Hydration + focus support without the energy drink crash</p>
+            <p className="typo-p-small text-mid-grey">{variantType}
+              <span><p className="typo-p-small text-black">Hydration + focus support without the energy drink crash</p>
+              </span>
+            </p>
             <ProductPrice
               price={selectedVariant?.price}
               compareAtPrice={selectedVariant?.compareAtPrice}
@@ -250,7 +252,7 @@ export default function Product() {
               purchaseType={purchaseType}
               setPurchaseType={setPurchaseType}
             />
-            
+
             <Accordion
               type="multiple"
               defaultValue={['description', 'how-to-consume', 'ingredient']}
@@ -260,20 +262,33 @@ export default function Product() {
                 className="border-neutral-900 border-t border-b-0"
               >
                 <AccordionTrigger className="typo-caption-responsive-uppercase pt-[12px] md:pt-[24px] data-[state=closed]:pb-[24px] data-[state=open]:pb-[12px]">
-                  Description 12
+                  Description
                 </AccordionTrigger>
                 <AccordionContent className="typo-p">
                   <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                 </AccordionContent>
               </AccordionItem>
 
-               {/* product additional components */}
-        {accordion?.reference && (
-          <HeroAccordion
-            reference={accordion.reference}
-            className="mt-10 mb-0 max-w-full"
-          />
-        )}
+
+
+              {/* product additional components */}
+              {accordion?.reference && (
+                <AccordionItem value="benefit"
+                  className="border-neutral-900 border-t border-b-0">
+                  <AccordionTrigger className="typo-caption-responsive-uppercase pt-3 md:pt-6 data-[state=closed]:pb-6 data-[state=open]:pb-3">
+                    Benefit
+                  </AccordionTrigger>
+                  <AccordionContent className="typo-p">
+                    <HeroAccordion
+                      reference={accordion.reference}
+                      className="mt-1 mb-0 max-w-full"
+                      size="small"
+                    />
+                  </AccordionContent>
+
+                </AccordionItem>
+
+              )}
 
               {ingredients && (
                 <AccordionItem
@@ -345,7 +360,7 @@ export default function Product() {
                   value="how-to-consume"
                   className="border-neutral-900 border-t border-b-0"
                 >
-                  <AccordionTrigger className="typo-caption-responsive-uppercase pt-[12px] md:pt-[24px] data-[state=closed]:pb-[24px] data-[state=open]:pb-[12px]">
+                  <AccordionTrigger className="typo-caption-responsive-uppercase pt-3 md:pt-6 data-[state=closed]:pb-6 data-[state=open]:pb-3">
                     How To Consume
                   </AccordionTrigger>
                   <AccordionContent className="typo-p whitespace-pre-line">
@@ -358,12 +373,12 @@ export default function Product() {
         </div>
 
         {/* product additional components */}
-        {accordion?.reference && (
+        {/* {accordion?.reference && (
           <HeroAccordion
             reference={accordion.reference}
             className="mt-10 mb-0 max-w-full"
           />
-        )}
+        )} */}
 
         {/* old {ingredients} */}
         {/* <div className="mt-10 p-8 mx-auto bg-white rounded-xl space-y-3">

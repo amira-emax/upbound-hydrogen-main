@@ -11,9 +11,10 @@ interface HeroAccordionProps {
   reference: AccordionFragment;
   titleCentered?: boolean;
   className?: string;
+  size?: 'default' | 'small';
 }
 
-function HeroAccordion({reference, className}: HeroAccordionProps) {
+function HeroAccordion({reference, className, size = 'default'}: HeroAccordionProps) {
   const {
     title,
     type,
@@ -27,10 +28,28 @@ function HeroAccordion({reference, className}: HeroAccordionProps) {
   const isCollapsible = collapsible?.value === 'true';
   const isNumbered = numberedContent?.value === 'true';
 
+  const isSmall = size === 'small';
+
+  if (isSmall) {
+    return (
+      <div className={cn('w-full flex flex-col gap-4', className)}>
+        {accordionItems.map((item, index) => (
+          <div key={index} className="flex flex-col">
+            <p className="typo-caption-responsive-uppercase flex gap-3">
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <span>{item.title?.value}</span>
+            </p>
+            <p className="typo-p text-mid-grey whitespace-pre-line">{item.description?.value}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
-        'max-w-content my-[100px] px-4 md:px-8 py-8  bg-white rounded-xl space-y-3',
+        'max-w-content my-25 px-4 md:px-8 py-8 bg-white rounded-xl space-y-3',
         className,
       )}
     >
@@ -41,7 +60,7 @@ function HeroAccordion({reference, className}: HeroAccordionProps) {
             variant?.value === 'faq' && 'text-center',
           )}
         >
-          {title.value}
+          {title.value} siniiiii
         </p>
       )}
 
@@ -60,15 +79,16 @@ function HeroAccordion({reference, className}: HeroAccordionProps) {
             >
               <AccordionTrigger
                 iconVariant={iconVariant?.value === 'plus' ? 'plus' : 'arrow'}
-                className={cn(
-                  'flex items-center pt-[20px] gap-2 md:gap-0',
-                  'data-[state=closed]:pb-[20px] data-[state=open]:pb-[16px] data-[state=open]:md:pb-[20px]',
-                )}
+                className="flex items-center gap-2 md:gap-0 pt-5 data-[state=closed]:pb-5 data-[state=open]:pb-4 data-[state=open]:md:pb-5"
               >
-                {isNumbered && <h2 className="w-[10%]">{itemNumber}</h2>}
-                <h2 className="flex-1 break-words">{item.title?.value}</h2>
+                {isNumbered && (
+                  <span className="w-[10%]">{itemNumber}</span>
+                )}
+                <span className="flex-1 wrap-break-word typo-p">
+                  {item.title?.value}
+                </span>
               </AccordionTrigger>
-              <AccordionContent className="pb-[24px] flex">
+              <AccordionContent className="flex pb-6">
                 {isNumbered && <span className="w-[10%]" />}
                 <p className="flex-1 typo-p-small whitespace-pre-line">
                   {item.description?.value}

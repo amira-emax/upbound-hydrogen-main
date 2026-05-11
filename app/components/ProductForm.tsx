@@ -16,6 +16,51 @@ import {
   type SellingPlanGroup,
 } from '~/components/SellingPlanSelector';
 
+const FREE_GIFT_CONFIG = {
+  '6-cans': {
+    name: 'Tote Bag',
+    variantId: 'gid://shopify/ProductVariant/10966462431425',
+    condition: '6-can pack',
+  },
+  '24-cans': {
+    name: 'T-Shirt',
+    variantId: 'gid://shopify/ProductVariant/49641234399425',
+    condition: '24-can pack',
+  },
+  subscription: {
+    name: 'Windbreaker',
+    variantId: 'gid://shopify/ProductVariant/10966462300353',
+    condition: 'Subscribe & Save',
+  },
+} as const;
+
+function getFreeGift(
+  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'],
+  purchaseType: 'one-time' | 'subscription',
+) {
+  if (purchaseType === 'subscription') return FREE_GIFT_CONFIG.subscription;
+
+  const allValues = [
+    selectedVariant?.title ?? '',
+    ...(selectedVariant?.selectedOptions?.map((o) => o.value) ?? []),
+  ].join(' ');
+
+  if (/\b24\b/.test(allValues)) return FREE_GIFT_CONFIG['24-cans'];
+  if (/\b6\b/.test(allValues)) return FREE_GIFT_CONFIG['6-cans'];
+  return null;
+}
+
+type GiftVariant = {
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  price: { amount: string; currencyCode: string };
+  compareAtPrice: { amount: string; currencyCode: string } | null;
+  selectedOptions: Array<{ name: string; value: string }>;
+  image: { url: string; altText: string | null; width: number | null; height: number | null } | null;
+  product: { title: string; handle: string };
+};
+
 export function ProductForm({
   productOptions,
   selectedVariant,
@@ -23,6 +68,7 @@ export function ProductForm({
   selectedSellingPlan,
   purchaseType,
   setPurchaseType,
+  giftVariants = [],
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -30,6 +76,7 @@ export function ProductForm({
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
   purchaseType: 'one-time' | 'subscription';
   setPurchaseType: (type: 'one-time' | 'subscription') => void;
+  giftVariants?: GiftVariant[];
 }) {
   const navigate = useNavigate();
   const { open } = useAside();
@@ -62,6 +109,11 @@ export function ProductForm({
     selectedSellingPlan?.id ||
     selectedVariant?.sellingPlanAllocations?.nodes?.[0]?.sellingPlan?.id;
 
+  const freeGift = getFreeGift(selectedVariant, purchaseType);
+  const freeGiftVariant = freeGift
+    ? giftVariants.find((v) => v.id === freeGift.variantId) ?? null
+    : null;
+
   return (
     <div className="product-form">
       {productOptions.map((option) => {
@@ -71,7 +123,7 @@ export function ProductForm({
         return (
           <div className="product-options" key={option.name}>
             <p className="typo-caption-responsive-uppercase pb-3">
-              {option.name}
+              {option.name} 12
             </p>
             <div className="product-options-grid">
               {option.optionValues.map((value) => {
@@ -163,14 +215,18 @@ export function ProductForm({
           lines={
             selectedVariant
               ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity,
-                  ...(purchaseType === 'subscription' && activeSellingPlanId && {
-                    sellingPlanId: activeSellingPlanId,
-                  }),
-                },
-              ]
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity,
+                    selectedVariant,
+                    ...(purchaseType === 'subscription' && activeSellingPlanId && {
+                      sellingPlanId: activeSellingPlanId,
+                    }),
+                  },
+                  ...(freeGift && freeGiftVariant
+                    ? [{ merchandiseId: freeGift.variantId, quantity: 1, selectedVariant: freeGiftVariant }]
+                    : []),
+                ]
               : []
           }
           buttonClassName="rounded-none w-full"
@@ -357,6 +413,29 @@ export function ProductForm({
           </div>
         )}
       </div>
+
+      {freeGift && selectedVariant?.availableForSale && (
+        <div className="mt-6 border-t pt-6">
+          <p className="typo-caption-responsive-uppercase pb-4">Free Gift</p>
+          <div className="border border-black p-4 flex items-center gap-4">
+            <div className="shrink-0 w-8 h-8 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125a2.625 2.625 0 000-5.25zM4.875 9.375A2.625 2.625 0 107.5 12H4.875A2.625 2.625 0 002.25 9.375zm14.25 0A2.625 2.625 0 1019.125 12H16.5a2.625 2.625 0 00-2.625-2.625z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25M3.375 12h17.25" />
+              </svg>
+            </div>
+            <div className="flex flex-col flex-1">
+              <span className="font-medium uppercase text-sm">{freeGift.name}</span>
+              <span className="text-xs text-gray-500 mt-0.5">
+                Free with your {freeGift.condition}
+              </span>
+            </div>
+            <span className="text-xs bg-mint px-2 py-1 font-bold uppercase tracking-wide rounded-full shrink-0">
+              Free
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

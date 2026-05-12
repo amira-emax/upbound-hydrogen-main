@@ -1,10 +1,10 @@
-import type {CartApiQueryFragment} from 'types/storefrontapi.generated';
-import type {CartLayout} from '~/components/CartMain';
-import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
-import {useRef} from 'react';
-import {FetcherWithComponents} from 'react-router';
-import {cn} from '~/lib/utils';
-import {Button} from './ui/button';
+import type { CartApiQueryFragment } from 'types/storefrontapi.generated';
+import type { CartLayout } from '~/components/CartMain';
+import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
+import { useRef } from 'react';
+import { FetcherWithComponents } from 'react-router';
+import { cn } from '~/lib/utils';
+import { Button } from './ui/button';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -33,19 +33,35 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       </dl>
       {/* <CartDiscounts discountCodes={cart.discountCodes} />
       <CartGiftCard giftCardCodes={cart.appliedGiftCards} /> */}
-      <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
+      <CartCheckoutActions checkoutUrl={cart.checkoutUrl} lines={cart.lines?.nodes} />
       <p className="typo-caption-responsive text-mid-grey text-center">
         Taxes and shipping calculated at checkout
       </p>
     </div>
   );
 }
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+function CartCheckoutActions({
+  checkoutUrl,
+  lines,
+}: {
+  checkoutUrl?: string;
+  lines?: CartApiQueryFragment['lines']['nodes'];
+}) {
   if (!checkoutUrl) return null;
+
+  function logCheckout() {
+    console.log('[Checkout] URL:', checkoutUrl);
+    console.log('[Checkout] Lines going to checkout:');
+    (lines ?? []).forEach((line, i) => {
+      console.log(
+        `  [${i + 1}] ${line.merchandise.product.title} — ${line.merchandise.title} | qty: ${line.quantity} | id: ${line.merchandise.id}`,
+      );
+    });
+  }
 
   return (
     <div>
-      <a href={checkoutUrl} target="_self">
+      <a href={checkoutUrl} target="_self" onClick={logCheckout}>
         <Button size="lg" className="rounded-none w-full">
           Checkout
         </Button>
@@ -63,7 +79,7 @@ function CartDiscounts({
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
-      ?.map(({code}) => code) || [];
+      ?.map(({ code }) => code) || [];
 
   return (
     <div>
@@ -121,7 +137,7 @@ function CartGiftCard({
   const appliedGiftCardCodes = useRef<string[]>([]);
   const giftCardCodeInput = useRef<HTMLInputElement>(null);
   const codes: string[] =
-    giftCardCodes?.map(({lastCharacters}) => `***${lastCharacters}`) || [];
+    giftCardCodes?.map(({ lastCharacters }) => `***${lastCharacters}`) || [];
 
   function saveAppliedCode(code: string) {
     const formattedCode = code.replace(/\s/g, ''); // Remove spaces

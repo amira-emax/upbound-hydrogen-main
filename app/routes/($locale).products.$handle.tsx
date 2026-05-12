@@ -77,20 +77,12 @@ async function loadCriticalData({
     throw new Error('Expected product handle to be defined');
   }
 
-  const GIFT_VARIANT_IDS = [
-    'gid://shopify/ProductVariant/10966462431425',
-    'gid://shopify/ProductVariant/49641234399425',
-    'gid://shopify/ProductVariant/10966462300353',
-  ];
-
-  const [{ product }, { nodes: giftVariantNodes }] = await Promise.all([
+  const [{ product }] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: { handle, selectedOptions: getSelectedProductOptions(request) },
     }),
-    storefront.query(GIFT_VARIANTS_QUERY, {
-      variables: { ids: GIFT_VARIANT_IDS },
-    }),
   ]);
+
 
   if (!product?.id) {
     throw new Response(null, { status: 404 });
@@ -143,21 +135,9 @@ async function loadCriticalData({
     }
   }
 
-  const giftVariants = (giftVariantNodes ?? []).filter(Boolean) as Array<{
-    id: string;
-    title: string;
-    availableForSale: boolean;
-    price: { amount: string; currencyCode: string };
-    compareAtPrice: { amount: string; currencyCode: string } | null;
-    selectedOptions: Array<{ name: string; value: string }>;
-    image: { url: string; altText: string | null; width: number | null; height: number | null } | null;
-    product: { title: string; handle: string };
-  }>;
-
   return {
     product,
     selectedSellingPlan,
-    giftVariants,
   };
 }
 
@@ -174,7 +154,7 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 }
 
 export default function Product() {
-  const { product, selectedSellingPlan, giftVariants } = useLoaderData<typeof loader>();
+  const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -270,7 +250,6 @@ export default function Product() {
               sellingPlanGroups={sellingPlanGroups}
               purchaseType={purchaseType}
               setPurchaseType={setPurchaseType}
-              giftVariants={giftVariants}
             />
 
             <Accordion
@@ -730,21 +709,4 @@ const PRODUCT_QUERY = `#graphql
   ${PRODUCT_FRAGMENT}
   ${ACCORDION_FRAGMENT}
   ${PRODUCT_ENDORSEMENT_CARD_FRAGMENT}
-` as const;
-
-const GIFT_VARIANTS_QUERY = `#graphql
-  query GiftVariants($ids: [ID!]!) {
-    nodes(ids: $ids) {
-      ... on ProductVariant {
-        id
-        title
-        availableForSale
-        price { amount currencyCode }
-        compareAtPrice { amount currencyCode }
-        selectedOptions { name value }
-        image { url altText width height }
-        product { title handle }
-      }
-    }
-  }
 ` as const;

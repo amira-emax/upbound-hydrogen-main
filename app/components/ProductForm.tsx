@@ -19,7 +19,7 @@ import {
 const FREE_GIFT_CONFIG = {
   '6-cans': {
     name: 'Tote Bag',
-    variantId: 'gid://shopify/ProductVariant/10966462431425',
+    variantId: 'gid://shopify/ProductVariant/50182545703105',
     condition: '6-can pack',
   },
   '24-cans': {
@@ -29,7 +29,7 @@ const FREE_GIFT_CONFIG = {
   },
   subscription: {
     name: 'Windbreaker',
-    variantId: 'gid://shopify/ProductVariant/10966462300353',
+    variantId: 'gid://shopify/ProductVariant/50182544818369',
     condition: 'Subscribe & Save',
   },
 } as const;
@@ -45,21 +45,10 @@ function getFreeGift(
     ...(selectedVariant?.selectedOptions?.map((o) => o.value) ?? []),
   ].join(' ');
 
-  if (/\b24\b/.test(allValues)) return FREE_GIFT_CONFIG['24-cans'];
-  if (/\b6\b/.test(allValues)) return FREE_GIFT_CONFIG['6-cans'];
+if (/\b24s?\b/i.test(allValues)) return FREE_GIFT_CONFIG['24-cans'];
+  if (/\b6s?\b/i.test(allValues)) return FREE_GIFT_CONFIG['6-cans'];
   return null;
 }
-
-type GiftVariant = {
-  id: string;
-  title: string;
-  availableForSale: boolean;
-  price: { amount: string; currencyCode: string };
-  compareAtPrice: { amount: string; currencyCode: string } | null;
-  selectedOptions: Array<{ name: string; value: string }>;
-  image: { url: string; altText: string | null; width: number | null; height: number | null } | null;
-  product: { title: string; handle: string };
-};
 
 export function ProductForm({
   productOptions,
@@ -68,7 +57,6 @@ export function ProductForm({
   selectedSellingPlan,
   purchaseType,
   setPurchaseType,
-  giftVariants = [],
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -76,14 +64,13 @@ export function ProductForm({
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
   purchaseType: 'one-time' | 'subscription';
   setPurchaseType: (type: 'one-time' | 'subscription') => void;
-  giftVariants?: GiftVariant[];
 }) {
   const navigate = useNavigate();
-  const { open } = useAside();
+  useAside();
 
   const [quantity, setQuantity] = useState(1);
 
-  const hasSubscription = selectedVariant?.sellingPlanAllocations?.nodes?.length > 0;
+  const hasSubscription = (selectedVariant?.sellingPlanAllocations?.nodes?.length ?? 0) > 0;
 
   useEffect(() => {
     if (!hasSubscription) {
@@ -110,8 +97,17 @@ export function ProductForm({
     selectedVariant?.sellingPlanAllocations?.nodes?.[0]?.sellingPlan?.id;
 
   const freeGift = getFreeGift(selectedVariant, purchaseType);
-  const freeGiftVariant = freeGift
-    ? giftVariants.find((v) => v.id === freeGift.variantId) ?? null
+  const freeGiftSelectedVariant = freeGift
+    ? ({
+        id: freeGift.variantId,
+        title: freeGift.name,
+        availableForSale: true,
+        price: {amount: '0.00', currencyCode: 'MYR'},
+        compareAtPrice: null,
+        selectedOptions: [],
+        image: null,
+        product: {title: freeGift.name, handle: ''},
+      } as any)
     : null;
 
   return (
@@ -215,6 +211,9 @@ export function ProductForm({
           lines={
             selectedVariant
               ? [
+                  ...(freeGift
+                    ? [{merchandiseId: freeGift.variantId, quantity: 1, selectedVariant: freeGiftSelectedVariant}]
+                    : []),
                   {
                     merchandiseId: selectedVariant.id,
                     quantity,
@@ -223,9 +222,6 @@ export function ProductForm({
                       sellingPlanId: activeSellingPlanId,
                     }),
                   },
-                  ...(freeGift && freeGiftVariant
-                    ? [{ merchandiseId: freeGift.variantId, quantity: 1, selectedVariant: freeGiftVariant }]
-                    : []),
                 ]
               : []
           }
@@ -338,7 +334,7 @@ export function ProductForm({
                         <div className="flex items-center gap-2">
                           {/* Slashed Original Price */}
                           <s className="text-gray-400 text-sm">
-                            RM <Money withoutCurrency data={originalPrice} className="inline" />
+                            RM <Money withoutCurrency data={originalPrice!} className="inline" />
                           </s>
                           {/* New Subscription Price */}
                           <span className="font-bold text-black">

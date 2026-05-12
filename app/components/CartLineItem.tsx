@@ -13,6 +13,12 @@ import { Button } from './ui/button';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
+export const GIFT_VARIANT_IDS = new Set([
+  'gid://shopify/ProductVariant/50182545703105', // Tote Bag
+  'gid://shopify/ProductVariant/49641234399425', // T-Shirt (S)
+  'gid://shopify/ProductVariant/50182544818369', // Windbreaker
+]);
+
 /**
  * A single line item in the cart. It displays the product image, title, price.
  * It also provides controls to update the quantity or remove the line item.
@@ -20,9 +26,11 @@ type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 export function CartLineItem({
   layout,
   line,
+  giftLineId,
 }: {
   layout: CartLayout;
   line: CartLine;
+  giftLineId?: string;
 }) {
   const { id, merchandise, isOptimistic, sellingPlanAllocation } = line;
   const { product, title, image, selectedOptions } = merchandise;
@@ -30,6 +38,7 @@ export function CartLineItem({
   const { close } = useAside();
   const { loadingLineIds } = useCartLine();
   const isLineLoading = loadingLineIds.has(id);
+  const isGift = GIFT_VARIANT_IDS.has(merchandise.id);
 
   return (
     <li key={id} className="flex py-4 border-b border-neutral-400 gap-4 typo-p">
@@ -75,13 +84,24 @@ export function CartLineItem({
             ))}
           </ul>
         </div>
-        <CartLineRemoveButton lineIds={[id]} disabled={!!isOptimistic} />
-        <CartLineQuantity line={line} />
-        <ProductPrice
-          price={line?.cost?.totalAmount}
-          className="self-end"
-          isLoading={isLineLoading || !!isOptimistic}
-        />
+        <CartLineRemoveButton lineIds={giftLineId ? [id, giftLineId] : [id]} disabled={!!isOptimistic} />
+        {isGift ? (
+          <div className="col-span-2 flex items-center justify-between">
+            <span className="text-xs text-gray-400">Included in your order</span>
+            <span className="text-xs bg-mint px-2 py-1 font-bold uppercase tracking-wide rounded-full">
+              Free
+            </span>
+          </div>
+        ) : (
+          <>
+            <CartLineQuantity line={line} />
+            <ProductPrice
+              price={line?.cost?.totalAmount}
+              className="self-end"
+              isLoading={isLineLoading || !!isOptimistic}
+            />
+          </>
+        )}
       </div>
     </li>
   );

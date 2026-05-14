@@ -97,40 +97,65 @@ async function loadCriticalData({
     variables: { handle, selectedOptions: getSelectedProductOptions(request) },
   });
 
-  // Collect gift variant IDs from the selected variant's metafields
   const selectedVar = product?.selectedOrFirstAvailableVariant as any;
-  const freeGiftId: string | null = selectedVar?.freeGift?.value ?? null;
-  const freeGiftSubRaw: string | null = selectedVar?.freeGiftSubscription?.value ?? null;
-  const freeGiftIds: string[] = freeGiftId ? parseGiftValue(freeGiftId) : [];
-  const freeGiftSubIds: string[] = freeGiftSubRaw ? parseGiftValue(freeGiftSubRaw) : [];
-  const giftIdsToFetch = [...new Set([...freeGiftIds, ...freeGiftSubIds])];
 
-  const giftImages: Record<string, { url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: { name: string; value: string }[] }> = {};
-  if (giftIdsToFetch.length > 0) {
-    const { nodes: giftNodes } = await storefront.query<any>(
-      `query GiftImages($ids: [ID!]!) {
-        nodes(ids: $ids) {
-          ... on ProductVariant {
-            id
-            product { title }
-            image { url altText width height }
-            selectedOptions { name value }
+  type GiftImageEntry = { url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: { name: string; value: string }[]; sizeChartUrl: string | null };
+  const giftImages: Record<string, GiftImageEntry> = {};
+
+  function addNode(node: any) {
+    if (node?.id) {
+      giftImages[node.id] = {
+        url: node.image?.url ?? null,
+        altText: node.image?.altText ?? null,
+        width: node.image?.width ?? 0,
+        height: node.image?.height ?? 0,
+        title: node.product?.title ?? '',
+        selectedOptions: node.selectedOptions ?? [],
+        sizeChartUrl: node.product?.sizeChart?.reference?.image?.url ?? null,
+      };
+    }
+  }
+
+  // Use embedded references (single round-trip — works when metafield type is variant_reference / list.variant_reference)
+  const freeGiftRefs: any[] = selectedVar?.freeGift?.references?.nodes ?? [];
+  const freeGiftSubRefs: any[] = selectedVar?.freeGiftSubscription?.references?.nodes ?? [];
+  freeGiftRefs.forEach(addNode);
+  freeGiftSubRefs.forEach(addNode);
+
+  // Fall back to separate query when references are empty (json / single_line_text_field metafield type)
+  if (Object.keys(giftImages).length === 0) {
+    const freeGiftId: string | null = selectedVar?.freeGift?.value ?? null;
+    const freeGiftSubRaw: string | null = selectedVar?.freeGiftSubscription?.value ?? null;
+    const giftIdsToFetch = [
+      ...new Set([
+        ...(freeGiftId ? parseGiftValue(freeGiftId) : []),
+        ...(freeGiftSubRaw ? parseGiftValue(freeGiftSubRaw) : []),
+      ]),
+    ];
+    if (giftIdsToFetch.length > 0) {
+      const { nodes: giftNodes } = await storefront.query<any>(
+        `query GiftImages($ids: [ID!]!) {
+          nodes(ids: $ids) {
+            ... on ProductVariant {
+              id
+              product {
+                title
+                sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+              }
+              image { url altText width height }
+              selectedOptions { name value }
+            }
           }
-        }
-      }`,
-      { variables: { ids: giftIdsToFetch } },
-    );
-    for (const node of giftNodes ?? []) {
-      if (node?.id) {
-        giftImages[node.id] = {
-          url: node.image?.url ?? null,
-          altText: node.image?.altText ?? null,
-          width: node.image?.width ?? 0,
-          height: node.image?.height ?? 0,
-          title: node.product?.title ?? '',
-          selectedOptions: node.selectedOptions ?? [],
-        };
-      }
+        }`,
+        { variables: { ids: giftIdsToFetch } },
+      );
+      (giftNodes ?? []).forEach(addNode);
     }
   }
 
@@ -542,9 +567,47 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
     }
     freeGift: metafield(key: "free_gift", namespace: "custom") {
       value
+      references(first: 10) {
+        nodes {
+          ... on ProductVariant {
+            id
+            product {
+              title
+              sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+            }
+            image { url altText width height }
+            selectedOptions { name value }
+          }
+        }
+      }
     }
     freeGiftSubscription: metafield(key: "free_gift_subscription", namespace: "custom") {
       value
+      references(first: 10) {
+        nodes {
+          ... on ProductVariant {
+            id
+            product {
+              title
+              sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+            }
+            image { url altText width height }
+            selectedOptions { name value }
+          }
+        }
+      }
     }
     sellingPlanAllocations(first: 10) {
       nodes {

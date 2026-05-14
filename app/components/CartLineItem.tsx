@@ -13,11 +13,6 @@ import { Button } from './ui/button';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
-export const GIFT_VARIANT_IDS = new Set([
-  'gid://shopify/ProductVariant/50182545703105', // Tote Bag
-  'gid://shopify/ProductVariant/49641234399425', // T-Shirt (S)
-  'gid://shopify/ProductVariant/50182544818369', // Windbreaker
-]);
 
 /**
  * A single line item in the cart. It displays the product image, title, price.
@@ -38,7 +33,7 @@ export function CartLineItem({
   const { close } = useAside();
   const { loadingLineIds } = useCartLine();
   const isLineLoading = loadingLineIds.has(id);
-  const isGift = GIFT_VARIANT_IDS.has(merchandise.id);
+  const isGift = line.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true') ?? false;
 
   return (
     <li key={id} className="flex py-4 border-b border-neutral-400 gap-4 typo-p">

@@ -16,35 +16,20 @@ import {
   type SellingPlanGroup,
 } from '~/components/SellingPlanSelector';
 
-const FREE_GIFT_CONFIG = {
-  '6-cans': {
-    name: 'Tote Bag',
-    variantId: 'gid://shopify/ProductVariant/50182545703105',
-  },
-  '24-cans': {
-    name: 'T-Shirt',
-    variantId: 'gid://shopify/ProductVariant/49641234399425',
-  },
-  subscription: {
-    name: 'Windbreaker',
-    variantId: 'gid://shopify/ProductVariant/50182544818369',
-  },
-} as const;
 
-function getFreeGift(
-  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'],
-  purchaseType: 'one-time' | 'subscription',
-) {
-  if (purchaseType === 'subscription') return FREE_GIFT_CONFIG.subscription;
-
-  const allValues = [
-    selectedVariant?.title ?? '',
-    ...(selectedVariant?.selectedOptions?.map((o) => o.value) ?? []),
-  ].join(' ');
-
-if (/\b24s?\b/i.test(allValues)) return FREE_GIFT_CONFIG['24-cans'];
-  if (/\b6s?\b/i.test(allValues)) return FREE_GIFT_CONFIG['6-cans'];
-  return null;
+function parseGiftValue(raw: string): string[] {
+  const stripped = raw.trim().replace(/^'([\s\S]*)'$/, '$1');
+  try {
+    const parsed = JSON.parse(stripped);
+    return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+  } catch {
+    try {
+      const parsed = JSON.parse(stripped.replace(/'/g, '"'));
+      return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+    } catch {
+      return raw.trim() ? [raw.trim()] : [];
+    }
+  }
 }
 
 export function ProductForm({
@@ -62,7 +47,7 @@ export function ProductForm({
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
   purchaseType: 'one-time' | 'subscription';
   setPurchaseType: (type: 'one-time' | 'subscription') => void;
-  giftImages?: Record<string, {url: string; altText: string | null; width: number; height: number; title: string}>;
+  giftImages?: Record<string, {url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: {name: string; value: string}[]}>;
 }) {
   const navigate = useNavigate();
   useAside();
@@ -95,17 +80,40 @@ export function ProductForm({
     selectedSellingPlan?.id ||
     selectedVariant?.sellingPlanAllocations?.nodes?.[0]?.sellingPlan?.id;
 
-  const freeGift = getFreeGift(selectedVariant, purchaseType);
-  const freeGiftSelectedVariant = freeGift
+  // Read gift config from variant metafields
+  const variantAny = selectedVariant as any;
+  const freeGiftId: string | null = variantAny?.freeGift?.value ?? null;
+  const freeGiftSubRaw: string | null = variantAny?.freeGiftSubscription?.value ?? null;
+  const isSubscription = purchaseType === 'subscription';
+
+  // Parse both metafields — each can be a single GID or an array of GIDs
+  const freeGiftIds: string[] = freeGiftId ? parseGiftValue(freeGiftId) : [];
+  const freeGiftSubIds: string[] = freeGiftSubRaw ? parseGiftValue(freeGiftSubRaw) : [];
+
+  // Pick the active gift based on purchase type
+  const activeGiftIds = isSubscription ? freeGiftSubIds : freeGiftIds;
+  const giftVariantId: string | null = activeGiftIds[0] ?? null;
+
+  // Size selector shown when there are multiple variants (e.g. T-Shirt S/M/L)
+  const giftSizeOptions: {label: string; variantId: string}[] =
+    activeGiftIds.length > 1
+      ? activeGiftIds.map((id) => ({
+          label:
+            giftImages[id]?.selectedOptions?.find((o) => o.name === 'Size')?.value ?? id,
+          variantId: id,
+        }))
+      : [];
+
+  const freeGiftSelectedVariant = giftVariantId
     ? ({
-        id: freeGift.variantId,
-        title: freeGift.name,
+        id: giftVariantId,
+        title: giftImages[giftVariantId]?.title ?? 'Free Gift',
         availableForSale: true,
         price: {amount: '0.00', currencyCode: 'MYR'},
         compareAtPrice: null,
         selectedOptions: [],
         image: null,
-        product: {title: freeGift.name, handle: ''},
+        product: {title: giftImages[giftVariantId]?.title ?? 'Free Gift', handle: ''},
       } as any)
     : null;
 
@@ -210,16 +218,25 @@ export function ProductForm({
           lines={
             selectedVariant
               ? [
-                  ...(freeGift
-                    ? [{merchandiseId: freeGift.variantId, quantity: 1, selectedVariant: freeGiftSelectedVariant}]
+                  ...(giftVariantId
+                    ? [{
+                        merchandiseId: giftVariantId,
+                        quantity: 1,
+                        selectedVariant: freeGiftSelectedVariant,
+                        attributes: [{key: '_is_free_gift', value: 'true'}],
+                      }]
                     : []),
                   {
                     merchandiseId: selectedVariant.id,
                     quantity,
                     selectedVariant,
-                    ...(purchaseType === 'subscription' && activeSellingPlanId && {
+                    ...(isSubscription && activeSellingPlanId && {
                       sellingPlanId: activeSellingPlanId,
                     }),
+                    attributes: [
+                      ...(giftVariantId ? [{key: '_free_gift_variant_id', value: giftVariantId}] : []),
+                      ...(giftSizeOptions.length > 0 ? [{key: '_free_gift_size_options', value: JSON.stringify(giftSizeOptions)}] : []),
+                    ],
                   },
                 ]
               : []
@@ -409,15 +426,15 @@ export function ProductForm({
         )}
       </div>
 
-      {freeGift && selectedVariant?.availableForSale && (
+      {giftVariantId && selectedVariant?.availableForSale && (
         <div className="mt-6 border-t pt-6">
           <p className="typo-caption-responsive-uppercase pb-4">Free Gift</p>
           <div className="border border-black p-4 flex items-center gap-4">
             <div className="shrink-0 w-16 h-16 bg-gray-100 flex items-center justify-center overflow-hidden">
-              {giftImages[freeGift.variantId] ? (
+              {giftImages[giftVariantId]?.url ? (
                 <img
-                  src={giftImages[freeGift.variantId].url}
-                  alt={giftImages[freeGift.variantId].altText ?? freeGift.name}
+                  src={giftImages[giftVariantId].url!}
+                  alt={giftImages[giftVariantId].altText ?? giftImages[giftVariantId].title}
                   className="object-cover w-full h-full"
                 />
               ) : (
@@ -429,7 +446,7 @@ export function ProductForm({
             </div>
             <div className="flex flex-col flex-1">
               <span className="font-medium uppercase text-sm">
-                {giftImages[freeGift.variantId]?.title ?? freeGift.name}
+                {giftImages[giftVariantId]?.title ?? 'Free Gift'}
               </span>
               <span className="text-xs text-gray-500 mt-0.5">
                 FEW UNITS LEFT

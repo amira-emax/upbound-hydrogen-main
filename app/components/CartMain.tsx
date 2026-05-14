@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'types/storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineProvider} from '~/components/CartLineContext';
-import {CartLineItem, GIFT_VARIANT_IDS} from '~/components/CartLineItem';
+import {CartLineItem} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
 import {Button} from './ui/button';
 import {cn} from '~/lib/utils';
@@ -16,31 +16,25 @@ export type CartMainProps = {
   layout: CartLayout;
 };
 
-const TSHIRT_SIZES = [
-  {label: 'S', variantId: 'gid://shopify/ProductVariant/49641234399425'},
-  {label: 'M', variantId: 'gid://shopify/ProductVariant/49641234432193'},
-  {label: 'L', variantId: 'gid://shopify/ProductVariant/49641234464961'},
-] as const;
-
-const TSHIRT_VARIANT_IDS = new Set(TSHIRT_SIZES.map((s) => s.variantId));
-
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
 function findGiftLine(line: CartLine, allLines: CartLine[]): CartLine | null {
-  if (line.sellingPlanAllocation) {
-    return allLines.find((l) => l.merchandise.id === 'gid://shopify/ProductVariant/50182544818369') ?? null;
-  }
-  const allValues = [
-    line.merchandise.title,
-    ...line.merchandise.selectedOptions.map((o) => o.value),
-  ].join(' ');
-  if (/\b24s?\b/i.test(allValues)) {
-    return allLines.find((l) => TSHIRT_VARIANT_IDS.has(l.merchandise.id as any)) ?? null;
-  }
-  if (/\b6s?\b/i.test(allValues)) {
-    return allLines.find((l) => l.merchandise.id === 'gid://shopify/ProductVariant/50182545703105') ?? null;
-  }
-  return null;
+  const giftVariantId = line.attributes?.find((a) => a.key === '_free_gift_variant_id')?.value;
+  if (!giftVariantId) return null;
+
+  // Build the full set of allowed variant IDs (handles post-size-swap cases)
+  const sizeOptionsRaw = line.attributes?.find((a) => a.key === '_free_gift_size_options')?.value;
+  const sizeIds: string[] = sizeOptionsRaw
+    ? (JSON.parse(sizeOptionsRaw) as {label: string; variantId: string}[]).map((o) => o.variantId)
+    : [giftVariantId];
+
+  return (
+    allLines.find(
+      (l) =>
+        sizeIds.includes(l.merchandise.id) &&
+        l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'),
+    ) ?? null
+  );
 }
 
 export function CartMain({layout, cart: originalCart}: CartMainProps) {
@@ -54,7 +48,9 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
 
   const allLines = cart?.lines?.nodes ?? [];
-  const mainLines = allLines.filter((l) => !GIFT_VARIANT_IDS.has(l.merchandise.id));
+  const mainLines = allLines.filter(
+    (l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'),
+  );
 
   return (
     <CartLineProvider>
@@ -68,7 +64,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
                 return (
                   <Fragment key={line.id}>
                     <CartLineItem line={line} layout={layout} giftLineId={giftLine?.id} />
-                    {giftLine && <CartGiftSubItem line={giftLine} />}
+                    {giftLine && <CartGiftSubItem line={giftLine} mainLine={line} />}
                   </Fragment>
                 );
               })}
@@ -81,9 +77,15 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   );
 }
 
-function CartGiftSubItem({line}: {line: CartLine}) {
+function CartGiftSubItem({line, mainLine}: {line: CartLine; mainLine: CartLine}) {
   const {id, merchandise} = line;
-  const isTShirt = TSHIRT_VARIANT_IDS.has(merchandise.id as any);
+
+  // Read size options stored as a cart attribute on the main line
+  const sizeOptionsRaw = mainLine.attributes?.find((a) => a.key === '_free_gift_size_options')?.value;
+  const sizeOptions: {label: string; variantId: string}[] = sizeOptionsRaw
+    ? (JSON.parse(sizeOptionsRaw) as {label: string; variantId: string}[])
+    : [];
+  const hasSize = sizeOptions.length > 0;
 
   return (
     <li className="flex items-center gap-3 py-3 px-3 ml-6 border-b border-neutral-400 bg-gray-50">
@@ -113,10 +115,10 @@ function CartGiftSubItem({line}: {line: CartLine}) {
         </div>
         <div>
           <p className="text-sm font-medium">{merchandise.product.title}</p>
-          {isTShirt ? (
+          {hasSize ? (
             <div className="flex items-center gap-1 mt-1">
               <span className="text-xs text-gray-400 mr-1">Size:</span>
-              {TSHIRT_SIZES.map(({label, variantId}) => (
+              {sizeOptions.map(({label, variantId}) => (
                 <CartForm
                   key={variantId}
                   route="/cart"

@@ -61,6 +61,22 @@ export async function loader(args: LoaderFunctionArgs) {
   return { ...deferredData, ...criticalData };
 }
 
+function parseGiftValue(raw: string): string[] {
+  const stripped = raw.trim().replace(/^'([\s\S]*)'$/, '$1');
+  try {
+    const parsed = JSON.parse(stripped);
+    return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+  } catch {
+    try {
+      const parsed = JSON.parse(stripped.replace(/'/g, '"'));
+      return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+    } catch {
+      // Plain GID string — not JSON
+      return raw.trim() ? [raw.trim()] : [];
+    }
+  }
+}
+
 /**
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
@@ -77,33 +93,45 @@ async function loadCriticalData({
     throw new Error('Expected product handle to be defined');
   }
 
-  const GIFT_VARIANT_IDS = [
-    'gid://shopify/ProductVariant/50182545703105', // Tote Bag
-    'gid://shopify/ProductVariant/49641234399425', // T-Shirt S
-    'gid://shopify/ProductVariant/50182544818369', // Windbreaker
-  ];
+  const { product } = await storefront.query(PRODUCT_QUERY, {
+    variables: { handle, selectedOptions: getSelectedProductOptions(request) },
+  });
 
-  const [{ product }, { nodes: giftNodes }] = await Promise.all([
-    storefront.query(PRODUCT_QUERY, {
-      variables: { handle, selectedOptions: getSelectedProductOptions(request) },
-    }),
-    storefront.query<any>(
+  // Collect gift variant IDs from the selected variant's metafields
+  const selectedVar = product?.selectedOrFirstAvailableVariant as any;
+  const freeGiftId: string | null = selectedVar?.freeGift?.value ?? null;
+  const freeGiftSubRaw: string | null = selectedVar?.freeGiftSubscription?.value ?? null;
+  const freeGiftIds: string[] = freeGiftId ? parseGiftValue(freeGiftId) : [];
+  const freeGiftSubIds: string[] = freeGiftSubRaw ? parseGiftValue(freeGiftSubRaw) : [];
+  const giftIdsToFetch = [...new Set([...freeGiftIds, ...freeGiftSubIds])];
+
+  const giftImages: Record<string, { url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: { name: string; value: string }[] }> = {};
+  if (giftIdsToFetch.length > 0) {
+    const { nodes: giftNodes } = await storefront.query<any>(
       `query GiftImages($ids: [ID!]!) {
         nodes(ids: $ids) {
           ... on ProductVariant {
             id
             product { title }
             image { url altText width height }
+            selectedOptions { name value }
           }
         }
       }`,
-      { variables: { ids: GIFT_VARIANT_IDS } },
-    ),
-  ]);
-
-  const giftImages: Record<string, { url: string; altText: string | null; width: number; height: number; title: string }> = {};
-  for (const node of giftNodes ?? []) {
-    if (node?.id) giftImages[node.id] = { ...node.image, title: node.product?.title ?? '' };
+      { variables: { ids: giftIdsToFetch } },
+    );
+    for (const node of giftNodes ?? []) {
+      if (node?.id) {
+        giftImages[node.id] = {
+          url: node.image?.url ?? null,
+          altText: node.image?.altText ?? null,
+          width: node.image?.width ?? 0,
+          height: node.image?.height ?? 0,
+          title: node.product?.title ?? '',
+          selectedOptions: node.selectedOptions ?? [],
+        };
+      }
+    }
   }
 
 
@@ -510,6 +538,12 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       currencyCode
     }
     unitsPerPack: metafield(key: "units_per_pack", namespace: "custom") {
+      value
+    }
+    freeGift: metafield(key: "free_gift", namespace: "custom") {
+      value
+    }
+    freeGiftSubscription: metafield(key: "free_gift_subscription", namespace: "custom") {
       value
     }
     sellingPlanAllocations(first: 10) {

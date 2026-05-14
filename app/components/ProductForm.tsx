@@ -431,14 +431,21 @@ export function ProductForm({
         <div className="mt-6 border-t pt-6">
           <p className="typo-caption-responsive-uppercase pb-4">Free Gift</p>
           <div className="border border-black p-4 flex items-center gap-4">
-            <div className="shrink-0 w-16 h-16 bg-gray-100 flex items-center justify-center overflow-hidden">
-              {giftImages[giftVariantId]?.url ? (
-                <img
-                  src={giftImages[giftVariantId].url!}
-                  alt={giftImages[giftVariantId].altText ?? giftImages[giftVariantId].title}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
+            <div className="relative shrink-0 w-16 h-16 bg-gray-100 flex items-center justify-center overflow-hidden">
+              {Object.entries(giftImages).map(([variantId, imgData]) =>
+                imgData.url ? (
+                  <img
+                    key={variantId}
+                    src={imgData.url}
+                    alt={imgData.altText ?? imgData.title}
+                    className={cn(
+                      'object-cover w-full h-full absolute inset-0 transition-opacity duration-200',
+                      variantId === giftVariantId ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
+                ) : null,
+              )}
+              {!giftImages[giftVariantId ?? '']?.url && (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125a2.625 2.625 0 000-5.25zM4.875 9.375A2.625 2.625 0 107.5 12H4.875A2.625 2.625 0 002.25 9.375zm14.25 0A2.625 2.625 0 1019.125 12H16.5a2.625 2.625 0 00-2.625-2.625z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25M3.375 12h17.25" />

@@ -77,11 +77,34 @@ async function loadCriticalData({
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{ product }] = await Promise.all([
+  const GIFT_VARIANT_IDS = [
+    'gid://shopify/ProductVariant/50182545703105', // Tote Bag
+    'gid://shopify/ProductVariant/49641234399425', // T-Shirt S
+    'gid://shopify/ProductVariant/50182544818369', // Windbreaker
+  ];
+
+  const [{ product }, { nodes: giftNodes }] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: { handle, selectedOptions: getSelectedProductOptions(request) },
     }),
+    storefront.query<any>(
+      `query GiftImages($ids: [ID!]!) {
+        nodes(ids: $ids) {
+          ... on ProductVariant {
+            id
+            product { title }
+            image { url altText width height }
+          }
+        }
+      }`,
+      { variables: { ids: GIFT_VARIANT_IDS } },
+    ),
   ]);
+
+  const giftImages: Record<string, { url: string; altText: string | null; width: number; height: number; title: string }> = {};
+  for (const node of giftNodes ?? []) {
+    if (node?.id) giftImages[node.id] = { ...node.image, title: node.product?.title ?? '' };
+  }
 
 
   if (!product?.id) {
@@ -138,6 +161,7 @@ async function loadCriticalData({
   return {
     product,
     selectedSellingPlan,
+    giftImages,
   };
 }
 
@@ -154,7 +178,7 @@ function loadDeferredData({ context, params }: LoaderFunctionArgs) {
 }
 
 export default function Product() {
-  const { product, selectedSellingPlan } = useLoaderData<typeof loader>();
+  const { product, selectedSellingPlan, giftImages } = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -250,6 +274,7 @@ export default function Product() {
               sellingPlanGroups={sellingPlanGroups}
               purchaseType={purchaseType}
               setPurchaseType={setPurchaseType}
+              giftImages={giftImages}
             />
 
             <Accordion

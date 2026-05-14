@@ -20,17 +20,14 @@ const FREE_GIFT_CONFIG = {
   '6-cans': {
     name: 'Tote Bag',
     variantId: 'gid://shopify/ProductVariant/50182545703105',
-    condition: '6-can pack',
   },
   '24-cans': {
     name: 'T-Shirt',
     variantId: 'gid://shopify/ProductVariant/49641234399425',
-    condition: '24-can pack',
   },
   subscription: {
     name: 'Windbreaker',
     variantId: 'gid://shopify/ProductVariant/50182544818369',
-    condition: 'Subscribe & Save',
   },
 } as const;
 
@@ -57,6 +54,7 @@ export function ProductForm({
   selectedSellingPlan,
   purchaseType,
   setPurchaseType,
+  giftImages = {},
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
@@ -64,6 +62,7 @@ export function ProductForm({
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
   purchaseType: 'one-time' | 'subscription';
   setPurchaseType: (type: 'one-time' | 'subscription') => void;
+  giftImages?: Record<string, {url: string; altText: string | null; width: number; height: number; title: string}>;
 }) {
   const navigate = useNavigate();
   useAside();
@@ -414,16 +413,26 @@ export function ProductForm({
         <div className="mt-6 border-t pt-6">
           <p className="typo-caption-responsive-uppercase pb-4">Free Gift</p>
           <div className="border border-black p-4 flex items-center gap-4">
-            <div className="shrink-0 w-8 h-8 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125a2.625 2.625 0 000-5.25zM4.875 9.375A2.625 2.625 0 107.5 12H4.875A2.625 2.625 0 002.25 9.375zm14.25 0A2.625 2.625 0 1019.125 12H16.5a2.625 2.625 0 00-2.625-2.625z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25M3.375 12h17.25" />
-              </svg>
+            <div className="shrink-0 w-16 h-16 bg-gray-100 flex items-center justify-center overflow-hidden">
+              {giftImages[freeGift.variantId] ? (
+                <img
+                  src={giftImages[freeGift.variantId].url}
+                  alt={giftImages[freeGift.variantId].altText ?? freeGift.name}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1012 10.125a2.625 2.625 0 000-5.25zM4.875 9.375A2.625 2.625 0 107.5 12H4.875A2.625 2.625 0 002.25 9.375zm14.25 0A2.625 2.625 0 1019.125 12H16.5a2.625 2.625 0 00-2.625-2.625z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25M3.375 12h17.25" />
+                </svg>
+              )}
             </div>
             <div className="flex flex-col flex-1">
-              <span className="font-medium uppercase text-sm">{freeGift.name}</span>
+              <span className="font-medium uppercase text-sm">
+                {giftImages[freeGift.variantId]?.title ?? freeGift.name}
+              </span>
               <span className="text-xs text-gray-500 mt-0.5">
-                Free with your {freeGift.condition}
+                FEW UNITS LEFT
               </span>
             </div>
             <span className="text-xs bg-mint px-2 py-1 font-bold uppercase tracking-wide rounded-full shrink-0">

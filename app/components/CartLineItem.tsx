@@ -15,7 +15,9 @@ type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
 export const GIFT_VARIANT_IDS = new Set([
   'gid://shopify/ProductVariant/50182545703105', // Tote Bag
-  'gid://shopify/ProductVariant/49641234399425', // T-Shirt (S)
+  'gid://shopify/ProductVariant/49641234399425', // T-Shirt S
+  'gid://shopify/ProductVariant/49641234432193', // T-Shirt M
+  'gid://shopify/ProductVariant/49641234464961', // T-Shirt L
   'gid://shopify/ProductVariant/50182544818369', // Windbreaker
 ]);
 

@@ -47,7 +47,7 @@ export function ProductForm({
   sellingPlanGroups: ProductFragment['sellingPlanGroups'];
   purchaseType: 'one-time' | 'subscription';
   setPurchaseType: (type: 'one-time' | 'subscription') => void;
-  giftImages?: Record<string, {url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: {name: string; value: string}[]}>;
+  giftImages?: Record<string, {url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: {name: string; value: string}[]; sizeChartUrl: string | null}>;
 }) {
   const navigate = useNavigate();
   useAside();
@@ -236,6 +236,7 @@ export function ProductForm({
                     attributes: [
                       ...(giftVariantId ? [{key: '_free_gift_variant_id', value: giftVariantId}] : []),
                       ...(giftSizeOptions.length > 0 ? [{key: '_free_gift_size_options', value: JSON.stringify(giftSizeOptions)}] : []),
+                      ...(giftVariantId && giftImages[giftVariantId]?.sizeChartUrl ? [{key: '_free_gift_size_chart_url', value: giftImages[giftVariantId]!.sizeChartUrl!}] : []),
                     ],
                   },
                 ]

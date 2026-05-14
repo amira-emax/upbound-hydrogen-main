@@ -99,7 +99,7 @@ async function loadCriticalData({
 
   const selectedVar = product?.selectedOrFirstAvailableVariant as any;
 
-  type GiftImageEntry = { url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: { name: string; value: string }[] };
+  type GiftImageEntry = { url: string | null; altText: string | null; width: number; height: number; title: string; selectedOptions: { name: string; value: string }[]; sizeChartUrl: string | null };
   const giftImages: Record<string, GiftImageEntry> = {};
 
   function addNode(node: any) {
@@ -111,6 +111,7 @@ async function loadCriticalData({
         height: node.image?.height ?? 0,
         title: node.product?.title ?? '',
         selectedOptions: node.selectedOptions ?? [],
+        sizeChartUrl: node.product?.sizeChart?.reference?.image?.url ?? null,
       };
     }
   }
@@ -137,7 +138,16 @@ async function loadCriticalData({
           nodes(ids: $ids) {
             ... on ProductVariant {
               id
-              product { title }
+              product {
+                title
+                sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+              }
               image { url altText width height }
               selectedOptions { name value }
             }
@@ -561,7 +571,16 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
         nodes {
           ... on ProductVariant {
             id
-            product { title }
+            product {
+              title
+              sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+            }
             image { url altText width height }
             selectedOptions { name value }
           }
@@ -574,7 +593,16 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
         nodes {
           ... on ProductVariant {
             id
-            product { title }
+            product {
+              title
+              sizeChart: metafield(key: "size_chart", namespace: "custom") {
+                reference {
+                  ... on MediaImage {
+                    image { url }
+                  }
+                }
+              }
+            }
             image { url altText width height }
             selectedOptions { name value }
           }

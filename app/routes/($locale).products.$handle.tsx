@@ -116,11 +116,18 @@ async function loadCriticalData({
     }
   }
 
-  // Use embedded references (single round-trip — works when metafield type is variant_reference / list.variant_reference)
-  const freeGiftRefs: any[] = selectedVar?.freeGift?.references?.nodes ?? [];
-  const freeGiftSubRefs: any[] = selectedVar?.freeGiftSubscription?.references?.nodes ?? [];
-  freeGiftRefs.forEach(addNode);
-  freeGiftSubRefs.forEach(addNode);
+  // Collect gift images from selected variant + all adjacent variants so every
+  // possible gift image is in the record regardless of which variant is active.
+  const variantsToScan: any[] = [
+    selectedVar,
+    ...((product as any)?.adjacentVariants ?? []),
+  ];
+  for (const v of variantsToScan) {
+    const refs: any[] = v?.freeGift?.references?.nodes ?? [];
+    const subRefs: any[] = v?.freeGiftSubscription?.references?.nodes ?? [];
+    refs.forEach(addNode);
+    subRefs.forEach(addNode);
+  }
 
   // Fall back to separate query when references are empty (json / single_line_text_field metafield type)
   if (Object.keys(giftImages).length === 0) {

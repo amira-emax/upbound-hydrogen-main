@@ -171,7 +171,12 @@ function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
       <Suspense fallback={<p>Loading cart ...</p>}>
         <Await resolve={cart}>
           {(cart) => {
-            setQuantity(cart?.totalQuantity ?? 0);
+            const mainCount = cart?.lines?.nodes
+              ? cart.lines.nodes
+                  .filter((l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'))
+                  .reduce((sum, l) => sum + l.quantity, 0)
+              : 0;
+            setQuantity(mainCount);
             return <CartMain cart={cart} layout="aside" />;
           }}
         </Await>

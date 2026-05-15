@@ -347,7 +347,12 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  const count = cart?.lines?.nodes
+    ? cart.lines.nodes
+        .filter((l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'))
+        .reduce((sum, l) => sum + l.quantity, 0)
+    : 0;
+  return <CartBadge count={count} />;
 }
 
 const FALLBACK_HEADER_MENU = {

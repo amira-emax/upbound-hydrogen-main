@@ -42,17 +42,17 @@ function findGiftLine(line: CartLine, allLines: CartLine[]): CartLine | null {
 export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
-  const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
-  const withDiscount =
-    cart &&
-    Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
-  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
-  const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
-
   const allLines = cart?.lines?.nodes ?? [];
   const mainLines = allLines.filter(
     (l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'),
   );
+
+  const linesCount = Boolean(mainLines.length);
+  const withDiscount =
+    cart &&
+    Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
+  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
+  const cartHasItems = mainLines.length > 0;
 
   return (
     <CartLineProvider>

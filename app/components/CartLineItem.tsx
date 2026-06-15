@@ -89,7 +89,7 @@ export function CartLineItem({
           </div>
         ) : (
           <>
-            <CartLineQuantity line={line} />
+            <CartLineQuantity line={line} giftLineId={giftLineId} />
             <ProductPrice
               price={line?.cost?.totalAmount}
               className="self-end"
@@ -107,15 +107,24 @@ export function CartLineItem({
  * These controls are disabled when the line item is new, and the server
  * hasn't yet responded that it was successfully added to the cart.
  */
-function CartLineQuantity({ line }: { line: CartLine }) {
+function CartLineQuantity({ line, giftLineId }: { line: CartLine; giftLineId?: string }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const { id: lineId, quantity, isOptimistic } = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
+  const decreaseLines: CartLineUpdateInput[] = [
+    { id: lineId, quantity: prevQuantity },
+    ...(giftLineId ? [{ id: giftLineId, quantity: prevQuantity }] : []),
+  ];
+  const increaseLines: CartLineUpdateInput[] = [
+    { id: lineId, quantity: nextQuantity },
+    ...(giftLineId ? [{ id: giftLineId, quantity: nextQuantity }] : []),
+  ];
+
   return (
     <div className="flex w-fit items-center bg-default-grey gap-2 md:gap-[14px]">
-      <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
+      <CartLineUpdateButton lines={decreaseLines}>
         <Button
           aria-label="Decrease quantity"
           disabled={quantity <= 1 || !!isOptimistic}
@@ -129,7 +138,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
       <div className="text-center">
         <p>{quantity}</p>
       </div>
-      <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
+      <CartLineUpdateButton lines={increaseLines}>
         <Button
           aria-label="Increase quantity"
           name="increase-quantity"

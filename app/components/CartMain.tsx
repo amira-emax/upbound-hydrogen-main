@@ -134,7 +134,7 @@ function CartGiftSubItem({line, mainLine}: {line: CartLine; mainLine: CartLine})
                     key={variantId}
                     route="/cart"
                     action={CartForm.ACTIONS.LinesUpdate}
-                    inputs={{lines: [{id, merchandiseId: variantId, quantity: 1}]}}
+                    inputs={{lines: [{id, merchandiseId: variantId, quantity: line.quantity}]}}
                   >
                     <button
                       type="submit"

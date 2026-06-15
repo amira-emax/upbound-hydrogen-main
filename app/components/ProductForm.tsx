@@ -221,7 +221,7 @@ export function ProductForm({
                   ...(giftVariantId
                     ? [{
                         merchandiseId: giftVariantId,
-                        quantity: 1,
+                        quantity: quantity,
                         selectedVariant: freeGiftSelectedVariant,
                         attributes: [{key: '_is_free_gift', value: 'true'}],
                       }]

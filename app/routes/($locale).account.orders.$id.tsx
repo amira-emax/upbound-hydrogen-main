@@ -29,7 +29,9 @@ export async function loader({params, context}: LoaderFunctionArgs) {
 
   const {order} = data;
 
-  const lineItems = flattenConnection(order.lineItems);
+  const lineItems = flattenConnection(order.lineItems).filter(
+    (item: any) => !item.customAttributes?.some((a: any) => a.key === '_is_free_gift' && a.value === 'true'),
+  );
   const discountApplications = flattenConnection(order.discountApplications);
 
   const fulfillmentStatus =

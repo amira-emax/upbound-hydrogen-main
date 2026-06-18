@@ -30,9 +30,69 @@ export async function action({request, context}: ActionFunctionArgs) {
   let result: CartQueryDataReturn;
 
   switch (action) {
-    case CartForm.ACTIONS.LinesAdd:
+    case CartForm.ACTIONS.LinesAdd: {
+      const newLines = inputs.lines as any[];
+      const newGiftLine = newLines.find((l: any) =>
+        l.attributes?.some((a: any) => a.key === '_is_free_gift' && a.value === 'true'),
+      );
+
+      if (newGiftLine) {
+        const newGiftVariantId = newGiftLine.merchandiseId;
+        const newMainLine = newLines.find(
+          (l: any) => !l.attributes?.some((a: any) => a.key === '_is_free_gift'),
+        );
+
+        // Build the full set of variant IDs in this gift family (handles multi-size gifts)
+        const sizeOptionsRaw = newMainLine?.attributes?.find(
+          (a: any) => a.key === '_free_gift_size_options',
+        )?.value;
+        const giftFamilyIds: string[] = sizeOptionsRaw
+          ? (JSON.parse(sizeOptionsRaw) as {label: string; variantId: string}[]).map(
+              (o) => o.variantId,
+            )
+          : [newGiftVariantId];
+
+        const currentCart = await cart.get();
+        const existingLines = (currentCart as any)?.lines?.nodes ?? [];
+
+        // Find gift lines in the same family but with a different variant (e.g. old M after swap)
+        const conflictingGiftLineIds: string[] = existingLines
+          .filter(
+            (l: any) =>
+              l.attributes?.some((a: any) => a.key === '_is_free_gift' && a.value === 'true') &&
+              giftFamilyIds.includes(l.merchandise.id) &&
+              l.merchandise.id !== newGiftVariantId,
+          )
+          .map((l: any) => l.id);
+
+        if (conflictingGiftLineIds.length > 0) {
+          // Recalculate gift qty = existing main product qty + qty being added now
+          const existingMainLine = newMainLine
+            ? existingLines.find(
+                (l: any) =>
+                  l.merchandise.id === newMainLine.merchandiseId &&
+                  !l.attributes?.some((a: any) => a.key === '_is_free_gift'),
+              )
+            : null;
+
+          const correctedQty =
+            (existingMainLine?.quantity ?? 0) + (newMainLine?.quantity ?? newGiftLine.quantity);
+
+          const linesToAdd = newLines.map((l: any) =>
+            l.attributes?.some((a: any) => a.key === '_is_free_gift' && a.value === 'true')
+              ? {...l, quantity: correctedQty}
+              : l,
+          );
+
+          await cart.removeLines(conflictingGiftLineIds);
+          result = await cart.addLines(linesToAdd);
+          break;
+        }
+      }
+
       result = await cart.addLines(inputs.lines);
       break;
+    }
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);
       break;

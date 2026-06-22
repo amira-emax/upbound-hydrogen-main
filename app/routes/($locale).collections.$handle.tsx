@@ -260,6 +260,9 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {
       id
       availableForSale
+      freeGift: metafield(key: "free_gift", namespace: "custom") {
+        value
+      }
     }
     productType
     totalInventory

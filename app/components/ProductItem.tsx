@@ -8,6 +8,21 @@ import { cn } from '~/lib/utils';
 import { useVariantUrl } from '~/lib/variants';
 import { AddToCartButton } from './AddToCartButton';
 
+function parseGiftValue(raw: string): string[] {
+  const stripped = raw.trim().replace(/^'([\s\S]*)'$/, '$1');
+  try {
+    const parsed = JSON.parse(stripped);
+    return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+  } catch {
+    try {
+      const parsed = JSON.parse(stripped.replace(/'/g, '"'));
+      return Array.isArray(parsed) ? (parsed as string[]) : [parsed as string];
+    } catch {
+      return raw.trim() ? [raw.trim()] : [];
+    }
+  }
+}
+
 export function ProductItem({
   product,
   loading,
@@ -26,6 +41,9 @@ export function ProductItem({
     (((compareAtPrice - price) / compareAtPrice) * 100).toFixed(0),
   );
   const soldOut = !product?.selectedOrFirstAvailableVariant?.availableForSale;
+
+  const freeGiftRaw = product?.selectedOrFirstAvailableVariant?.freeGift?.value ?? null;
+  const giftVariantId = freeGiftRaw ? (parseGiftValue(freeGiftRaw)[0] ?? null) : null;
 
   return (
     <div className="product-item flex flex-col gap-5 text-center max-w-[400px]">
@@ -94,12 +112,21 @@ export function ProductItem({
           soldOut
             ? []
             : [
-              {
-                merchandiseId:
-                  product?.selectedOrFirstAvailableVariant?.id ?? '',
-                quantity: 1,
-              },
-            ]
+                ...(giftVariantId
+                  ? [{
+                      merchandiseId: giftVariantId,
+                      quantity: 1,
+                      attributes: [{key: '_is_free_gift', value: 'true'}],
+                    }]
+                  : []),
+                {
+                  merchandiseId: product?.selectedOrFirstAvailableVariant?.id ?? '',
+                  quantity: 1,
+                  ...(giftVariantId
+                    ? {attributes: [{key: '_free_gift_variant_id', value: giftVariantId}]}
+                    : {}),
+                },
+              ]
         }
         productData={product}
         quantity={1}

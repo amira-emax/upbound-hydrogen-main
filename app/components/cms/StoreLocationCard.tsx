@@ -22,25 +22,35 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
   const outletNodes = outlets?.references?.nodes ?? [];
   const logoImage = store_logo?.reference?.image;
 
+  const outletsByArea = outletNodes.reduce<Record<string, typeof outletNodes>>(
+    (groups, outlet) => {
+      const area = outlet.area?.value ?? '';
+      groups[area] = groups[area] ?? [];
+      groups[area].push(outlet);
+      return groups;
+    },
+    {},
+  );
+
   return (
     <div className="relative pt-5">
       {/* back layer */}
-      <div className="absolute inset-x-2 top-1 bottom-0 rounded-xl bg-black/5" />
+      <div className="absolute inset-x-2 top-1 bottom-0 rounded-xl bg-[#f2f2f2] shadow-[5px_7px_9px_rgba(0,0,0,0.25)]" />
 
       {/* logo layer */}
-      <div className="relative -mx-1 h-40 rounded-lg bg-white shadow-md ring-1 ring-black/5 flex items-center justify-center p-4">
+      <div className="relative -mx-1 h-40 rounded-lg bg-white shadow-[5px_7px_9px_rgba(0,0,0,0.25)] ring-1 ring-black/5 flex items-center justify-center p-8 overflow-hidden">
         {logoImage && (
           <Image
             data={logoImage}
-            className="max-h-16 w-auto object-contain"
-            sizes="150px"
+            className="h-full w-full object-contain"
+            sizes="200px"
           />
         )}
       </div>
 
       <div className="relative px-6 pt-4 pb-4 text-center">
-        <div className="mb-4 flex min-h-[2lh] items-center justify-center">
-          <p className="typo-h2 line-clamp-2">{store_name?.value}</p>
+        <div className="mb-4 flex min-h-12 items-center justify-center md:min-h-16">
+          <p className="typo-h2 text-2xl line-clamp-2">{store_name?.value}</p>
         </div>
         <button
           type="button"
@@ -52,34 +62,33 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
 
         {open && (
           hasMultipleLocations ? (
-            <ul className={cn('mt-3 flex flex-col gap-3 text-left text-sm')}>
-              {outletNodes.map((outlet, index) => (
-                <li key={outlet.id ?? index}>
-                  <p className="font-medium">
-                    {outlet.name?.value}
-                    {outlet.area?.value ? ` (${outlet.area.value})` : ''}
-                  </p>
-                  {outlet.address?.value && (
-                    <p className="whitespace-pre-line text-black/60">
-                      {outlet.address.value}
-                    </p>
-                  )}
-                  {outlet.map_url?.value && (
-                    <a
-                      href={outlet.map_url.value}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline underline-offset-2"
-                    >
-                      View on map
-                    </a>
-                  )}
-                </li>
+            <div className={cn('mt-3 flex flex-col gap-4 text-sm')}>
+              {Object.entries(outletsByArea).map(([area, areaOutlets]) => (
+                <div key={area}>
+                  {area && <p className="font-semibold">{area}</p>}
+                  <ul className="list-inside list-[circle]">
+                    {areaOutlets.map((outlet, index) => (
+                      <li key={outlet.id ?? index}>
+                        {outlet.map_url?.value ? (
+                          <a
+                            href={outlet.map_url.value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {outlet.name?.value}
+                          </a>
+                        ) : (
+                          outlet.name?.value
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : (
             address?.value && (
-              <p className="mt-3 whitespace-pre-line text-left text-sm text-black/60">
+              <p className="mt-3 whitespace-pre-line text-center text-sm">
                 {address.value}
               </p>
             )

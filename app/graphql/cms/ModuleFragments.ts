@@ -688,6 +688,34 @@ fragment StoreLocation on Metaobject {
 }
 `;
 
+export const STORE_LOCATOR_HERO_FRAGMENT = `#graphql
+fragment StoreLocatorHero on Metaobject {
+  id
+  type
+  hero_header: field(key: "hero_header") {
+    value
+  }
+  hero_text_position: field(key: "hero_text_position") {
+    value
+  }
+  hero_text_color: field(key: "hero_text_color") {
+    value
+  }
+  hero_image: field(key: "hero_image") {
+    reference {
+      ... on MediaImage {
+        image {
+          height
+          width
+          url
+          altText
+        }
+      }
+    }
+  }
+}
+`;
+
 export const STORE_TYPE_FRAGMENT = `#graphql
 ${STORE_LOCATION_FRAGMENT}
 

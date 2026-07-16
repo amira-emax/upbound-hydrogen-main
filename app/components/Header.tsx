@@ -117,6 +117,20 @@ export function HeaderMenu({
           </NavLink>
         );
       })}
+      {viewport === 'mobile' && (
+        <NavLink
+          className="header-menu-item"
+          end
+          onClick={close}
+          prefetch="intent"
+          style={activeLinkStyle}
+          to="/store-locator"
+        >
+          <Button size="lg" variant="link">
+            <p className="typo-display-l capitalize">Find Us</p>
+          </Button>
+        </NavLink>
+      )}
     </nav>
   );
 }
@@ -128,6 +142,19 @@ function HeaderCtas({
   return (
     <nav className="flex items-center gap-1" role="navigation">
       {/* <HeaderSearch viewport="desktop" /> */}
+      <NavLink
+        prefetch="intent"
+        to="/store-locator"
+        style={activeLinkStyle}
+        className="hidden lg:block"
+      >
+        <Button size="sm" variant="glass-default">
+          Find Us
+        </Button>
+      </NavLink>
+      <span className="hidden lg:block text-black/30" aria-hidden="true">
+        |
+      </span>
       <NavLink
         prefetch="intent"
         to="/account"

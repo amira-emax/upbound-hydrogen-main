@@ -1465,6 +1465,28 @@ export type StoreLocationFragment = Pick<
   }>;
 };
 
+export type StoreLocatorHeroFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'id' | 'type'
+> & {
+  hero_header?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'value'>
+  >;
+  hero_text_position?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'value'>
+  >;
+  hero_text_color?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'value'>
+  >;
+  hero_image?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+      >;
+    }>;
+  }>;
+};
+
 export type StoreTypeFragment = Pick<
   StorefrontAPI.Metaobject,
   'id' | 'type'
@@ -1729,69 +1751,7 @@ export type StoreLocatorPageCmsQueryVariables = StorefrontAPI.Exact<{
 
 export type StoreLocatorPageCmsQuery = {
   storeLocatorPage?: StorefrontAPI.Maybe<
-    Pick<StorefrontAPI.Metaobject, 'id' | 'handle'> & {
-      hero?: StorefrontAPI.Maybe<{
-        reference?: StorefrontAPI.Maybe<
-          Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
-            background_image?: StorefrontAPI.Maybe<{
-              reference?: StorefrontAPI.Maybe<{
-                image?: StorefrontAPI.Maybe<
-                  Pick<StorefrontAPI.Image, 'url' | 'altText'>
-                >;
-              }>;
-            }>;
-            enable_overlay?: StorefrontAPI.Maybe<
-              Pick<StorefrontAPI.MetaobjectField, 'value'>
-            >;
-            overlay_opacity?: StorefrontAPI.Maybe<
-              Pick<StorefrontAPI.MetaobjectField, 'value'>
-            >;
-            logo?: StorefrontAPI.Maybe<{
-              references?: StorefrontAPI.Maybe<{
-                nodes: Array<{
-                  image?: StorefrontAPI.Maybe<{
-                    reference?: StorefrontAPI.Maybe<{
-                      image?: StorefrontAPI.Maybe<
-                        Pick<StorefrontAPI.Image, 'url' | 'altText'>
-                      >;
-                    }>;
-                  }>;
-                }>;
-              }>;
-            }>;
-            texts?: StorefrontAPI.Maybe<{
-              references?: StorefrontAPI.Maybe<{
-                nodes: Array<{
-                  text?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  position?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  font_size?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  font_weight?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  text_color?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  tag?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  label?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                  listing?: StorefrontAPI.Maybe<
-                    Pick<StorefrontAPI.MetaobjectField, 'value'>
-                  >;
-                }>;
-              }>;
-            }>;
-          }
-        >;
-      }>;
+    Pick<StorefrontAPI.Metaobject, 'id' | 'handle' | 'type'> & {
       category?: StorefrontAPI.Maybe<{
         references?: StorefrontAPI.Maybe<{
           nodes: Array<
@@ -1844,6 +1804,22 @@ export type StoreLocatorPageCmsQuery = {
                 }>;
               }>;
             }
+          >;
+        }>;
+      }>;
+      hero_header?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      hero_text_position?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      hero_text_color?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      hero_image?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<{
+          image?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
           >;
         }>;
       }>;
@@ -3780,7 +3756,7 @@ interface GeneratedQueryTypes {
     return: SciencePageCmsQuery;
     variables: SciencePageCmsQueryVariables;
   };
-  '#graphql\n  #graphql\nfragment HeroImageMultiText on Metaobject {\n  id\n  type\n\n  background_image: field(key: "background_image") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n\n  enable_overlay: field(key: "enable_overlay") {\n    value\n  }\n  overlay_opacity: field(key: "overlay_opacity") {\n    value\n  }\n\n  logo: field(key: "logo") {\n    references(first: 10) {\n      nodes {\n        ... on Metaobject {\n          image: field(key: "image") {\n            reference {\n              ... on MediaImage {\n                image {\n                  url\n                  altText\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n\n  texts: field(key: "texts") {\n    references(first: 10) {\n      nodes {\n        ... on Metaobject {\n          text: field(key: "text") { value }\n          position: field(key: "position") { value }\n          font_size: field(key: "font_size") { value }\n          font_weight: field(key: "font_weight") { value }\n          text_color: field(key: "text_color") { value }\n          tag: field(key: "tag") { value }\n          label: field(key: "label") { value }\n          listing: field(key: "listing") { value }\n        }\n      }\n    }\n  }\n}\n\n  #graphql\n#graphql\n#graphql\nfragment StoreOutlet on Metaobject {\n  id\n  type\n  area: field(key: "area") {\n    value\n  }\n  name: field(key: "name") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n}\n\n\nfragment StoreLocation on Metaobject {\n  id\n  type\n  store_name: field(key: "store_name") {\n    value\n  }\n  store_logo: field(key: "store_logo") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n  more_than_1_location: field(key: "more_than_1_location") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n  outlets: field(key: "outlets") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreOutlet\n        }\n      }\n    }\n  }\n}\n\n\nfragment StoreType on Metaobject {\n  id\n  type\n  type_name: field(key: "type_name") {\n    value\n  }\n  store_list: field(key: "store_list") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreLocation\n        }\n      }\n    }\n  }\n}\n\n\n  query StoreLocatorPageCms {\n    storeLocatorPage: metaobject(\n      handle: {type: "store_locator", handle: "store-locator"}\n    ) {\n      id\n      handle\n\n      hero: field(key: "hero") {\n        reference {\n          ... on Metaobject {\n            id\n            type\n            ...HeroImageMultiText\n          }\n        }\n      }\n\n      category: field(key: "category") {\n        references(first: 50) {\n          nodes {\n            ... on Metaobject {\n              ...StoreType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\nfragment StoreLocatorHero on Metaobject {\n  id\n  type\n  hero_header: field(key: "hero_header") {\n    value\n  }\n  hero_text_position: field(key: "hero_text_position") {\n    value\n  }\n  hero_text_color: field(key: "hero_text_color") {\n    value\n  }\n  hero_image: field(key: "hero_image") {\n    reference {\n      ... on MediaImage {\n        image {\n          height\n          width\n          url\n          altText\n        }\n      }\n    }\n  }\n}\n\n  #graphql\n#graphql\n#graphql\nfragment StoreOutlet on Metaobject {\n  id\n  type\n  area: field(key: "area") {\n    value\n  }\n  name: field(key: "name") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n}\n\n\nfragment StoreLocation on Metaobject {\n  id\n  type\n  store_name: field(key: "store_name") {\n    value\n  }\n  store_logo: field(key: "store_logo") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n  more_than_1_location: field(key: "more_than_1_location") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n  outlets: field(key: "outlets") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreOutlet\n        }\n      }\n    }\n  }\n}\n\n\nfragment StoreType on Metaobject {\n  id\n  type\n  type_name: field(key: "type_name") {\n    value\n  }\n  store_list: field(key: "store_list") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreLocation\n        }\n      }\n    }\n  }\n}\n\n\n  query StoreLocatorPageCms {\n    storeLocatorPage: metaobject(\n      handle: {type: "store_locator", handle: "store-locator"}\n    ) {\n      id\n      handle\n      ...StoreLocatorHero\n\n      category: field(key: "category") {\n        references(first: 50) {\n          nodes {\n            ... on Metaobject {\n              ...StoreType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: StoreLocatorPageCmsQuery;
     variables: StoreLocatorPageCmsQueryVariables;
   };

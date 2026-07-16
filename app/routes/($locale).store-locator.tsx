@@ -1,7 +1,7 @@
 import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
 import { useLoaderData, type MetaFunction } from 'react-router';
 import { STORE_LOCATOR_PAGE_CMS_QUERY } from '~/graphql/cms/StoreLocatorPageQuery';
-import HeroImageMultiText from '~/components/cms/HeroImageMultiText';
+import StoreLocatorHero from '~/components/cms/StoreLocatorHero';
 import StoreLocatorCategory from '~/components/cms/StoreLocatorCategory';
 
 export const meta: MetaFunction<typeof loader> = () => {
@@ -27,8 +27,8 @@ export default function StoreLocatorPage() {
 
   return (
     <div className="storeLocator">
-      {storeLocatorPage?.hero?.reference && (
-        <HeroImageMultiText reference={storeLocatorPage.hero.reference} />
+      {storeLocatorPage?.hero_image?.reference && (
+        <StoreLocatorHero reference={storeLocatorPage} />
       )}
 
       <div className="py-12 md:py-20 px-12 md:px-20">

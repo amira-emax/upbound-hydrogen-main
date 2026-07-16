@@ -1417,6 +1417,105 @@ export type GalleryRowsFragment = Pick<
   label?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
 };
 
+export type StoreOutletFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'id' | 'type'
+> & {
+  area?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  name?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  map_url?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  address?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+};
+
+export type StoreLocationFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'id' | 'type'
+> & {
+  store_name?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'value'>
+  >;
+  store_logo?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>;
+    }>;
+  }>;
+  more_than_1_location?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.MetaobjectField, 'value'>
+  >;
+  address?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  outlets?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+          area?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          name?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          map_url?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          address?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+        }
+      >;
+    }>;
+  }>;
+};
+
+export type StoreTypeFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'id' | 'type'
+> & {
+  type_name?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  store_list?: StorefrontAPI.Maybe<{
+    references?: StorefrontAPI.Maybe<{
+      nodes: Array<
+        Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+          store_name?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          store_logo?: StorefrontAPI.Maybe<{
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Image, 'url' | 'altText'>
+              >;
+            }>;
+          }>;
+          more_than_1_location?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          address?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          outlets?: StorefrontAPI.Maybe<{
+            references?: StorefrontAPI.Maybe<{
+              nodes: Array<
+                Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+                  area?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  name?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  map_url?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  address?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                }
+              >;
+            }>;
+          }>;
+        }
+      >;
+    }>;
+  }>;
+};
+
 export type BannerStepsFragment = Pick<
   StorefrontAPI.Metaobject,
   'id' | 'type'
@@ -1617,6 +1716,134 @@ export type SciencePageCmsQuery = {
         reference?: StorefrontAPI.Maybe<{
           image?: StorefrontAPI.Maybe<
             Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+          >;
+        }>;
+      }>;
+    }
+  >;
+};
+
+export type StoreLocatorPageCmsQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type StoreLocatorPageCmsQuery = {
+  storeLocatorPage?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id' | 'handle'> & {
+      hero?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+            background_image?: StorefrontAPI.Maybe<{
+              reference?: StorefrontAPI.Maybe<{
+                image?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                >;
+              }>;
+            }>;
+            enable_overlay?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.MetaobjectField, 'value'>
+            >;
+            overlay_opacity?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.MetaobjectField, 'value'>
+            >;
+            logo?: StorefrontAPI.Maybe<{
+              references?: StorefrontAPI.Maybe<{
+                nodes: Array<{
+                  image?: StorefrontAPI.Maybe<{
+                    reference?: StorefrontAPI.Maybe<{
+                      image?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                      >;
+                    }>;
+                  }>;
+                }>;
+              }>;
+            }>;
+            texts?: StorefrontAPI.Maybe<{
+              references?: StorefrontAPI.Maybe<{
+                nodes: Array<{
+                  text?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  position?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  font_size?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  font_weight?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  text_color?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  tag?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  label?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                  listing?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.MetaobjectField, 'value'>
+                  >;
+                }>;
+              }>;
+            }>;
+          }
+        >;
+      }>;
+      category?: StorefrontAPI.Maybe<{
+        references?: StorefrontAPI.Maybe<{
+          nodes: Array<
+            Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+              type_name?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MetaobjectField, 'value'>
+              >;
+              store_list?: StorefrontAPI.Maybe<{
+                references?: StorefrontAPI.Maybe<{
+                  nodes: Array<
+                    Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+                      store_name?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'value'>
+                      >;
+                      store_logo?: StorefrontAPI.Maybe<{
+                        reference?: StorefrontAPI.Maybe<{
+                          image?: StorefrontAPI.Maybe<
+                            Pick<StorefrontAPI.Image, 'url' | 'altText'>
+                          >;
+                        }>;
+                      }>;
+                      more_than_1_location?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'value'>
+                      >;
+                      address?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'value'>
+                      >;
+                      outlets?: StorefrontAPI.Maybe<{
+                        references?: StorefrontAPI.Maybe<{
+                          nodes: Array<
+                            Pick<StorefrontAPI.Metaobject, 'id' | 'type'> & {
+                              area?: StorefrontAPI.Maybe<
+                                Pick<StorefrontAPI.MetaobjectField, 'value'>
+                              >;
+                              name?: StorefrontAPI.Maybe<
+                                Pick<StorefrontAPI.MetaobjectField, 'value'>
+                              >;
+                              map_url?: StorefrontAPI.Maybe<
+                                Pick<StorefrontAPI.MetaobjectField, 'value'>
+                              >;
+                              address?: StorefrontAPI.Maybe<
+                                Pick<StorefrontAPI.MetaobjectField, 'value'>
+                              >;
+                            }
+                          >;
+                        }>;
+                      }>;
+                    }
+                  >;
+                }>;
+              }>;
+            }
           >;
         }>;
       }>;
@@ -2001,7 +2228,11 @@ export type CollectionQuery = {
               >;
             };
             selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
-              Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
+              Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+                freeGift?: StorefrontAPI.Maybe<
+                  Pick<StorefrontAPI.Metafield, 'value'>
+                >;
+              }
             >;
           }
         >;
@@ -2129,7 +2360,11 @@ export type CatalogQuery = {
           >;
         };
         selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
-          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
+          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+            freeGift?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Metafield, 'value'>
+            >;
+          }
         >;
       }
     >;
@@ -3545,6 +3780,10 @@ interface GeneratedQueryTypes {
     return: SciencePageCmsQuery;
     variables: SciencePageCmsQueryVariables;
   };
+  '#graphql\n  #graphql\nfragment HeroImageMultiText on Metaobject {\n  id\n  type\n\n  background_image: field(key: "background_image") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n\n  enable_overlay: field(key: "enable_overlay") {\n    value\n  }\n  overlay_opacity: field(key: "overlay_opacity") {\n    value\n  }\n\n  logo: field(key: "logo") {\n    references(first: 10) {\n      nodes {\n        ... on Metaobject {\n          image: field(key: "image") {\n            reference {\n              ... on MediaImage {\n                image {\n                  url\n                  altText\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n\n  texts: field(key: "texts") {\n    references(first: 10) {\n      nodes {\n        ... on Metaobject {\n          text: field(key: "text") { value }\n          position: field(key: "position") { value }\n          font_size: field(key: "font_size") { value }\n          font_weight: field(key: "font_weight") { value }\n          text_color: field(key: "text_color") { value }\n          tag: field(key: "tag") { value }\n          label: field(key: "label") { value }\n          listing: field(key: "listing") { value }\n        }\n      }\n    }\n  }\n}\n\n  #graphql\n#graphql\n#graphql\nfragment StoreOutlet on Metaobject {\n  id\n  type\n  area: field(key: "area") {\n    value\n  }\n  name: field(key: "name") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n}\n\n\nfragment StoreLocation on Metaobject {\n  id\n  type\n  store_name: field(key: "store_name") {\n    value\n  }\n  store_logo: field(key: "store_logo") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n  more_than_1_location: field(key: "more_than_1_location") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n  outlets: field(key: "outlets") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreOutlet\n        }\n      }\n    }\n  }\n}\n\n\nfragment StoreType on Metaobject {\n  id\n  type\n  type_name: field(key: "type_name") {\n    value\n  }\n  store_list: field(key: "store_list") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreLocation\n        }\n      }\n    }\n  }\n}\n\n\n  query StoreLocatorPageCms {\n    storeLocatorPage: metaobject(\n      handle: {type: "store_locator", handle: "store-locator"}\n    ) {\n      id\n      handle\n\n      hero: field(key: "hero") {\n        reference {\n          ... on Metaobject {\n            id\n            type\n            ...HeroImageMultiText\n          }\n        }\n      }\n\n      category: field(key: "category") {\n        references(first: 50) {\n          nodes {\n            ... on Metaobject {\n              ...StoreType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: StoreLocatorPageCmsQuery;
+    variables: StoreLocatorPageCmsQueryVariables;
+  };
   '#graphql\n  fragment Shop on Shop {\n    id\n    name\n    description\n    primaryDomain {\n      url\n    }\n    brand {\n      logo {\n        image {\n          url\n        }\n      }\n    }\n  }\n  query Header(\n    $country: CountryCode\n    $headerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    shop {\n      ...Shop\n    }\n    menu(handle: $headerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: HeaderQuery;
     variables: HeaderQueryVariables;
@@ -3553,7 +3792,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n    productType\n    totalInventory\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          endCursor\n          startCursor\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {\n      id\n      availableForSale\n      freeGift: metafield(key: "free_gift", namespace: "custom") {\n        value\n      }\n    }\n    productType\n    totalInventory\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          endCursor\n          startCursor\n        }\n      }\n    }\n  }\n': {
     return: CollectionQuery;
     variables: CollectionQueryVariables;
   };
@@ -3561,7 +3800,7 @@ interface GeneratedQueryTypes {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
   };
-  '#graphql\n  query Catalog(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {\n      nodes {\n        ...CollectionItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n  #graphql\n  fragment MoneyCollectionItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment CollectionItem on Product {\n    id\n    handle\n    title\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n    productType\n  }\n\n': {
+  '#graphql\n  query Catalog(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {\n      nodes {\n        ...CollectionItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n  #graphql\n  fragment MoneyCollectionItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment CollectionItem on Product {\n    id\n    handle\n    title\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    selectedOrFirstAvailableVariant(ignoreUnknownOptions: true) {\n      id\n      availableForSale\n      freeGift: metafield(key: "free_gift", namespace: "custom") {\n        value\n      }\n    }\n    productType\n  }\n\n': {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };

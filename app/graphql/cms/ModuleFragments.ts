@@ -632,6 +632,83 @@ fragment GalleryRows on Metaobject {
 }
 `;
 
+export const STORE_OUTLET_FRAGMENT = `#graphql
+fragment StoreOutlet on Metaobject {
+  id
+  type
+  area: field(key: "area") {
+    value
+  }
+  name: field(key: "name") {
+    value
+  }
+  map_url: field(key: "map_url") {
+    value
+  }
+  address: field(key: "address") {
+    value
+  }
+}
+`;
+
+export const STORE_LOCATION_FRAGMENT = `#graphql
+${STORE_OUTLET_FRAGMENT}
+
+fragment StoreLocation on Metaobject {
+  id
+  type
+  store_name: field(key: "store_name") {
+    value
+  }
+  store_logo: field(key: "store_logo") {
+    reference {
+      ... on MediaImage {
+        image {
+          url
+          altText
+        }
+      }
+    }
+  }
+  more_than_1_location: field(key: "more_than_1_location") {
+    value
+  }
+  address: field(key: "address") {
+    value
+  }
+  outlets: field(key: "outlets") {
+    references(first: 50) {
+      nodes {
+        ... on Metaobject {
+          ...StoreOutlet
+        }
+      }
+    }
+  }
+}
+`;
+
+export const STORE_TYPE_FRAGMENT = `#graphql
+${STORE_LOCATION_FRAGMENT}
+
+fragment StoreType on Metaobject {
+  id
+  type
+  type_name: field(key: "type_name") {
+    value
+  }
+  store_list: field(key: "store_list") {
+    references(first: 50) {
+      nodes {
+        ... on Metaobject {
+          ...StoreLocation
+        }
+      }
+    }
+  }
+}
+`;
+
 export const BANNER_STEPS_FRAGMENT = `#graphql
 fragment BannerSteps on Metaobject {
   id

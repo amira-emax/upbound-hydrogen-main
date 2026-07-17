@@ -14,7 +14,7 @@ function StoreLocatorCategory({ reference }: StoreLocatorCategoryProps) {
   return (
     <section className="mb-12">
       <h2 className="mb-6 typo-header">{type_name?.value}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-18">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-18 items-start">
         {locations.map((location, index) => (
           <StoreLocationCard key={location.id ?? index} reference={location} />
         ))}

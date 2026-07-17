@@ -55,7 +55,7 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="typo-body-l underline underline-offset-2"
+          className={cn('typo-body-l underline-offset-2 hover:underline', open && 'underline')}
         >
           {hasMultipleLocations ? 'Available stores' : 'Address'} {open ? '˅' : '>'}
         </button>

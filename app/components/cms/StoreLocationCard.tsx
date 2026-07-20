@@ -15,6 +15,7 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
     store_logo,
     more_than_1_location,
     address,
+    map_url,
     outlets,
   } = reference;
 
@@ -68,12 +69,19 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
                   {area && <p className="font-semibold">{area}</p>}
                   <ul className="list-inside list-[circle]">
                     {areaOutlets.map((outlet, index) => (
-                      <li key={outlet.id ?? index}>
+                      <li
+                        key={outlet.id ?? index}
+                        className={cn(
+                          outlet.map_url?.value &&
+                            'marker:text-black hover:list-disc active:list-disc',
+                        )}
+                      >
                         {outlet.map_url?.value ? (
                           <a
                             href={outlet.map_url.value}
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="underline-offset-2 hover:underline active:underline"
                           >
                             {outlet.name?.value}
                           </a>
@@ -88,9 +96,20 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
             </div>
           ) : (
             address?.value && (
-              <p className="mt-3 whitespace-pre-line text-center text-sm">
-                {address.value}
-              </p>
+              map_url?.value ? (
+                <a
+                  href={map_url.value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 block whitespace-pre-line text-center text-sm underline-offset-2 hover:underline active:underline"
+                >
+                  {address.value}
+                </a>
+              ) : (
+                <p className="mt-3 whitespace-pre-line text-center text-sm">
+                  {address.value}
+                </p>
+              )
             )
           )
         )}

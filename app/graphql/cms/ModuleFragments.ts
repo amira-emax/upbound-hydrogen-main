@@ -676,6 +676,9 @@ fragment StoreLocation on Metaobject {
   address: field(key: "address") {
     value
   }
+  map_url: field(key: "map_url") {
+    value
+  }
   outlets: field(key: "outlets") {
     references(first: 50) {
       nodes {

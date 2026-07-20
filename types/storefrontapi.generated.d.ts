@@ -1443,6 +1443,7 @@ export type StoreLocationFragment = Pick<
     Pick<StorefrontAPI.MetaobjectField, 'value'>
   >;
   address?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+  map_url?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
   outlets?: StorefrontAPI.Maybe<{
     references?: StorefrontAPI.Maybe<{
       nodes: Array<
@@ -1510,6 +1511,9 @@ export type StoreTypeFragment = Pick<
             Pick<StorefrontAPI.MetaobjectField, 'value'>
           >;
           address?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.MetaobjectField, 'value'>
+          >;
+          map_url?: StorefrontAPI.Maybe<
             Pick<StorefrontAPI.MetaobjectField, 'value'>
           >;
           outlets?: StorefrontAPI.Maybe<{
@@ -1777,6 +1781,9 @@ export type StoreLocatorPageCmsQuery = {
                         Pick<StorefrontAPI.MetaobjectField, 'value'>
                       >;
                       address?: StorefrontAPI.Maybe<
+                        Pick<StorefrontAPI.MetaobjectField, 'value'>
+                      >;
+                      map_url?: StorefrontAPI.Maybe<
                         Pick<StorefrontAPI.MetaobjectField, 'value'>
                       >;
                       outlets?: StorefrontAPI.Maybe<{
@@ -3756,7 +3763,7 @@ interface GeneratedQueryTypes {
     return: SciencePageCmsQuery;
     variables: SciencePageCmsQueryVariables;
   };
-  '#graphql\n  #graphql\nfragment StoreLocatorHero on Metaobject {\n  id\n  type\n  hero_header: field(key: "hero_header") {\n    value\n  }\n  hero_text_position: field(key: "hero_text_position") {\n    value\n  }\n  hero_text_color: field(key: "hero_text_color") {\n    value\n  }\n  hero_image: field(key: "hero_image") {\n    reference {\n      ... on MediaImage {\n        image {\n          height\n          width\n          url\n          altText\n        }\n      }\n    }\n  }\n}\n\n  #graphql\n#graphql\n#graphql\nfragment StoreOutlet on Metaobject {\n  id\n  type\n  area: field(key: "area") {\n    value\n  }\n  name: field(key: "name") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n}\n\n\nfragment StoreLocation on Metaobject {\n  id\n  type\n  store_name: field(key: "store_name") {\n    value\n  }\n  store_logo: field(key: "store_logo") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n  more_than_1_location: field(key: "more_than_1_location") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n  outlets: field(key: "outlets") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreOutlet\n        }\n      }\n    }\n  }\n}\n\n\nfragment StoreType on Metaobject {\n  id\n  type\n  type_name: field(key: "type_name") {\n    value\n  }\n  store_list: field(key: "store_list") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreLocation\n        }\n      }\n    }\n  }\n}\n\n\n  query StoreLocatorPageCms {\n    storeLocatorPage: metaobject(\n      handle: {type: "store_locator", handle: "store-locator"}\n    ) {\n      id\n      handle\n      ...StoreLocatorHero\n\n      category: field(key: "category") {\n        references(first: 50) {\n          nodes {\n            ... on Metaobject {\n              ...StoreType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\nfragment StoreLocatorHero on Metaobject {\n  id\n  type\n  hero_header: field(key: "hero_header") {\n    value\n  }\n  hero_text_position: field(key: "hero_text_position") {\n    value\n  }\n  hero_text_color: field(key: "hero_text_color") {\n    value\n  }\n  hero_image: field(key: "hero_image") {\n    reference {\n      ... on MediaImage {\n        image {\n          height\n          width\n          url\n          altText\n        }\n      }\n    }\n  }\n}\n\n  #graphql\n#graphql\n#graphql\nfragment StoreOutlet on Metaobject {\n  id\n  type\n  area: field(key: "area") {\n    value\n  }\n  name: field(key: "name") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n}\n\n\nfragment StoreLocation on Metaobject {\n  id\n  type\n  store_name: field(key: "store_name") {\n    value\n  }\n  store_logo: field(key: "store_logo") {\n    reference {\n      ... on MediaImage {\n        image {\n          url\n          altText\n        }\n      }\n    }\n  }\n  more_than_1_location: field(key: "more_than_1_location") {\n    value\n  }\n  address: field(key: "address") {\n    value\n  }\n  map_url: field(key: "map_url") {\n    value\n  }\n  outlets: field(key: "outlets") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreOutlet\n        }\n      }\n    }\n  }\n}\n\n\nfragment StoreType on Metaobject {\n  id\n  type\n  type_name: field(key: "type_name") {\n    value\n  }\n  store_list: field(key: "store_list") {\n    references(first: 50) {\n      nodes {\n        ... on Metaobject {\n          ...StoreLocation\n        }\n      }\n    }\n  }\n}\n\n\n  query StoreLocatorPageCms {\n    storeLocatorPage: metaobject(\n      handle: {type: "store_locator", handle: "store-locator"}\n    ) {\n      id\n      handle\n      ...StoreLocatorHero\n\n      category: field(key: "category") {\n        references(first: 50) {\n          nodes {\n            ... on Metaobject {\n              ...StoreType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: StoreLocatorPageCmsQuery;
     variables: StoreLocatorPageCmsQueryVariables;
   };

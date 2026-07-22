@@ -5,9 +5,10 @@ import type { StoreLocationFragment } from 'types/storefrontapi.generated';
 
 interface StoreLocationCardProps {
   reference: StoreLocationFragment;
+  openToRight?: boolean;
 }
 
-function StoreLocationCard({ reference }: StoreLocationCardProps) {
+function StoreLocationCard({ reference, openToRight }: StoreLocationCardProps) {
   const [open, setOpen] = useState(false);
 
   const {
@@ -60,12 +61,30 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
         >
           {hasMultipleLocations ? 'Available stores' : 'Address'} {open ? '˅' : '>'}
         </button>
+      </div>
 
-        {open && (
-          hasMultipleLocations ? (
-            <div className={cn('mt-3 flex flex-col gap-4 text-sm')}>
+      {open && (
+        <div
+          className={cn(
+            'relative px-6 text-sm text-center pb-4',
+            openToRight &&
+              'lg:absolute lg:left-full lg:top-6 lg:z-20 lg:mt-0 lg:ml-2 lg:px-0 lg:rounded-xl lg:bg-[#f2f2f2] lg:p-4 lg:text-left lg:shadow-[5px_7px_9px_rgba(0,0,0,0.25)]',
+            openToRight && (hasMultipleLocations ? 'lg:w-144' : 'lg:w-72'),
+          )}
+        >
+          {hasMultipleLocations ? (
+            <div
+              className={cn(
+                'flex flex-col gap-4',
+                openToRight &&
+                  'lg:block lg:columns-3 lg:gap-x-6 lg:[column-rule:1px_solid_rgba(0,0,0,0.15)]',
+              )}
+            >
               {Object.entries(outletsByArea).map(([area, areaOutlets]) => (
-                <div key={area}>
+                <div
+                  key={area}
+                  className={cn(openToRight && 'lg:mb-4 lg:break-inside-avoid')}
+                >
                   {area && <p className="font-semibold">{area}</p>}
                   <ul className="list-inside list-[circle]">
                     {areaOutlets.map((outlet, index) => (
@@ -95,25 +114,22 @@ function StoreLocationCard({ reference }: StoreLocationCardProps) {
               ))}
             </div>
           ) : (
-            address?.value && (
-              map_url?.value ? (
-                <a
-                  href={map_url.value}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 block whitespace-pre-line text-center text-sm underline-offset-2 hover:underline active:underline"
-                >
-                  {address.value}
-                </a>
-              ) : (
-                <p className="mt-3 whitespace-pre-line text-center text-sm">
-                  {address.value}
-                </p>
-              )
-            )
-          )
-        )}
-      </div>
+            address?.value &&
+            (map_url?.value ? (
+              <a
+                href={map_url.value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block whitespace-pre-line underline-offset-2 hover:underline active:underline"
+              >
+                {address.value}
+              </a>
+            ) : (
+              <p className="whitespace-pre-line">{address.value}</p>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

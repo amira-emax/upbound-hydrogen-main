@@ -69,7 +69,7 @@ function StoreLocationCard({ reference, openToRight }: StoreLocationCardProps) {
             'relative px-6 text-sm text-center pb-4',
             openToRight &&
               'lg:absolute lg:left-full lg:top-6 lg:z-20 lg:mt-0 lg:ml-2 lg:px-0 lg:rounded-xl lg:bg-[#f2f2f2] lg:p-4 lg:text-left lg:shadow-[5px_7px_9px_rgba(0,0,0,0.25)]',
-            openToRight && (hasMultipleLocations ? 'lg:w-144' : 'lg:w-72'),
+            openToRight && (hasMultipleLocations ? 'lg:w-xl' : 'lg:w-72'),
           )}
         >
           {hasMultipleLocations ? (

@@ -12,6 +12,7 @@ import { Aside, useAside } from '~/components/Aside';
 import { CartMain } from '~/components/CartMain';
 import { Footer } from '~/components/Footer';
 import { Header } from '~/components/Header';
+import type { CartDiscountOption } from '~/graphql/admin/CartDiscountsQuery';
 import {
   SEARCH_ENDPOINT,
   SearchFormPredictive,
@@ -25,6 +26,7 @@ import Logo from './icons/Logo';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
+  cartDiscounts: Promise<CartDiscountOption[]>;
   footer: Promise<FooterMenuCmsQuery | null>;
   header: HeaderQuery;
   globalBanner: Promise<GlobalBannerCmsQuery | null>;
@@ -41,6 +43,7 @@ const COOLDOWN_MINUTES = 10;
 
 export function PageLayout({
   cart,
+  cartDiscounts,
   children = null,
   footer,
   header,
@@ -55,7 +58,7 @@ export function PageLayout({
   return (
     <Aside.Provider>
       <IOSSafariScrollFix />
-      <CartAside cart={cart} />
+      <CartAside cart={cart} cartDiscounts={cartDiscounts} />
       <SearchAside />
       {/* <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} /> */}
 
@@ -156,7 +159,13 @@ function IOSSafariScrollFix() {
   return null;
 }
 
-function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
+function CartAside({
+  cart,
+  cartDiscounts,
+}: {
+  cart: PageLayoutProps['cart'];
+  cartDiscounts: PageLayoutProps['cartDiscounts'];
+}) {
   const [quantity, setQuantity] = useState(0);
 
   return (
@@ -169,20 +178,43 @@ function CartAside({ cart }: { cart: PageLayoutProps['cart'] }) {
       }
     >
       <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={cart}>
-          {(cart) => {
-            const mainCount = cart?.lines?.nodes
-              ? cart.lines.nodes
-                  .filter((l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'))
-                  .reduce((sum, l) => sum + l.quantity, 0)
-              : 0;
-            setQuantity(mainCount);
-            return <CartMain cart={cart} layout="aside" />;
-          }}
+        <Await resolve={Promise.all([cart, cartDiscounts])}>
+          {([cart, cartDiscounts]) => (
+            <CartAsideContent
+              cart={cart}
+              cartDiscounts={cartDiscounts}
+              onQuantityChange={setQuantity}
+            />
+          )}
         </Await>
       </Suspense>
     </Aside>
   );
+}
+
+function CartAsideContent({
+  cart,
+  cartDiscounts,
+  onQuantityChange,
+}: {
+  cart: CartApiQueryFragment | null;
+  cartDiscounts: CartDiscountOption[];
+  onQuantityChange: (quantity: number) => void;
+}) {
+  const mainCount = cart?.lines?.nodes
+    ? cart.lines.nodes
+        .filter((l) => !l.attributes?.some((a) => a.key === '_is_free_gift' && a.value === 'true'))
+        .reduce((sum, l) => sum + l.quantity, 0)
+    : 0;
+
+  // Setting state belongs in an effect, not directly in another
+  // component's render (Await's children) — doing it during render can
+  // leave the cart UI stuck showing a stale snapshot after a mutation.
+  useEffect(() => {
+    onQuantityChange(mainCount);
+  }, [mainCount, onQuantityChange]);
+
+  return <CartMain cart={cart} layout="aside" cartDiscounts={cartDiscounts} />;
 }
 
 function SearchAside() {

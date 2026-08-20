@@ -1,4 +1,10 @@
-import {type MetaFunction, useLoaderData} from 'react-router';
+import {Suspense} from 'react';
+import {
+  Await,
+  type MetaFunction,
+  useLoaderData,
+  useRouteLoaderData,
+} from 'react-router';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {
@@ -8,6 +14,7 @@ import {
   type HeadersFunction,
 } from '@shopify/remix-oxygen';
 import {CartMain} from '~/components/CartMain';
+import type {RootLoader} from '~/root';
 
 export const meta: MetaFunction = () => {
   return [{title: `Upbound | Cart`}];
@@ -174,11 +181,19 @@ export async function loader({context}: LoaderFunctionArgs) {
 
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const cartDiscounts = rootData?.cartDiscounts ?? Promise.resolve([]);
 
   return (
     <div className="cart">
       <h1>Cart</h1>
-      <CartMain layout="page" cart={cart} />
+      <Suspense fallback={<CartMain layout="page" cart={cart} />}>
+        <Await resolve={cartDiscounts}>
+          {(cartDiscounts) => (
+            <CartMain layout="page" cart={cart} cartDiscounts={cartDiscounts} />
+          )}
+        </Await>
+      </Suspense>
     </div>
   );
 }

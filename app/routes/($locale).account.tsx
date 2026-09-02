@@ -39,7 +39,7 @@ export default function AccountLayout() {
 
   return (
     <div className="account">
-      <AccountMenu />
+      <AccountMenu isRewardsTester={customer?.testAccount?.value === 'true'} />
       <div className="flex-3">
         <Outlet context={{customer}} />
       </div>
@@ -47,7 +47,7 @@ export default function AccountLayout() {
   );
 }
 
-function AccountMenu() {
+function AccountMenu({isRewardsTester}: {isRewardsTester: boolean}) {
   function isActiveStyle({
     isActive,
     isPending,
@@ -93,13 +93,15 @@ function AccountMenu() {
       className="typo-caption-responsive text-mid-grey">
         Subscriptions
       </NavLink>
-      <NavLink
-        to="/account/rewards"
-        style={isActiveStyle}
-        className="typo-caption-responsive text-mid-grey"
-      >
-        Rewards
-      </NavLink>
+      {isRewardsTester && (
+        <NavLink
+          to="/account/rewards"
+          style={isActiveStyle}
+          className="typo-caption-responsive text-mid-grey"
+        >
+          Points & Rewards
+        </NavLink>
+      )}
       <Logout />
     </nav>
   );

@@ -27,6 +27,7 @@ import Logo from './icons/Logo';
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
   cartDiscounts: Promise<CartDiscountOption[]>;
+  canUseRewards: Promise<boolean>;
   footer: Promise<FooterMenuCmsQuery | null>;
   header: HeaderQuery;
   globalBanner: Promise<GlobalBannerCmsQuery | null>;
@@ -44,6 +45,7 @@ const COOLDOWN_MINUTES = 10;
 export function PageLayout({
   cart,
   cartDiscounts,
+  canUseRewards,
   children = null,
   footer,
   header,
@@ -58,7 +60,7 @@ export function PageLayout({
   return (
     <Aside.Provider>
       <IOSSafariScrollFix />
-      <CartAside cart={cart} cartDiscounts={cartDiscounts} />
+      <CartAside cart={cart} cartDiscounts={cartDiscounts} canUseRewards={canUseRewards} />
       <SearchAside />
       {/* <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} /> */}
 
@@ -162,9 +164,11 @@ function IOSSafariScrollFix() {
 function CartAside({
   cart,
   cartDiscounts,
+  canUseRewards,
 }: {
   cart: PageLayoutProps['cart'];
   cartDiscounts: PageLayoutProps['cartDiscounts'];
+  canUseRewards: PageLayoutProps['canUseRewards'];
 }) {
   const [quantity, setQuantity] = useState(0);
 
@@ -178,11 +182,12 @@ function CartAside({
       }
     >
       <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={Promise.all([cart, cartDiscounts])}>
-          {([cart, cartDiscounts]) => (
+        <Await resolve={Promise.all([cart, cartDiscounts, canUseRewards])}>
+          {([cart, cartDiscounts, canUseRewards]) => (
             <CartAsideContent
               cart={cart}
               cartDiscounts={cartDiscounts}
+              canUseRewards={canUseRewards}
               onQuantityChange={setQuantity}
             />
           )}
@@ -195,10 +200,12 @@ function CartAside({
 function CartAsideContent({
   cart,
   cartDiscounts,
+  canUseRewards,
   onQuantityChange,
 }: {
   cart: CartApiQueryFragment | null;
   cartDiscounts: CartDiscountOption[];
+  canUseRewards: boolean;
   onQuantityChange: (quantity: number) => void;
 }) {
   const mainCount = cart?.lines?.nodes
@@ -214,7 +221,14 @@ function CartAsideContent({
     onQuantityChange(mainCount);
   }, [mainCount, onQuantityChange]);
 
-  return <CartMain cart={cart} layout="aside" cartDiscounts={cartDiscounts} />;
+  return (
+    <CartMain
+      cart={cart}
+      layout="aside"
+      cartDiscounts={cartDiscounts}
+      canUseRewards={canUseRewards}
+    />
+  );
 }
 
 function SearchAside() {

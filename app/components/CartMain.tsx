@@ -17,6 +17,7 @@ export type CartMainProps = {
   cart: CartApiQueryFragment | null;
   layout: CartLayout;
   cartDiscounts?: CartDiscountOption[];
+  canUseRewards?: boolean;
 };
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
@@ -41,7 +42,12 @@ function findGiftLine(line: CartLine, allLines: CartLine[]): CartLine | null {
   );
 }
 
-export function CartMain({layout, cart: originalCart, cartDiscounts = []}: CartMainProps) {
+export function CartMain({
+  layout,
+  cart: originalCart,
+  cartDiscounts = [],
+  canUseRewards = false,
+}: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
   const allLines = cart?.lines?.nodes ?? [];
@@ -75,7 +81,12 @@ export function CartMain({layout, cart: originalCart, cartDiscounts = []}: CartM
             </ul>
           </div>
           {cartHasItems && (
-            <CartSummary cart={cart} layout={layout} cartDiscounts={cartDiscounts} />
+            <CartSummary
+              cart={cart}
+              layout={layout}
+              cartDiscounts={cartDiscounts}
+              canUseRewards={canUseRewards}
+            />
           )}
         </div>
       </div>

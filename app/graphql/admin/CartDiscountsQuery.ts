@@ -49,4 +49,7 @@ export const CART_DISCOUNTS_QUERY = `#graphql
 export type CartDiscountOption = {
   code: string;
   label: string;
+  // Shopify's auto-generated discount summary (e.g. "5% off orders over
+  // RM50") — null when it wouldn't say anything the label doesn't already.
+  description: string | null;
 };

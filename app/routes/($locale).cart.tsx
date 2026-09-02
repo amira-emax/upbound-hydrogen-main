@@ -183,14 +183,20 @@ export default function Cart() {
   const cart = useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const cartDiscounts = rootData?.cartDiscounts ?? Promise.resolve([]);
+  const canUseRewards = rootData?.canUseRewards ?? Promise.resolve(false);
 
   return (
     <div className="cart">
       <h1>Cart</h1>
       <Suspense fallback={<CartMain layout="page" cart={cart} />}>
-        <Await resolve={cartDiscounts}>
-          {(cartDiscounts) => (
-            <CartMain layout="page" cart={cart} cartDiscounts={cartDiscounts} />
+        <Await resolve={Promise.all([cartDiscounts, canUseRewards])}>
+          {([cartDiscounts, canUseRewards]) => (
+            <CartMain
+              layout="page"
+              cart={cart}
+              cartDiscounts={cartDiscounts}
+              canUseRewards={canUseRewards}
+            />
           )}
         </Await>
       </Suspense>

@@ -112,6 +112,9 @@ export type CustomerFragment = Pick<
       >
     >;
   };
+  testAccount?: CustomerAccountAPI.Maybe<
+    Pick<CustomerAccountAPI.Metafield, 'value'>
+  >;
 };
 
 export type AddressFragment = Pick<
@@ -181,6 +184,9 @@ export type CustomerDetailsQuery = {
         >
       >;
     };
+    testAccount?: CustomerAccountAPI.Maybe<
+      Pick<CustomerAccountAPI.Metafield, 'value'>
+    >;
   };
 };
 
@@ -189,7 +195,14 @@ export type CustomerIdQueryVariables = CustomerAccountAPI.Exact<{
 }>;
 
 export type CustomerIdQuery = {
-  customer: Pick<CustomerAccountAPI.Customer, 'id'>;
+  customer: Pick<CustomerAccountAPI.Customer, 'id'> & {
+    emailAddress?: CustomerAccountAPI.Maybe<
+      Pick<CustomerAccountAPI.CustomerEmailAddress, 'emailAddress'>
+    >;
+    testAccount?: CustomerAccountAPI.Maybe<
+      Pick<CustomerAccountAPI.Metafield, 'value'>
+    >;
+  };
 };
 
 export type OrderMoneyFragment = Pick<
@@ -617,11 +630,11 @@ export type CustomerUpdateMutation = {
 };
 
 interface GeneratedQueryTypes {
-  '#graphql\n  query CustomerDetails {\n    customer {\n      ...Customer\n    }\n  }\n  #graphql\n  fragment Customer on Customer {\n    id\n    firstName\n    lastName\n    emailAddress {\n      emailAddress\n    }\n    phoneNumber {\n      phoneNumber\n    }\n    defaultAddress {\n      ...Address\n    }\n    addresses(first: 6) {\n      nodes {\n        ...Address\n      }\n    }\n  }\n  fragment Address on CustomerAddress {\n    id\n    formatted(withCompany: false)\n    firstName\n    lastName\n    company\n    address1\n    address2\n    territoryCode\n    zoneCode\n    city\n    zip\n    phoneNumber\n  }\n\n': {
+  '#graphql\n  query CustomerDetails {\n    customer {\n      ...Customer\n    }\n  }\n  #graphql\n  fragment Customer on Customer {\n    id\n    firstName\n    lastName\n    emailAddress {\n      emailAddress\n    }\n    phoneNumber {\n      phoneNumber\n    }\n    defaultAddress {\n      ...Address\n    }\n    addresses(first: 6) {\n      nodes {\n        ...Address\n      }\n    }\n    # Gates the rewards feature while it\'s still being rolled out — see\n    # isRewardsTester in ~/lib/rewards.\n    testAccount: metafield(namespace: "custom", key: "test_account") {\n      value\n    }\n  }\n  fragment Address on CustomerAddress {\n    id\n    formatted(withCompany: false)\n    firstName\n    lastName\n    company\n    address1\n    address2\n    territoryCode\n    zoneCode\n    city\n    zip\n    phoneNumber\n  }\n\n': {
     return: CustomerDetailsQuery;
     variables: CustomerDetailsQueryVariables;
   };
-  '#graphql\n  query CustomerId {\n    customer {\n      id\n    }\n  }\n': {
+  '#graphql\n  query CustomerId {\n    customer {\n      id\n      emailAddress {\n        emailAddress\n      }\n      testAccount: metafield(namespace: "custom", key: "test_account") {\n        value\n      }\n    }\n  }\n': {
     return: CustomerIdQuery;
     variables: CustomerIdQueryVariables;
   };

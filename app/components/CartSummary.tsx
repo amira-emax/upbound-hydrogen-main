@@ -11,9 +11,10 @@ type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
   cartDiscounts?: CartDiscountOption[];
+  canUseRewards?: boolean;
 };
 
-export function CartSummary({cart, layout, cartDiscounts = []}: CartSummaryProps) {
+export function CartSummary({cart, layout, cartDiscounts = [], canUseRewards = false}: CartSummaryProps) {
   const className =
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
@@ -33,7 +34,11 @@ export function CartSummary({cart, layout, cartDiscounts = []}: CartSummaryProps
           )}
         </dd>
       </dl>
-      <CartDiscounts discountCodes={cart.discountCodes} availableDiscounts={cartDiscounts} />
+      <CartDiscounts
+        discountCodes={cart.discountCodes}
+        availableDiscounts={cartDiscounts}
+        canUseRewards={canUseRewards}
+      />
       {/* <CartGiftCard giftCardCodes={cart.appliedGiftCards} /> */}
       <CartCheckoutActions checkoutUrl={cart.checkoutUrl} lines={cart.lines?.nodes} />
       <p className="typo-caption-responsive text-mid-grey text-center">
@@ -76,9 +81,11 @@ function CartCheckoutActions({
 function CartDiscounts({
   discountCodes,
   availableDiscounts = [],
+  canUseRewards = false,
 }: {
   discountCodes?: CartApiQueryFragment['discountCodes'];
   availableDiscounts?: CartDiscountOption[];
+  canUseRewards?: boolean;
 }) {
   const codes: string[] =
     discountCodes
@@ -120,14 +127,18 @@ function CartDiscounts({
         </div>
       )}
 
-      {/* Fallback: manually enter a code not in the list above */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <input type="text" name="discountCode" placeholder="Have another code?" />
-          &nbsp;
-          <button type="submit">Apply</button>
-        </div>
-      </UpdateDiscountForm>
+      {/* Fallback: manually enter a code not in the list above — gated
+          behind the same rewards whitelist while it's still being rolled
+          out, so non-whitelisted customers can't self-apply loyalty codes. */}
+      {canUseRewards && (
+        <UpdateDiscountForm discountCodes={codes}>
+          <div>
+            <input type="text" name="discountCode" placeholder="Have another code?" />
+            &nbsp;
+            <button type="submit">Apply</button>
+          </div>
+        </UpdateDiscountForm>
+      )}
     </div>
   );
 }

@@ -1,10 +1,4 @@
-import {Suspense} from 'react';
-import {
-  Await,
-  type MetaFunction,
-  useLoaderData,
-  useRouteLoaderData,
-} from 'react-router';
+import {type MetaFunction, useLoaderData} from 'react-router';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {
@@ -14,7 +8,6 @@ import {
   type HeadersFunction,
 } from '@shopify/remix-oxygen';
 import {CartMain} from '~/components/CartMain';
-import type {RootLoader} from '~/root';
 
 export const meta: MetaFunction = () => {
   return [{title: `Upbound | Cart`}];
@@ -181,25 +174,11 @@ export async function loader({context}: LoaderFunctionArgs) {
 
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
-  const rootData = useRouteLoaderData<RootLoader>('root');
-  const cartDiscounts = rootData?.cartDiscounts ?? Promise.resolve([]);
-  const canUseRewards = rootData?.canUseRewards ?? Promise.resolve(false);
 
   return (
     <div className="cart">
       <h1>Cart</h1>
-      <Suspense fallback={<CartMain layout="page" cart={cart} />}>
-        <Await resolve={Promise.all([cartDiscounts, canUseRewards])}>
-          {([cartDiscounts, canUseRewards]) => (
-            <CartMain
-              layout="page"
-              cart={cart}
-              cartDiscounts={cartDiscounts}
-              canUseRewards={canUseRewards}
-            />
-          )}
-        </Await>
-      </Suspense>
+      <CartMain layout="page" cart={cart} />
     </div>
   );
 }

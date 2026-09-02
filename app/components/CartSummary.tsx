@@ -3,18 +3,15 @@ import type { CartLayout } from '~/components/CartMain';
 import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
 import { useRef } from 'react';
 import { FetcherWithComponents } from 'react-router';
-import type { CartDiscountOption } from '~/graphql/admin/CartDiscountsQuery';
 import { cn } from '~/lib/utils';
 import { Button } from './ui/button';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
-  cartDiscounts?: CartDiscountOption[];
-  canUseRewards?: boolean;
 };
 
-export function CartSummary({cart, layout, cartDiscounts = [], canUseRewards = false}: CartSummaryProps) {
+export function CartSummary({cart, layout}: CartSummaryProps) {
   const className =
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
@@ -34,12 +31,8 @@ export function CartSummary({cart, layout, cartDiscounts = [], canUseRewards = f
           )}
         </dd>
       </dl>
-      <CartDiscounts
-        discountCodes={cart.discountCodes}
-        availableDiscounts={cartDiscounts}
-        canUseRewards={canUseRewards}
-      />
-      {/* <CartGiftCard giftCardCodes={cart.appliedGiftCards} /> */}
+      {/* <CartDiscounts discountCodes={cart.discountCodes} />
+      <CartGiftCard giftCardCodes={cart.appliedGiftCards} /> */}
       <CartCheckoutActions checkoutUrl={cart.checkoutUrl} lines={cart.lines?.nodes} />
       <p className="typo-caption-responsive text-mid-grey text-center">
         Taxes and shipping calculated at checkout
@@ -80,111 +73,39 @@ function CartCheckoutActions({
 
 function CartDiscounts({
   discountCodes,
-  availableDiscounts = [],
-  canUseRewards = false,
 }: {
   discountCodes?: CartApiQueryFragment['discountCodes'];
-  availableDiscounts?: CartDiscountOption[];
-  canUseRewards?: boolean;
 }) {
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
       ?.map(({ code }) => code) || [];
 
-  // Don't show a "pick me" chip for a code that's already applied
-  const pickableDiscounts = availableDiscounts.filter(
-    (discount) => !codes.includes(discount.code),
-  );
-
   return (
-    <div className="space-y-2">
-      {/* Have existing discount(s), each individually removable */}
+    <div>
+      {/* Have existing discount, display it with a remove option */}
       <dl hidden={!codes.length}>
         <div>
           <dt>Discount(s)</dt>
-          {codes.map((code) => (
-            <UpdateDiscountForm
-              key={code}
-              discountCodes={codes.filter((c) => c !== code)}
-            >
-              <div className="cart-discount">
-                <code>{code}</code>
-                &nbsp;
-                <button type="submit">Remove</button>
-              </div>
-            </UpdateDiscountForm>
-          ))}
+          <UpdateDiscountForm>
+            <div className="cart-discount">
+              <code>{codes?.join(', ')}</code>
+              &nbsp;
+              <button>Remove</button>
+            </div>
+          </UpdateDiscountForm>
         </div>
       </dl>
 
-      {/* Customer's own eligible discounts — pick one to apply */}
-      {pickableDiscounts.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {pickableDiscounts.map((discount) => (
-            <DiscountChip key={discount.code} discount={discount} appliedCodes={codes} />
-          ))}
+      {/* Show an input to apply a discount */}
+      <UpdateDiscountForm discountCodes={codes}>
+        <div>
+          <input type="text" name="discountCode" placeholder="Discount code" />
+          &nbsp;
+          <button type="submit">Apply</button>
         </div>
-      )}
-
-      {/* Fallback: manually enter a code not in the list above — gated
-          behind the same rewards whitelist while it's still being rolled
-          out, so non-whitelisted customers can't self-apply loyalty codes. */}
-      {canUseRewards && (
-        <UpdateDiscountForm discountCodes={codes}>
-          <div>
-            <input type="text" name="discountCode" placeholder="Have another code?" />
-            &nbsp;
-            <button type="submit">Apply</button>
-          </div>
-        </UpdateDiscountForm>
-      )}
+      </UpdateDiscountForm>
     </div>
-  );
-}
-
-function DiscountChip({
-  discount,
-  appliedCodes,
-}: {
-  discount: CartDiscountOption;
-  appliedCodes: string[];
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.DiscountCodesUpdate}
-      inputs={{
-        discountCode: discount.code,
-        discountCodes: appliedCodes,
-      }}
-    >
-      {(fetcher: FetcherWithComponents<any>) => {
-        const submittedCode = fetcher.formData?.get('discountCode');
-        const resultCodes = fetcher.data?.cart?.discountCodes as
-          | CartApiQueryFragment['discountCodes']
-          | undefined;
-        const notApplicable =
-          submittedCode === discount.code &&
-          resultCodes?.some((c) => c.code === discount.code && !c.applicable);
-
-        return (
-          <div className="flex flex-col items-start">
-            <button
-              type="submit"
-              className="text-xs px-3 py-1.5 border border-gray-300 text-gray-600 font-medium rounded-full hover:border-gray-500"
-            >
-              {discount.label}
-            </button>
-            {notApplicable && (
-              <span className="text-xs text-red-500 mt-1">
-                This code isn&apos;t valid for your cart right now
-              </span>
-            )}
-          </div>
-        );
-      }}
-    </CartForm>
   );
 }
 

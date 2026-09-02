@@ -18,11 +18,6 @@ export const CUSTOMER_FRAGMENT = `#graphql
         ...Address
       }
     }
-    # Gates the rewards feature while it's still being rolled out — see
-    # isRewardsTester in ~/lib/rewards.
-    testAccount: metafield(namespace: "custom", key: "test_account") {
-      value
-    }
   }
   fragment Address on CustomerAddress {
     id

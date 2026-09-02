@@ -21,8 +21,6 @@ declare global {
   interface Env extends HydrogenEnv {
     // declare additional Env parameter use in the fetch handler and Remix loader context here
     STORE_PASSWORD: string;
-    LOYALTY_API_URL?: string;
-    LOYALTY_API_KEY?: string;
   }
 }
 

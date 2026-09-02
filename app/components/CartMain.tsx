@@ -6,7 +6,6 @@ import type {CartApiQueryFragment} from 'types/storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineProvider} from '~/components/CartLineContext';
 import {CartLineItem} from '~/components/CartLineItem';
-import type {CartDiscountOption} from '~/graphql/admin/CartDiscountsQuery';
 import {CartSummary} from './CartSummary';
 import {Button} from './ui/button';
 import {cn} from '~/lib/utils';
@@ -16,8 +15,6 @@ export type CartLayout = 'page' | 'aside';
 export type CartMainProps = {
   cart: CartApiQueryFragment | null;
   layout: CartLayout;
-  cartDiscounts?: CartDiscountOption[];
-  canUseRewards?: boolean;
 };
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
@@ -42,12 +39,7 @@ function findGiftLine(line: CartLine, allLines: CartLine[]): CartLine | null {
   );
 }
 
-export function CartMain({
-  layout,
-  cart: originalCart,
-  cartDiscounts = [],
-  canUseRewards = false,
-}: CartMainProps) {
+export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
 
   const allLines = cart?.lines?.nodes ?? [];
@@ -80,14 +72,7 @@ export function CartMain({
               })}
             </ul>
           </div>
-          {cartHasItems && (
-            <CartSummary
-              cart={cart}
-              layout={layout}
-              cartDiscounts={cartDiscounts}
-              canUseRewards={canUseRewards}
-            />
-          )}
+          {cartHasItems && <CartSummary cart={cart} layout={layout} />}
         </div>
       </div>
     </CartLineProvider>

@@ -19,7 +19,6 @@ import { PageLayout } from './components/PageLayout';
 import { FOOTER_MENU_CMS_QUERY } from './graphql/cms/FooterMenuQuery';
 import { GLOBAL_BANNER_CMS_QUERY } from './graphql/cms/GlobalBannerQuery';
 import { GLOBAL_NEWSLETTER_POPUP_CMS_QUERY } from './graphql/cms/GlobalNewsletterPopupQuery';
-import { getCustomerVouchers, isRewardsTester } from '~/lib/rewards';
 import tailwindCss from './styles/tailwind.css?url';
 import {GoogleTagManager} from '~/components/GoogleTagManager';
 
@@ -170,20 +169,12 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
       return null;
     });
 
-  const cartDiscounts = getCustomerVouchers(context);
-  // Gates the cart's manual "Have another code?" entry the same way as the
-  // account rewards pages — only whitelisted test accounts can use it while
-  // the feature is still being rolled out.
-  const canUseRewards = isRewardsTester(context);
-
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
     globalBanner,
     globalNewsletterPopup,
-    cartDiscounts,
-    canUseRewards,
   };
 }
 

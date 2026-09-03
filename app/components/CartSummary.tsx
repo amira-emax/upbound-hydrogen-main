@@ -1,11 +1,41 @@
 import type { CartApiQueryFragment } from 'types/storefrontapi.generated';
 import type { CartLayout } from '~/components/CartMain';
 import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
+import { Loader2 } from 'lucide-react';
 import { useRef } from 'react';
 import { FetcherWithComponents } from 'react-router';
 import type { CartDiscountOption } from '~/graphql/admin/CartDiscountsQuery';
 import { cn } from '~/lib/utils';
 import { Button } from './ui/button';
+
+// A cart mutation "warning" (e.g. DISCOUNT_CODE_NOT_HONOURED) or the
+// discountCodes-level `applicable: false` flag (e.g. minimum spend not met)
+// — whichever fired — as a message to show the customer for the code they
+// just submitted.
+function getDiscountRejection(
+  fetcher: FetcherWithComponents<any>,
+  code: string | null | undefined,
+): string | null {
+  if (!code) return null;
+
+  const warnings = fetcher.data?.warnings as
+    | {code?: string; message?: string; target?: string}[]
+    | undefined;
+  const matchingWarning = warnings?.find((w) =>
+    w.message?.toLowerCase().includes(code.toLowerCase()),
+  );
+  if (matchingWarning?.message) return matchingWarning.message;
+
+  const resultCodes = fetcher.data?.cart?.discountCodes as
+    | CartApiQueryFragment['discountCodes']
+    | undefined;
+  const isInapplicable = resultCodes?.some(
+    (c) => c.code === code && !c.applicable,
+  );
+  if (isInapplicable) return "This code isn't valid for your cart right now";
+
+  return null;
+}
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -108,11 +138,22 @@ function CartDiscounts({
               key={code}
               discountCodes={codes.filter((c) => c !== code)}
             >
-              <div className="cart-discount">
-                <code>{code}</code>
-                &nbsp;
-                <button type="submit">Remove</button>
-              </div>
+              {(fetcher) => {
+                const isRemoving = fetcher.state !== 'idle';
+                return (
+                  <div className="cart-discount flex items-center gap-2">
+                    <code>{code}</code>
+                    <button
+                      type="submit"
+                      disabled={isRemoving}
+                      className="inline-flex items-center gap-1 disabled:opacity-60"
+                    >
+                      {isRemoving && <Loader2 className="size-3 animate-spin" />}
+                      {isRemoving ? 'Removing…' : 'Remove'}
+                    </button>
+                  </div>
+                );
+              }}
             </UpdateDiscountForm>
           ))}
         </div>
@@ -132,11 +173,39 @@ function CartDiscounts({
           out, so non-whitelisted customers can't self-apply loyalty codes. */}
       {canUseRewards && (
         <UpdateDiscountForm discountCodes={codes}>
-          <div>
-            <input type="text" name="discountCode" placeholder="Have another code?" />
-            &nbsp;
-            <button type="submit">Apply</button>
-          </div>
+          {(fetcher) => {
+            const isApplying = fetcher.state !== 'idle';
+            const submittedCode = fetcher.formData?.get('discountCode') as
+              | string
+              | null;
+            const rejection = getDiscountRejection(fetcher, submittedCode);
+
+            return (
+              <div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    name="discountCode"
+                    placeholder="Have another code?"
+                    disabled={isApplying}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isApplying}
+                    className="inline-flex items-center gap-1 disabled:opacity-60"
+                  >
+                    {isApplying && <Loader2 className="size-3 animate-spin" />}
+                    {isApplying ? 'Applying…' : 'Apply'}
+                  </button>
+                </div>
+                {rejection && (
+                  <span className="text-xs text-red-500 mt-1 block">
+                    {rejection}
+                  </span>
+                )}
+              </div>
+            );
+          }}
         </UpdateDiscountForm>
       )}
     </div>
@@ -160,26 +229,27 @@ function DiscountChip({
       }}
     >
       {(fetcher: FetcherWithComponents<any>) => {
-        const submittedCode = fetcher.formData?.get('discountCode');
-        const resultCodes = fetcher.data?.cart?.discountCodes as
-          | CartApiQueryFragment['discountCodes']
-          | undefined;
-        const notApplicable =
-          submittedCode === discount.code &&
-          resultCodes?.some((c) => c.code === discount.code && !c.applicable);
+        const isApplying = fetcher.state !== 'idle';
+        const submittedCode = fetcher.formData?.get('discountCode') as
+          | string
+          | null;
+        const rejection =
+          submittedCode === discount.code
+            ? getDiscountRejection(fetcher, submittedCode)
+            : null;
 
         return (
           <div className="flex flex-col items-start">
             <button
               type="submit"
-              className="text-xs px-3 py-1.5 border border-gray-300 text-gray-600 font-medium rounded-full hover:border-gray-500"
+              disabled={isApplying}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-300 text-gray-600 font-medium rounded-full hover:border-gray-500 disabled:opacity-60"
             >
+              {isApplying && <Loader2 className="size-3 animate-spin" />}
               {discount.label}
             </button>
-            {notApplicable && (
-              <span className="text-xs text-red-500 mt-1">
-                This code isn&apos;t valid for your cart right now
-              </span>
+            {rejection && (
+              <span className="text-xs text-red-500 mt-1">{rejection}</span>
             )}
           </div>
         );
@@ -193,7 +263,7 @@ function UpdateDiscountForm({
   children,
 }: {
   discountCodes?: string[];
-  children: React.ReactNode;
+  children: (fetcher: FetcherWithComponents<any>) => React.ReactNode;
 }) {
   return (
     <CartForm

@@ -1,8 +1,14 @@
 // NOTE: https://shopify.dev/docs/api/admin-graphql/latest/queries/discountNodes
-// Looks up a specific customer's active discounts (assigned via Shopify's
-// native "Specific customers" discount eligibility) so they can be offered
-// as pickable options in the cart. No manually-curated/duplicated list —
-// this reads real discounts live from Shopify.
+// Looks up active discounts so eligible ones can be offered as pickable
+// options in the cart. No manually-curated/duplicated list — this reads
+// real discounts live from Shopify.
+//
+// IMPORTANT: `query: $query` only filters by things Shopify's discount
+// search actually indexes (status, title, dates, etc.) — `customer_ids:` is
+// NOT a supported search term here and is silently ignored rather than
+// erroring, so it must never be relied on to scope results to one customer.
+// customerSelection is fetched per discount instead, and getCustomerVouchers
+// filters by it in code — see there for why.
 export const CART_DISCOUNTS_QUERY = `#graphql
   query CustomerCartDiscounts($query: String!) {
     discountNodes(first: 20, query: $query) {
@@ -19,6 +25,16 @@ export const CART_DISCOUNTS_QUERY = `#graphql
                 code
               }
             }
+            customerSelection {
+              ... on DiscountCustomerAll {
+                allCustomers
+              }
+              ... on DiscountCustomers {
+                customers {
+                  id
+                }
+              }
+            }
           }
           ... on DiscountCodeFreeShipping {
             title
@@ -29,6 +45,16 @@ export const CART_DISCOUNTS_QUERY = `#graphql
                 code
               }
             }
+            customerSelection {
+              ... on DiscountCustomerAll {
+                allCustomers
+              }
+              ... on DiscountCustomers {
+                customers {
+                  id
+                }
+              }
+            }
           }
           ... on DiscountCodeBxgy {
             title
@@ -37,6 +63,16 @@ export const CART_DISCOUNTS_QUERY = `#graphql
             codes(first: 1) {
               nodes {
                 code
+              }
+            }
+            customerSelection {
+              ... on DiscountCustomerAll {
+                allCustomers
+              }
+              ... on DiscountCustomers {
+                customers {
+                  id
+                }
               }
             }
           }

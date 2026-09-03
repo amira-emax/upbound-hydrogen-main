@@ -27,6 +27,9 @@ export type CustomerCartDiscountsQuery = {
                 codes: {
                   nodes: Array<Pick<StorefrontAPI.DiscountRedeemCode, 'code'>>;
                 };
+                customerSelection:
+                  | Pick<StorefrontAPI.DiscountCustomerAll, 'allCustomers'>
+                  | {customers: Array<Pick<StorefrontAPI.Customer, 'id'>>};
               })
           | ({__typename: 'DiscountCodeBxgy'} & Pick<
               StorefrontAPI.DiscountCodeBxgy,
@@ -35,6 +38,9 @@ export type CustomerCartDiscountsQuery = {
                 codes: {
                   nodes: Array<Pick<StorefrontAPI.DiscountRedeemCode, 'code'>>;
                 };
+                customerSelection:
+                  | Pick<StorefrontAPI.DiscountCustomerAll, 'allCustomers'>
+                  | {customers: Array<Pick<StorefrontAPI.Customer, 'id'>>};
               })
           | ({__typename: 'DiscountCodeFreeShipping'} & Pick<
               StorefrontAPI.DiscountCodeFreeShipping,
@@ -43,6 +49,9 @@ export type CustomerCartDiscountsQuery = {
                 codes: {
                   nodes: Array<Pick<StorefrontAPI.DiscountRedeemCode, 'code'>>;
                 };
+                customerSelection:
+                  | Pick<StorefrontAPI.DiscountCustomerAll, 'allCustomers'>
+                  | {customers: Array<Pick<StorefrontAPI.Customer, 'id'>>};
               });
       }
     >;
@@ -63,7 +72,7 @@ export type CustomerCreateMutation = {
 };
 
 interface GeneratedQueryTypes {
-  '#graphql\n  query CustomerCartDiscounts($query: String!) {\n    discountNodes(first: 20, query: $query) {\n      nodes {\n        id\n        discount {\n          __typename\n          ... on DiscountCodeBasic {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n          }\n          ... on DiscountCodeFreeShipping {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n          }\n          ... on DiscountCodeBxgy {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query CustomerCartDiscounts($query: String!) {\n    discountNodes(first: 20, query: $query) {\n      nodes {\n        id\n        discount {\n          __typename\n          ... on DiscountCodeBasic {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n            customerSelection {\n              ... on DiscountCustomerAll {\n                allCustomers\n              }\n              ... on DiscountCustomers {\n                customers {\n                  id\n                }\n              }\n            }\n          }\n          ... on DiscountCodeFreeShipping {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n            customerSelection {\n              ... on DiscountCustomerAll {\n                allCustomers\n              }\n              ... on DiscountCustomers {\n                customers {\n                  id\n                }\n              }\n            }\n          }\n          ... on DiscountCodeBxgy {\n            title\n            summary\n            status\n            codes(first: 1) {\n              nodes {\n                code\n              }\n            }\n            customerSelection {\n              ... on DiscountCustomerAll {\n                allCustomers\n              }\n              ... on DiscountCustomers {\n                customers {\n                  id\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: CustomerCartDiscountsQuery;
     variables: CustomerCartDiscountsQueryVariables;
   };

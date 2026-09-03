@@ -144,13 +144,13 @@ export async function getCustomerVouchers(
     const customer = await (rewardsCustomer ?? getRewardsCustomer(context));
     if (!customer?.isEligible) return [];
 
-    const numericId = customer.id.split('/').pop();
-    if (!numericId) return [];
-
     const {data: discountData, errors} = await adminApiClient.request(
       CART_DISCOUNTS_QUERY,
       {
-        variables: {query: `customer_ids:${numericId} status:active`},
+        // Shopify's discountNodes search does NOT support filtering by
+        // customer (see CartDiscountsQuery.ts) — eligibility is checked
+        // below, per-discount, using its own customerSelection instead.
+        variables: {query: 'status:active'},
         // Without this, a slow/unresponsive Admin API call hangs forever —
         // and since this is part of the cart's deferred data, that leaves
         // the whole cart drawer stuck on "Loading cart ..." after Add to
@@ -166,6 +166,13 @@ export async function getCustomerVouchers(
     const nodes = discountData?.discountNodes?.nodes ?? [];
     return nodes.reduce((options: CartDiscountOption[], node: any) => {
       const discount = node?.discount;
+      // This is the actual customer-scoping check — without it, EVERY
+      // active store-wide discount code would be offered to EVERY
+      // customer, regardless of who it was actually assigned to.
+      if (!isEligibleForCustomer(discount?.customerSelection, customer.id)) {
+        return options;
+      }
+
       const code = discount?.codes?.nodes?.[0]?.code;
       if (code) {
         const label = discount.title || discount.summary || code;
@@ -181,6 +188,20 @@ export async function getCustomerVouchers(
     console.error('Failed to load customer vouchers:', error);
     return [];
   }
+}
+
+// A discount's customerSelection is either DiscountCustomerAll (open to
+// everyone) or DiscountCustomers (an explicit id list) — only offer a code
+// as this customer's voucher if it's genuinely scoped to them (or to
+// everyone). This is what actually prevents one customer's "Specific
+// customers" codes from leaking into another customer's voucher list.
+function isEligibleForCustomer(
+  customerSelection: {allCustomers?: boolean; customers?: {id: string}[]} | null | undefined,
+  customerId: string,
+): boolean {
+  if (!customerSelection) return false;
+  if (customerSelection.allCustomers) return true;
+  return customerSelection.customers?.some((c) => c.id === customerId) ?? false;
 }
 
 // Raw shape returned by the loyalty API's GET /loyalty/api/customer?email=...

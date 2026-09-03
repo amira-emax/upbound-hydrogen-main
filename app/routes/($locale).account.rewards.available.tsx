@@ -89,7 +89,7 @@ export default function AccountAvailableRewards() {
 
   return (
     <div>
-      <p className="typo-body-l mb-4">Available vouchers</p>
+      <p className="typo-body-l mb-4">Available Vouchers</p>
       {redeemedResult && (
         <p className="typo-caption-responsive text-mid-grey mb-4">
           {redeemedResult.voucherCode
@@ -123,7 +123,7 @@ export default function AccountAvailableRewards() {
                     {voucher.pointsCost.toLocaleString()} pts
                   </span>
                   <input type="hidden" name="voucherId" value={voucher.id} />
-                  <Button type="submit" size="sm" disabled={!canRedeem}>
+                  <Button type="submit" size="sm" variant="mint-black" disabled={!canRedeem}>
                     {isRedeemed
                       ? 'Redeemed'
                       : isRedeeming

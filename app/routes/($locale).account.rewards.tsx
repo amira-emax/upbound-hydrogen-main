@@ -38,7 +38,7 @@ export default function AccountRewardsLayout() {
 
   return (
     <div className="account-rewards">
-      <p className="typo-body-l mb-4">Your Points</p>
+      <h2 className="typo-h2 mb-4">Your Points</h2>
       <RewardsSummaryCard {...rewardsSummary} />
 
       <h2 className="typo-h2 mt-8 mb-4">Rewards</h2>

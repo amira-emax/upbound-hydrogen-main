@@ -12,6 +12,12 @@ export type RewardsSummary = {
   tier: string;
   nextTier: string | null;
   nextTierAt: number | null;
+  // Current tier's max_points (from GET /loyalty/api/tiers) — null for the
+  // top tier, which has no ceiling. Used to render tier progress.
+  tierMaxPoints: number | null;
+  // ISO date string ("YYYY-MM-DD") the customer's current membership tier
+  // expires, or null if the loyalty API didn't return one.
+  expiredMembershipDate: string | null;
 };
 
 // Shape mirrors one entry of `unredeemed_rewards` from the real loyalty API
@@ -190,20 +196,77 @@ type LoyaltyCustomerResponse = {
   email: string;
   points: number;
   tier: string;
+  expired_membership_date: string | null;
+  status_code: number;
+};
+
+// Raw shape returned by the loyalty API's GET /loyalty/api/tiers endpoint.
+type LoyaltyTier = {
+  id: number;
+  name: string;
+  min_points: number;
+  // null on the top tier — no ceiling.
+  max_points: number | null;
+};
+
+type LoyaltyTiersResponse = {
+  tiers: LoyaltyTier[];
   status_code: number;
 };
 
 /**
- * Fetches the logged-in customer's points/tier from the loyalty API. The
- * API doesn't currently expose next-tier progression, so nextTier/nextTierAt
- * stay null (RewardsSummaryCard just hides that line when they're null).
- * Never throws — a missing config, a logged-out customer, or an API failure
- * all just fall back to a zeroed summary so the page still renders normally.
+ * Fetches the tier ladder from the loyalty API (GET /loyalty/api/tiers),
+ * sorted ascending by min_points. Never throws — a missing config or API
+ * failure just resolves to [] so tier progress is simply omitted.
+ */
+async function getLoyaltyTiers(
+  context: LoaderFunctionArgs['context'],
+): Promise<LoyaltyTier[]> {
+  try {
+    const {env} = context;
+    const apiUrl = env.LOYALTY_API_URL;
+    const apiKey = env.LOYALTY_API_KEY;
+    if (!apiUrl || !apiKey) return [];
+
+    const response = await fetch(`${apiUrl}/loyalty/api/tiers`, {
+      headers: {
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!response.ok) {
+      console.error(`Loyalty API returned ${response.status} fetching tiers`);
+      return [];
+    }
+
+    const json = (await response.json()) as LoyaltyTiersResponse;
+    return (json?.tiers ?? []).slice().sort((a, b) => a.min_points - b.min_points);
+  } catch (error) {
+    console.error('Failed to load tiers from loyalty API:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetches the logged-in customer's points/tier from the loyalty API, plus
+ * the tier ladder (GET /loyalty/api/tiers) to derive progress toward the
+ * next tier. Never throws — a missing config, a logged-out customer, or an
+ * API failure all just fall back to a zeroed summary so the page still
+ * renders normally.
  */
 export async function getCustomerRewardsSummary(
   context: LoaderFunctionArgs['context'],
 ): Promise<RewardsSummary> {
-  const fallback: RewardsSummary = {points: 0, tier: 'N/A', nextTier: null, nextTierAt: null};
+  const fallback: RewardsSummary = {
+    points: 0,
+    tier: 'N/A',
+    nextTier: null,
+    nextTierAt: null,
+    tierMaxPoints: null,
+    expiredMembershipDate: null,
+  };
 
   try {
     const {customerAccount, env} = context;
@@ -218,28 +281,38 @@ export async function getCustomerRewardsSummary(
     const email = customerData?.customer?.emailAddress?.emailAddress;
     if (!email) return fallback;
 
-    const response = await fetch(
-      `${apiUrl}/loyalty/api/customer?email=${encodeURIComponent(email)}`,
-      {
+    const [customerResponse, tiers] = await Promise.all([
+      fetch(`${apiUrl}/loyalty/api/customer?email=${encodeURIComponent(email)}`, {
         headers: {
           'X-API-Key': apiKey,
           'Content-Type': 'application/json',
         },
         signal: AbortSignal.timeout(5000),
-      },
-    );
+      }),
+      getLoyaltyTiers(context),
+    ]);
 
-    if (!response.ok) {
-      console.error(`Loyalty API returned ${response.status} fetching customer rewards summary`);
+    if (!customerResponse.ok) {
+      console.error(
+        `Loyalty API returned ${customerResponse.status} fetching customer rewards summary`,
+      );
       return fallback;
     }
 
-    const json = (await response.json()) as LoyaltyCustomerResponse;
+    const json = (await customerResponse.json()) as LoyaltyCustomerResponse;
+
+    const currentTierIndex = tiers.findIndex((t) => t.name === json.tier);
+    const currentTier = currentTierIndex >= 0 ? tiers[currentTierIndex] : undefined;
+    const nextTierData =
+      currentTierIndex >= 0 ? tiers[currentTierIndex + 1] : undefined;
+
     return {
       points: json.points,
       tier: json.tier,
-      nextTier: null,
-      nextTierAt: null,
+      nextTier: nextTierData?.name ?? null,
+      nextTierAt: nextTierData?.min_points ?? null,
+      tierMaxPoints: currentTier?.max_points ?? null,
+      expiredMembershipDate: json.expired_membership_date ?? null,
     };
   } catch (error) {
     console.error('Failed to load customer rewards summary from loyalty API:', error);

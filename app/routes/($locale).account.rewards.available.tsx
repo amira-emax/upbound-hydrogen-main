@@ -40,7 +40,12 @@ export async function loader({context}: LoaderFunctionArgs) {
 
   const availableVouchers = await getAvailableVouchersToClaim(context);
 
-  return {availableVouchers};
+  // Per-customer vouchers — must never be cached, or a shared browser/CDN
+  // cache could serve one customer's available vouchers to another.
+  return data(
+    {availableVouchers},
+    {headers: {'Cache-Control': 'no-cache, no-store, must-revalidate'}},
+  );
 }
 
 export async function action({request, context}: ActionFunctionArgs) {

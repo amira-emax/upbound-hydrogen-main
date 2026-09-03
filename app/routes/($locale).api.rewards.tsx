@@ -1,9 +1,17 @@
-import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {data, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {
   getCustomerVouchers,
   getRewardsCustomer,
   isRewardsEligible,
 } from '~/lib/rewards';
+
+// This response is per-customer (vouchers, eligibility) and must never be
+// cached by a browser or an intermediary (CDN/Oxygen edge) — without this,
+// the SAME URL requested by a different customer on a shared cache could be
+// served someone else's voucher data.
+const NO_STORE_HEADERS = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+};
 
 /**
  * Resource route for the cart's rewards data (available discount vouchers +
@@ -41,5 +49,5 @@ export async function loader({context}: LoaderFunctionArgs) {
     getCustomerVouchers(context, rewardsCustomer),
   ]);
 
-  return {cartDiscounts, canUseRewards};
+  return data({cartDiscounts, canUseRewards}, {headers: NO_STORE_HEADERS});
 }

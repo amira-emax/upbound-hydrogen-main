@@ -1,4 +1,4 @@
-import {redirect} from '@shopify/remix-oxygen';
+import {data, redirect} from '@shopify/remix-oxygen';
 import {Outlet, useLoaderData, type LoaderFunctionArgs, type MetaFunction} from 'react-router';
 import {RewardsSummaryCard} from '~/components/account/RewardsSummaryCard';
 import {RewardsTabs} from '~/components/account/RewardsTabs';
@@ -20,7 +20,12 @@ export async function loader({context}: LoaderFunctionArgs) {
 
   const rewardsSummary = await getCustomerRewardsSummary(context);
 
-  return {rewardsSummary};
+  // Per-customer data (points/tier) — must never be cached, or a shared
+  // browser/CDN cache could serve one customer's summary to another.
+  return data(
+    {rewardsSummary},
+    {headers: {'Cache-Control': 'no-cache, no-store, must-revalidate'}},
+  );
 }
 
 /**

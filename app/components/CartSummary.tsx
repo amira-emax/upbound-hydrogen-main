@@ -8,31 +8,41 @@ import type { CartDiscountOption } from '~/graphql/admin/CartDiscountsQuery';
 import { cn } from '~/lib/utils';
 import { Button } from './ui/button';
 
-// A cart mutation "warning" (e.g. DISCOUNT_CODE_NOT_HONOURED) or the
-// discountCodes-level `applicable: false` flag (e.g. minimum spend not met)
-// — whichever fired — as a message to show the customer for the code they
-// just submitted.
+// A cart mutation "warning" (e.g. DISCOUNT_CODE_NOT_HONOURED,
+// DISCOUNT_NO_ENTITLED_LINE_ITEMS) or the discountCodes-level
+// `applicable: false` flag (e.g. minimum spend not met) — whichever fired —
+// as a message to show for the code that was just submitted.
+//
+// `code` is best-effort only: fetcher.formData (where the submitted code
+// would normally come from) is cleared by React Router once the fetcher
+// settles back to 'idle' — which happens right as the result actually needs
+// rendering — so by the time we'd show this, `code` is often already gone.
+// When we have it, prefer a warning that names it; otherwise fetcher.data
+// itself is scoped to this one form's own last submission, so any warning
+// present there is already the relevant one.
 function getDiscountRejection(
   fetcher: FetcherWithComponents<any>,
-  code: string | null | undefined,
+  code?: string | null,
 ): string | null {
-  if (!code) return null;
-
   const warnings = fetcher.data?.warnings as
     | {code?: string; message?: string; target?: string}[]
     | undefined;
-  const matchingWarning = warnings?.find((w) =>
-    w.message?.toLowerCase().includes(code.toLowerCase()),
-  );
-  if (matchingWarning?.message) return matchingWarning.message;
+  if (warnings?.length) {
+    const matching = code
+      ? warnings.find((w) => w.message?.toLowerCase().includes(code.toLowerCase()))
+      : undefined;
+    return (matching ?? warnings[0])?.message ?? null;
+  }
 
-  const resultCodes = fetcher.data?.cart?.discountCodes as
-    | CartApiQueryFragment['discountCodes']
-    | undefined;
-  const isInapplicable = resultCodes?.some(
-    (c) => c.code === code && !c.applicable,
-  );
-  if (isInapplicable) return "This code isn't valid for your cart right now";
+  if (code) {
+    const resultCodes = fetcher.data?.cart?.discountCodes as
+      | CartApiQueryFragment['discountCodes']
+      | undefined;
+    const isInapplicable = resultCodes?.some(
+      (c) => c.code === code && !c.applicable,
+    );
+    if (isInapplicable) return "This code isn't valid for your cart right now";
+  }
 
   return null;
 }
@@ -230,13 +240,10 @@ function DiscountChip({
     >
       {(fetcher: FetcherWithComponents<any>) => {
         const isApplying = fetcher.state !== 'idle';
-        const submittedCode = fetcher.formData?.get('discountCode') as
-          | string
-          | null;
-        const rejection =
-          submittedCode === discount.code
-            ? getDiscountRejection(fetcher, submittedCode)
-            : null;
+        // This chip's own fetcher only ever submits discount.code, so any
+        // result on it already belongs to that code — no need to check
+        // fetcher.formData (which is cleared by the time this renders).
+        const rejection = getDiscountRejection(fetcher, discount.code);
 
         return (
           <div className="flex flex-col items-start">

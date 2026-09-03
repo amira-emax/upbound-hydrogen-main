@@ -2,7 +2,7 @@ import {redirect} from '@shopify/remix-oxygen';
 import {Outlet, useLoaderData, type LoaderFunctionArgs, type MetaFunction} from 'react-router';
 import {RewardsSummaryCard} from '~/components/account/RewardsSummaryCard';
 import {RewardsTabs} from '~/components/account/RewardsTabs';
-import {getCustomerRewardsSummary, isRewardsTester} from '~/lib/rewards';
+import {getCustomerRewardsSummary, isRewardsEligible} from '~/lib/rewards';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Rewards'}];
@@ -14,7 +14,7 @@ export async function loader({context}: LoaderFunctionArgs) {
   // Rewards is still rolled out only to whitelisted test accounts — kick
   // everyone else back to their profile rather than showing a broken/empty
   // section (also protects direct navigation to /account/rewards/*).
-  if (!(await isRewardsTester(context))) {
+  if (!(await isRewardsEligible(context))) {
     throw redirect('/account/profile');
   }
 

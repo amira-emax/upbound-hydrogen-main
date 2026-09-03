@@ -1,5 +1,5 @@
 import { Suspense, useId, useState, useEffect } from 'react';
-import { Await, Link, NavLink } from 'react-router';
+import { Await, Link, NavLink, useFetcher } from 'react-router';
 import type {
   CartApiQueryFragment,
   FooterMenuCmsQuery,
@@ -26,8 +26,6 @@ import Logo from './icons/Logo';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
-  cartDiscounts: Promise<CartDiscountOption[]>;
-  canUseRewards: Promise<boolean>;
   footer: Promise<FooterMenuCmsQuery | null>;
   header: HeaderQuery;
   globalBanner: Promise<GlobalBannerCmsQuery | null>;
@@ -44,8 +42,6 @@ const COOLDOWN_MINUTES = 10;
 
 export function PageLayout({
   cart,
-  cartDiscounts,
-  canUseRewards,
   children = null,
   footer,
   header,
@@ -60,7 +56,7 @@ export function PageLayout({
   return (
     <Aside.Provider>
       <IOSSafariScrollFix />
-      <CartAside cart={cart} cartDiscounts={cartDiscounts} canUseRewards={canUseRewards} />
+      <CartAside cart={cart} />
       <SearchAside />
       {/* <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} /> */}
 
@@ -161,16 +157,29 @@ function IOSSafariScrollFix() {
   return null;
 }
 
-function CartAside({
-  cart,
-  cartDiscounts,
-  canUseRewards,
-}: {
-  cart: PageLayoutProps['cart'];
-  cartDiscounts: PageLayoutProps['cartDiscounts'];
-  canUseRewards: PageLayoutProps['canUseRewards'];
-}) {
+function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   const [quantity, setQuantity] = useState(0);
+  const rewardsFetcher = useFetcher<{
+    cartDiscounts: CartDiscountOption[];
+    canUseRewards: boolean;
+  }>();
+
+  // Loaded via its own independent fetcher rather than through root's
+  // loader — root is always-mounted and matched by every mutation's
+  // revalidation (add to cart, login, etc.), and having this data there
+  // was found to break the mutating fetcher's own state lifecycle (its
+  // `state` never returned to 'idle' even though the request completed
+  // successfully), leaving the cart UI stuck on a loading spinner forever.
+  // See ($locale).api.rewards.tsx.
+  useEffect(() => {
+    if (rewardsFetcher.state === 'idle' && rewardsFetcher.data === undefined) {
+      rewardsFetcher.load('/api/rewards');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const cartDiscounts = rewardsFetcher.data?.cartDiscounts ?? [];
+  const canUseRewards = rewardsFetcher.data?.canUseRewards ?? false;
 
   return (
     <Aside
@@ -182,8 +191,8 @@ function CartAside({
       }
     >
       <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={Promise.all([cart, cartDiscounts, canUseRewards])}>
-          {([cart, cartDiscounts, canUseRewards]) => (
+        <Await resolve={cart}>
+          {(cart) => (
             <CartAsideContent
               cart={cart}
               cartDiscounts={cartDiscounts}

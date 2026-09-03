@@ -46,25 +46,83 @@ function cleanDiscountSummary(summary?: string | null): string | null {
   return summary.replace(/\s+For\s+.+$/i, '').trim() || null;
 }
 
+// Rejects if `promise` hasn't settled within `ms` — for clients like
+// customerAccount.query() that don't accept an AbortSignal, so a hung
+// request can't stall a caller forever.
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
+export type RewardsCustomer = {
+  id: string;
+  email: string;
+  isEligible: boolean;
+} | null;
+
 /**
- * Rewards is still being rolled out — only customers whitelisted via the
- * `custom.test_account` boolean metafield (set in Shopify admin) can see or
- * use it. Never throws — a logged-out customer or a query failure both just
- * mean "not whitelisted" rather than breaking the page.
+ * Resolves the logged-in customer's id/email/eligibility ONCE. isRewardsEligible
+ * and getCustomerVouchers below both accept an already-resolved (or
+ * in-flight) RewardsCustomer and only call this themselves when one isn't
+ * supplied. Callers that already have an `isLoggedIn` promise in flight
+ * (e.g. the root loader, which needs it anyway for the header) should pass
+ * it in instead of letting this call customerAccount.isLoggedIn() again.
+ *
+ * This used to be three independent Customer Account API round trips per
+ * page load (one each in isRewardsTester, getCustomerVouchers, and root's
+ * own isLoggedIn field) — sharing one lookup is what fixed a ~30s+
+ * slowdown that was happening on every single page.
  */
-export async function isRewardsTester(
+export async function getRewardsCustomer(
   context: LoaderFunctionArgs['context'],
-): Promise<boolean> {
+  isLoggedIn?: Promise<boolean> | boolean,
+): Promise<RewardsCustomer> {
   try {
     const {customerAccount} = context;
-    if (!(await customerAccount.isLoggedIn())) return false;
+    if (!(await (isLoggedIn ?? customerAccount.isLoggedIn()))) return null;
 
-    const {data} = await customerAccount.query(CUSTOMER_ID_QUERY);
-    return data?.customer?.testAccount?.value === 'true';
+    // customerAccount.query() doesn't accept an AbortSignal, so a hung
+    // Customer Account API call would otherwise stall this indefinitely —
+    // and since every rewards field (canUseRewards, cartDiscounts) now
+    // shares this one lookup, that would freeze the whole cart drawer on
+    // "Loading cart ..." rather than just failing this one lookup.
+    const {data} = await withTimeout(
+      customerAccount.query(CUSTOMER_ID_QUERY),
+      5000,
+    );
+    const customer = data?.customer;
+    if (!customer?.id) return null;
+
+    return {
+      id: customer.id,
+      email: customer.emailAddress?.emailAddress ?? '',
+      // Rewards is still being rolled out — only customers whitelisted via
+      // the `custom.test_account` boolean metafield (set in Shopify admin)
+      // are eligible.
+      isEligible: customer.testAccount?.value === 'true',
+    };
   } catch (error) {
-    console.error('Failed to check rewards whitelist:', error);
-    return false;
+    console.error('Failed to load rewards customer:', error);
+    return null;
   }
+}
+
+/**
+ * Whether the logged-in customer can see/use rewards. Never throws — a
+ * logged-out customer or a lookup failure both just mean "not eligible"
+ * rather than breaking the page. (Previously named isRewardsTester — renamed
+ * now that eligibility isn't tied to a "test account" concept.)
+ */
+export async function isRewardsEligible(
+  context: LoaderFunctionArgs['context'],
+  rewardsCustomer?: Promise<RewardsCustomer> | RewardsCustomer,
+): Promise<boolean> {
+  const customer = await (rewardsCustomer ?? getRewardsCustomer(context));
+  return customer?.isEligible ?? false;
 }
 
 /**
@@ -72,31 +130,32 @@ export async function isRewardsTester(
  * Shopify's native "Specific customers" discount eligibility). Used both by
  * the cart's discount picker and the account "My Rewards" page. Guests,
  * stores without an Admin API client configured, and customers not
- * whitelisted for rewards (see isRewardsTester) simply get no personalized
+ * eligible for rewards (see isRewardsEligible) simply get no personalized
  * discounts — never throws, so a failure here should never break the page.
  */
 export async function getCustomerVouchers(
   context: LoaderFunctionArgs['context'],
+  rewardsCustomer?: Promise<RewardsCustomer> | RewardsCustomer,
 ): Promise<CartDiscountOption[]> {
   try {
-    const {customerAccount, adminApiClient} = context;
+    const {adminApiClient} = context;
+    if (!adminApiClient) return [];
 
-    if (!adminApiClient || !(await customerAccount.isLoggedIn())) {
-      return [];
-    }
+    const customer = await (rewardsCustomer ?? getRewardsCustomer(context));
+    if (!customer?.isEligible) return [];
 
-    const {data: customerData} = await customerAccount.query(
-      CUSTOMER_ID_QUERY,
-    );
-    if (customerData?.customer?.testAccount?.value !== 'true') return [];
-
-    const numericId = customerData?.customer?.id?.split('/').pop();
+    const numericId = customer.id.split('/').pop();
     if (!numericId) return [];
 
     const {data: discountData, errors} = await adminApiClient.request(
       CART_DISCOUNTS_QUERY,
       {
         variables: {query: `customer_ids:${numericId} status:active`},
+        // Without this, a slow/unresponsive Admin API call hangs forever —
+        // and since this is part of the cart's deferred data, that leaves
+        // the whole cart drawer stuck on "Loading cart ..." after Add to
+        // Cart rather than just failing this one lookup.
+        signal: AbortSignal.timeout(5000),
       },
     );
     if (errors) {

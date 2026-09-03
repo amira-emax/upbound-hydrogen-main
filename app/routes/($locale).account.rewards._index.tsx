@@ -27,7 +27,7 @@ export default function AccountRewardsIndex() {
 
   return (
     <div>
-      <p className="typo-body-l mb-4">Your vouchers</p>
+      <p className="typo-body-l mb-4">My Vouchers</p>
       {vouchers.length === 0 ? (
         <p className="typo-caption-responsive text-mid-grey">
           You don&apos;t have any vouchers yet.
@@ -62,7 +62,7 @@ function CopyCodeButton({code}: {code: string}) {
   }
 
   return (
-    <Button type="button" size="sm" variant="outline" onClick={handleCopy}>
+    <Button type="button" size="sm" variant="mint-black" onClick={handleCopy}>
       {copied ? 'Copied!' : `Copy code (${code})`}
     </Button>
   );

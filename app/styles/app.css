@@ -488,11 +488,14 @@ aside header .close:hover {
 .account {
   display: block;
   column-gap: 1rem;
-  padding: 120px 24px;
+  /* AccountHero (rendered above this in routes/($locale).account.tsx)
+     clears the fixed, transparent site header, so this only needs normal
+     section spacing below it, not header-height top padding. */
+  padding: 48px 24px;
 
   @media (min-width: 768px) {
     display: flex;
-    padding: 172px 24px;
+    padding: 64px 50px;
   }
 }
 

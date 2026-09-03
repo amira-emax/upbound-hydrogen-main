@@ -3,6 +3,25 @@
 /* eslint-disable */
 import type * as StorefrontAPI from '@shopify/hydrogen/storefront-api-types';
 
+export type AccountPageCmsQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type AccountPageCmsQuery = {
+  accountHero?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id' | 'handle' | 'type'> & {
+      title?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      hero_image?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<{
+          image?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+          >;
+        }>;
+      }>;
+    }
+  >;
+};
+
 export type BlogPostsByHandleQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
 }>;
@@ -1108,6 +1127,20 @@ export type ScienceHeroFragment = Pick<
   description?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.MetaobjectField, 'value'>
   >;
+  hero_image?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<{
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'height' | 'width' | 'url' | 'altText'>
+      >;
+    }>;
+  }>;
+};
+
+export type AccountHeroFragment = Pick<
+  StorefrontAPI.Metaobject,
+  'id' | 'type'
+> & {
+  title?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
   hero_image?: StorefrontAPI.Maybe<{
     reference?: StorefrontAPI.Maybe<{
       image?: StorefrontAPI.Maybe<
@@ -3715,6 +3748,10 @@ export type StoreRobotsQueryVariables = StorefrontAPI.Exact<{
 export type StoreRobotsQuery = {shop: Pick<StorefrontAPI.Shop, 'id'>};
 
 interface GeneratedQueryTypes {
+  '#graphql\n  #graphql\n  fragment AccountHero on Metaobject {\n    id\n    type\n    title: field(key: "title") {\n      value\n    }\n    hero_image: field(key: "hero_image") {\n      reference {\n        ... on MediaImage {\n          image {\n            height\n            width\n            url\n            altText\n          }\n        }\n      }\n    }\n  }\n\n\n  query AccountPageCms {\n    accountHero: metaobject(handle: {handle: "account-page", type: "account_page"}) {\n      id\n      handle\n\n      ... on Metaobject {\n        ...AccountHero\n      }\n    }\n  }\n': {
+    return: AccountPageCmsQuery;
+    variables: AccountPageCmsQueryVariables;
+  };
   '#graphql\nquery BlogPostsByHandle($handle: String!) {\n  blog(handle: $handle) {\n    articles(first: 25) {\n      nodes {\n        id\n        handle\n        title\n        excerpt\n        contentHtml\n        image {\n          height\n          width\n          url\n          altText\n        }\n        tags\n        caption: metafield(key: "caption", namespace: "custom") {\n          type\n          value\n        }\n      }\n    }\n  }\n}': {
     return: BlogPostsByHandleQuery;
     variables: BlogPostsByHandleQueryVariables;

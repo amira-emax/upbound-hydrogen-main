@@ -226,6 +226,28 @@ export const SCIENCE_HERO_FRAGMENT = `#graphql
   }
 `;
 
+export const ACCOUNT_HERO_FRAGMENT = `#graphql
+  fragment AccountHero on Metaobject {
+    id
+    type
+    title: field(key: "title") {
+      value
+    }
+    hero_image: field(key: "hero_image") {
+      reference {
+        ... on MediaImage {
+          image {
+            height
+            width
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const COMMUNITY_HERO_FRAGMENT = `#graphql
   fragment CommunityHero on Metaobject {
     id

@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {useLoaderData, type LoaderFunctionArgs, type MetaFunction} from 'react-router';
+import {data, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {useLoaderData, type MetaFunction} from 'react-router';
 import {VoucherCard} from '~/components/account/VoucherCard';
 import {Button} from '~/components/ui/button';
 import {getCustomerVouchers} from '~/lib/rewards';
@@ -13,7 +14,12 @@ export async function loader({context}: LoaderFunctionArgs) {
 
   const vouchers = await getCustomerVouchers(context);
 
-  return {vouchers};
+  // Per-customer vouchers — must never be cached, or a shared browser/CDN
+  // cache could serve one customer's vouchers to another.
+  return data(
+    {vouchers},
+    {headers: {'Cache-Control': 'no-cache, no-store, must-revalidate'}},
+  );
 }
 
 export default function AccountRewardsIndex() {

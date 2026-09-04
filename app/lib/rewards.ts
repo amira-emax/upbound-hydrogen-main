@@ -8,7 +8,13 @@ import {CUSTOMER_ID_QUERY} from '~/graphql/customer-account/CustomerIdQuery';
 export type {CartDiscountOption};
 
 export type RewardsSummary = {
+  // Current spendable balance — shown as "Your Points".
   points: number;
+  // Lifetime points earned, used for tier progress (the progress bar and
+  // "N more points to reach <tier>") instead of the spendable `points`
+  // balance, since redeeming a voucher shouldn't visually knock the
+  // customer's tier progress backwards.
+  accumulatedPoints: number;
   tier: string;
   nextTier: string | null;
   nextTierAt: number | null;
@@ -216,6 +222,10 @@ type LoyaltyCustomerResponse = {
   id: number;
   email: string;
   points: number;
+  // Lifetime points earned — never decreases when a customer spends points,
+  // unlike `points` (their current spendable balance). Tier progress is
+  // based on this, not the spendable balance.
+  accumulated_points: number;
   tier: string;
   expired_membership_date: string | null;
   status_code: number;
@@ -282,6 +292,7 @@ export async function getCustomerRewardsSummary(
 ): Promise<RewardsSummary> {
   const fallback: RewardsSummary = {
     points: 0,
+    accumulatedPoints: 0,
     tier: 'N/A',
     nextTier: null,
     nextTierAt: null,
@@ -329,6 +340,7 @@ export async function getCustomerRewardsSummary(
 
     return {
       points: json.points,
+      accumulatedPoints: json.accumulated_points,
       tier: json.tier,
       nextTier: nextTierData?.name ?? null,
       nextTierAt: nextTierData?.min_points ?? null,

@@ -2,17 +2,21 @@ import type {RewardsSummary} from '~/lib/rewards';
 
 export function RewardsSummaryCard({
   points,
+  accumulatedPoints,
   tier,
   nextTier,
   nextTierAt,
   tierMaxPoints,
   expiredMembershipDate,
 }: RewardsSummary) {
-  const remaining = nextTierAt ? Math.max(nextTierAt - points, 0) : null;
-  // Progress toward the current tier's ceiling (points / tier.max_points).
+  // Tier progress is based on lifetime accumulated points, not the
+  // spendable `points` balance — redeeming a voucher shouldn't visually
+  // knock the customer's tier progress backwards.
+  const remaining = nextTierAt ? Math.max(nextTierAt - accumulatedPoints, 0) : null;
+  // Progress toward the current tier's ceiling (accumulated / tier.max_points).
   // Top tier has no max_points, so there's nothing to show a ratio against.
   const progressPercent = tierMaxPoints
-    ? Math.min((points / tierMaxPoints) * 100, 100)
+    ? Math.min((accumulatedPoints / tierMaxPoints) * 100, 100)
     : null;
   const expiryLabel = expiredMembershipDate
     ? new Date(expiredMembershipDate).toLocaleDateString()

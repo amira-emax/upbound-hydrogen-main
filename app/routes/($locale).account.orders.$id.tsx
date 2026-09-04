@@ -82,10 +82,10 @@ export default function OrderRoute() {
         >
           <Button variant="link" className="!p-0 !h-fit">
             <ArrowLeft />
-            <p>Back to Orders</p>
+            <p className='typo-body-1'>Back to Orders</p>
           </Button>
         </Link>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center mt-3">
           <h2 className="typo-body-l">Order {order.name}</h2>
           <div className="flex items-center">
             <StatusBadge status={fulfillmentStatus} />

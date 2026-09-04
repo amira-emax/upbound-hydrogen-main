@@ -16,6 +16,8 @@ export type CartLayout = 'page' | 'aside';
 export type CartMainProps = {
   cart: CartApiQueryFragment | null;
   layout: CartLayout;
+  // Loaded via a separate fetcher (see ($locale).api.rewards.tsx), not
+  // through root's loader — so these arrive pre-resolved, not as promises.
   cartDiscounts?: CartDiscountOption[];
   canUseRewards?: boolean;
 };

@@ -1,9 +1,8 @@
-import {Suspense} from 'react';
+import {useEffect} from 'react';
 import {
-  Await,
   type MetaFunction,
+  useFetcher,
   useLoaderData,
-  useRouteLoaderData,
 } from 'react-router';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
@@ -14,7 +13,7 @@ import {
   type HeadersFunction,
 } from '@shopify/remix-oxygen';
 import {CartMain} from '~/components/CartMain';
-import type {RootLoader} from '~/root';
+import type {CartDiscountOption} from '~/graphql/admin/CartDiscountsQuery';
 
 export const meta: MetaFunction = () => {
   return [{title: `Upbound | Cart`}];
@@ -181,25 +180,32 @@ export async function loader({context}: LoaderFunctionArgs) {
 
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
-  const rootData = useRouteLoaderData<RootLoader>('root');
-  const cartDiscounts = rootData?.cartDiscounts ?? Promise.resolve([]);
-  const canUseRewards = rootData?.canUseRewards ?? Promise.resolve(false);
+  const rewardsFetcher = useFetcher<{
+    cartDiscounts: CartDiscountOption[];
+    canUseRewards: boolean;
+  }>();
+
+  // Loaded via its own independent fetcher rather than through this route's
+  // own loader — see ($locale).api.rewards.tsx for why (bundling it with a
+  // loader that's revalidated by this same page's mutations was found to
+  // leave the mutating fetcher's own state stuck, never returning to
+  // 'idle' even though the request had completed successfully).
+  useEffect(() => {
+    if (rewardsFetcher.state === 'idle' && rewardsFetcher.data === undefined) {
+      rewardsFetcher.load('/api/rewards');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="cart">
       <h1>Cart</h1>
-      <Suspense fallback={<CartMain layout="page" cart={cart} />}>
-        <Await resolve={Promise.all([cartDiscounts, canUseRewards])}>
-          {([cartDiscounts, canUseRewards]) => (
-            <CartMain
-              layout="page"
-              cart={cart}
-              cartDiscounts={cartDiscounts}
-              canUseRewards={canUseRewards}
-            />
-          )}
-        </Await>
-      </Suspense>
+      <CartMain
+        layout="page"
+        cart={cart}
+        cartDiscounts={rewardsFetcher.data?.cartDiscounts}
+        canUseRewards={rewardsFetcher.data?.canUseRewards}
+      />
     </div>
   );
 }

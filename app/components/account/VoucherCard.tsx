@@ -8,6 +8,10 @@ type VoucherCardProps = {
   imageUrl?: string | null;
   footer: ReactNode;
   className?: string;
+  // When supplied, the image/title/description area becomes clickable and
+  // opens a details popup — the footer (Redeem/Copy code) stays a separate
+  // sibling so it isn't nested inside that trigger button.
+  onOpenDetails?: () => void;
 };
 
 /**
@@ -16,23 +20,40 @@ type VoucherCardProps = {
  * "Available Vouchers" page (claimable vouchers — footer shows the points
  * cost + a redeem button).
  */
-export function VoucherCard({title, description, imageUrl, footer, className}: VoucherCardProps) {
+export function VoucherCard({
+  title,
+  description,
+  imageUrl,
+  footer,
+  className,
+  onOpenDetails,
+}: VoucherCardProps) {
   return (
     <div
       className={cn(
-        'border border-neutral-400 p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between',
+        'bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-3 pr-4 flex items-center justify-between gap-4',
         className,
       )}
     >
-      <div className="flex items-center gap-4">
+      <button
+        type="button"
+        onClick={onOpenDetails}
+        disabled={!onOpenDetails}
+        className="group/voucher relative flex min-w-0 flex-1 items-center gap-3 text-left disabled:cursor-default"
+      >
         <VoucherImage imageUrl={imageUrl} />
-        <div>
-          <p className="typo-body-l">{title}</p>
+        <div className="min-w-0">
+          <p className="typo-body-l truncate">{title}</p>
           {description && (
-            <p className="typo-caption-responsive text-mid-grey mt-1">{description}</p>
+            <p className="typo-caption-responsive text-mid-grey mt-0.5 truncate">{description}</p>
           )}
         </div>
-      </div>
+        {onOpenDetails && (
+          <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover/voucher:opacity-100">
+            View details
+          </span>
+        )}
+      </button>
       <div className="shrink-0">{footer}</div>
     </div>
   );
@@ -46,13 +67,13 @@ function VoucherImage({imageUrl}: {imageUrl?: string | null}) {
       <img
         src={imageUrl}
         alt=""
-        className="size-12 shrink-0 object-cover rounded-sm border border-neutral-400"
+        className="size-11 shrink-0 object-cover rounded-xl"
       />
     );
   }
 
   return (
-    <div className="size-12 shrink-0 flex items-center justify-center rounded-sm border border-neutral-400 bg-gray-100">
+    <div className="size-11 shrink-0 flex items-center justify-center rounded-xl bg-neutral-100">
       <Ticket className="size-5 text-mid-grey" />
     </div>
   );

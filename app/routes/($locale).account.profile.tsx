@@ -89,45 +89,49 @@ export default function AccountProfile() {
   const action = useActionData<ActionResponse>();
   const customer = action?.customer ?? account?.customer;
 
+  const labelClassName = 'typo-body-l';
+  const inputClassName =
+    'w-full rounded-xl bg-[#FDFDFD] shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 py-4 typo-body-l text-black placeholder:text-mid-grey outline-none focus:ring-2 focus:ring-black/10 read-only:text-mid-grey';
+
   return (
-    <div className="account-profile">
-      <p className="typo-body-l mb-6 md:mb-12">Account information</p>
+    <div className="account-profile max-w-xl">
+      <p className="typo-h2 mb-6 md:mb-10">Account Information</p>
       <Form method="PUT">
         <fieldset className="space-y-6">
-          <div className="space-y-2 [&>*]:block">
-            <label htmlFor="firstName" className="typo-caption-responsive">
-              First name
+          <div className="space-y-2 [&>label]:block">
+            <label htmlFor="firstName" className={labelClassName}>
+              First Name
             </label>
             <input
               id="firstName"
               name="firstName"
               type="text"
               autoComplete="given-name"
-              placeholder="First name"
+              placeholder="First Name"
               aria-label="First name"
               defaultValue={customer.firstName ?? ''}
               minLength={2}
-              className="typo-p"
+              className={inputClassName}
             />
           </div>
-          <div className="space-y-2 [&>*]:block">
-            <label htmlFor="lastName" className="typo-caption-responsive">
-              Last name
+          <div className="space-y-2 [&>label]:block">
+            <label htmlFor="lastName" className={labelClassName}>
+              Last Name
             </label>
             <input
               id="lastName"
               name="lastName"
               type="text"
               autoComplete="family-name"
-              placeholder="Last name"
+              placeholder="Last Name"
               aria-label="Last name"
               defaultValue={customer.lastName ?? ''}
               minLength={2}
-              className="typo-p"
+              className={inputClassName}
             />
           </div>
-          <div className="space-y-2 [&>*]:block">
-            <label htmlFor="email" className="typo-caption-responsive">
+          <div className="space-y-2 [&>label]:block">
+            <label htmlFor="email" className={labelClassName}>
               Email
             </label>
             <input
@@ -139,11 +143,11 @@ export default function AccountProfile() {
               aria-label="Email"
               defaultValue={customer.emailAddress?.emailAddress ?? ''}
               readOnly
-              className="typo-p"
+              className={inputClassName}
             />
           </div>
-          <div className="space-y-2 [&>*]:block">
-            <label htmlFor="phone" className="typo-caption-responsive">
+          <div className="space-y-2 [&>label]:block">
+            <label htmlFor="phone" className={labelClassName}>
               Phone
             </label>
             <input
@@ -153,30 +157,33 @@ export default function AccountProfile() {
               placeholder="Phone"
               aria-label="Phone"
               defaultValue={customer.phoneNumber?.phoneNumber ?? ''}
-              className="typo-p"
+              className={inputClassName}
             />
           </div>
           <div className="space-y-2">
-            <p className="typo-caption-responsive">Address</p>
-            <div>
+            <p className={labelClassName}>Address (Default)</p>
+            <div className={inputClassName}>
               {customer.defaultAddress?.formatted ? (
                 customer.defaultAddress.formatted.map((line, index) => (
                   <p key={index}>{line}</p>
                 ))
               ) : (
-                <p>No default address set.</p>
+                <p className="text-mid-grey">No default address set.</p>
               )}
             </div>
           </div>
 
           {action?.error && (
-            <p className="typo-caption-responsive">{action.error}</p>
+            <p className="typo-caption-responsive text-red-500">
+              {action.error}
+            </p>
           )}
 
           <Button
             type="submit"
+            variant="mint-black"
             disabled={state !== 'idle'}
-            className="w-full md:w-fit rounded-none"
+            className="w-full sm:w-fit"
           >
             {state !== 'idle' ? 'Updating' : 'Update'}
           </Button>

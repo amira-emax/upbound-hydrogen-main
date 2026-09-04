@@ -27,6 +27,8 @@ import {
 import {Button} from '~/components/ui/button';
 import {useEffect, useState} from 'react';
 import {countries, Country} from '~/lib/countries';
+import {MapPin} from 'lucide-react';
+import {cn} from '~/lib/utils';
 
 export type ActionResponse = {
   addressId?: string | null;
@@ -349,17 +351,16 @@ function ExistingAddresses({
   if (newAddress && !selectedAddress)
     return <NewAddressForm setNewAddress={setNewAddress} />;
 
-  if (!addresses.nodes.length)
-    return (
-      <div className="space-y-6">
-        <p>You have no addresses saved.</p>
-        <Button onClick={() => setNewAddress(true)}>Add Address</Button>
-      </div>
-    );
-
   return (
     <div className="space-y-6">
-      <p className="typo-body-l mb-6 md:mb-12">Saved Shipping Addresses</p>
+      <div className="flex items-center justify-between">
+        <h2 className="typo-h2">Addresses</h2>
+        {!selectedAddress && (
+          <Button size="sm" className="rounded-xl" onClick={() => setNewAddress(true)}>
+            Add
+          </Button>
+        )}
+      </div>
       {selectedAddress ? (
         <AddressForm
           key={selectedAddress.id}
@@ -397,34 +398,33 @@ function ExistingAddresses({
             </div>
           )}
         </AddressForm>
-      ) : (
-        <div className="!grid !grid-cols-1 !md:grid-cols-2 !gap-4">
-          {addresses.nodes.map((address) => {
-            return (
-              <AddressCard
-                key={address.id}
-                address={address}
-                isDefault={address.id === defaultAddress?.id}
-              >
-                <Button
-                  onClick={() => setSelectedAddress(address)}
-                  className="rounded-none w-full md:w-fit"
-                >
-                  Edit
-                </Button>
-              </AddressCard>
-            );
-          })}
+      ) : addresses.nodes.length ? (
+        <div className="space-y-3">
+          {addresses.nodes.map((address) => (
+            <AddressCard
+              key={address.id}
+              address={address}
+              isDefault={address.id === defaultAddress?.id}
+              onClick={() => setSelectedAddress(address)}
+            />
+          ))}
         </div>
+      ) : (
+        <EmptyAddressCard />
       )}
-      {!selectedAddress && (
-        <Button
-          className="w-full rounded-none"
-          onClick={() => setNewAddress(true)}
-        >
-          + New Address
-        </Button>
-      )}
+    </div>
+  );
+}
+
+function EmptyAddressCard() {
+  return (
+    <div className="flex w-full items-center gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-mid-grey">
+        <MapPin className="size-5" />
+      </span>
+      <span className="typo-caption-responsive text-mid-grey">
+        No addresses added
+      </span>
     </div>
   );
 }
@@ -613,23 +613,35 @@ export function AddressForm({
 export function AddressCard({
   address,
   isDefault,
-  children,
+  onClick,
 }: {
   address: CustomerAddress;
   isDefault?: boolean;
-  children?: React.ReactNode;
+  onClick?: () => void;
 }) {
   return (
-    <div className="space-y-4">
-      <p>
-        {address.firstName} {address.lastName} {isDefault && '(Default)'}
-      </p>
-      <div>
-        {address.formatted &&
-          address.formatted.map((line, index) => <p key={index}>{line}</p>)}
-      </div>
-      <p>{address.phoneNumber}</p>
-      {children}
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-center gap-4 rounded-lg border border-neutral-200 bg-white p-4 text-left shadow-sm transition-colors',
+        'hover:border-neutral-400',
+      )}
+    >
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-mid-grey">
+        <MapPin className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="typo-body-l block truncate">
+          {address.firstName} {address.lastName}
+          {isDefault && (
+            <span className="typo-caption-responsive text-mid-grey"> (Default)</span>
+          )}
+        </span>
+        <span className="typo-caption-responsive text-mid-grey block truncate">
+          {address.phoneNumber || 'No phone number added'}
+        </span>
+      </span>
+    </button>
   );
 }

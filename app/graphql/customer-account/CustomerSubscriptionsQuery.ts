@@ -5,6 +5,7 @@ const SUBSCRIPTION_CONTRACT_FRAGMENT = `#graphql
     id
     status
     createdAt
+    nextBillingDate
     billingPolicy {
       ...SubscriptionBillingPolicy
     }
@@ -47,8 +48,22 @@ export const SUBSCRIPTIONS_CONTRACTS_QUERY = `#graphql
           ...SubscriptionContract
           lines(first: 100) {
             nodes {
-              name
               id
+              name
+              quantity
+              currentPrice {
+                amount
+                currencyCode
+              }
+              # Used as the subscription card's thumbnail — same idea as the
+              # first line item's image on an order card.
+              image {
+                altText
+                height
+                id
+                url
+                width
+              }
             }
           }
         }

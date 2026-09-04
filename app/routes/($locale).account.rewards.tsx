@@ -37,7 +37,7 @@ export default function AccountRewardsLayout() {
   const {rewardsSummary} = useLoaderData<typeof loader>();
 
   return (
-    <div className="account-rewards">
+    <div className="account-rewards max-w-xl">
       <h2 className="typo-h2 mb-4">Your Points</h2>
       <RewardsSummaryCard {...rewardsSummary} />
 

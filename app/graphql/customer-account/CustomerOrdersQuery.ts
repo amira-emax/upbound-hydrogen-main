@@ -14,6 +14,19 @@ export const ORDER_ITEM_FRAGMENT = `#graphql
     id
     number
     processedAt
+    # Just the first line item — used as the order card's thumbnail image.
+    lineItems(first: 1) {
+      nodes {
+        title
+        image {
+          altText
+          height
+          id
+          url
+          width
+        }
+      }
+    }
   }
 ` as const;
 

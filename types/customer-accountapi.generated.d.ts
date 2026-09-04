@@ -422,6 +422,18 @@ export type OrderItemFragment = Pick<
 > & {
   totalPrice: Pick<CustomerAccountAPI.MoneyV2, 'amount' | 'currencyCode'>;
   fulfillments: {nodes: Array<Pick<CustomerAccountAPI.Fulfillment, 'status'>>};
+  lineItems: {
+    nodes: Array<
+      Pick<CustomerAccountAPI.LineItem, 'title'> & {
+        image?: CustomerAccountAPI.Maybe<
+          Pick<
+            CustomerAccountAPI.Image,
+            'altText' | 'height' | 'id' | 'url' | 'width'
+          >
+        >;
+      }
+    >;
+  };
 };
 
 export type CustomerOrdersFragment = {
@@ -434,6 +446,18 @@ export type CustomerOrdersFragment = {
         totalPrice: Pick<CustomerAccountAPI.MoneyV2, 'amount' | 'currencyCode'>;
         fulfillments: {
           nodes: Array<Pick<CustomerAccountAPI.Fulfillment, 'status'>>;
+        };
+        lineItems: {
+          nodes: Array<
+            Pick<CustomerAccountAPI.LineItem, 'title'> & {
+              image?: CustomerAccountAPI.Maybe<
+                Pick<
+                  CustomerAccountAPI.Image,
+                  'altText' | 'height' | 'id' | 'url' | 'width'
+                >
+              >;
+            }
+          >;
         };
       }
     >;
@@ -474,6 +498,18 @@ export type CustomerOrdersQuery = {
           fulfillments: {
             nodes: Array<Pick<CustomerAccountAPI.Fulfillment, 'status'>>;
           };
+          lineItems: {
+            nodes: Array<
+              Pick<CustomerAccountAPI.LineItem, 'title'> & {
+                image?: CustomerAccountAPI.Maybe<
+                  Pick<
+                    CustomerAccountAPI.Image,
+                    'altText' | 'height' | 'id' | 'url' | 'width'
+                  >
+                >;
+              }
+            >;
+          };
         }
       >;
       pageInfo: Pick<
@@ -505,7 +541,7 @@ export type SubscriptionContractCancelMutation = {
 
 export type SubscriptionContractFragment = Pick<
   CustomerAccountAPI.SubscriptionContract,
-  'id' | 'status' | 'createdAt'
+  'id' | 'status' | 'createdAt' | 'nextBillingDate'
 > & {
   billingPolicy: Pick<
     CustomerAccountAPI.SubscriptionBillingPolicy,
@@ -566,11 +602,25 @@ export type SubscriptionsContractsQueryQuery = {
       nodes: Array<
         Pick<
           CustomerAccountAPI.SubscriptionContract,
-          'id' | 'status' | 'createdAt'
+          'id' | 'status' | 'createdAt' | 'nextBillingDate'
         > & {
           lines: {
             nodes: Array<
-              Pick<CustomerAccountAPI.SubscriptionLine, 'name' | 'id'>
+              Pick<
+                CustomerAccountAPI.SubscriptionLine,
+                'id' | 'name' | 'quantity'
+              > & {
+                currentPrice: Pick<
+                  CustomerAccountAPI.MoneyV2,
+                  'amount' | 'currencyCode'
+                >;
+                image?: CustomerAccountAPI.Maybe<
+                  Pick<
+                    CustomerAccountAPI.Image,
+                    'altText' | 'height' | 'id' | 'url' | 'width'
+                  >
+                >;
+              }
             >;
           };
           billingPolicy: Pick<
@@ -642,11 +692,11 @@ interface GeneratedQueryTypes {
     return: OrderQuery;
     variables: OrderQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment CustomerOrders on Customer {\n    orders(\n      sortKey: PROCESSED_AT,\n      reverse: true,\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...OrderItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        endCursor\n        startCursor\n      }\n    }\n  }\n  #graphql\n  fragment OrderItem on Order {\n    totalPrice {\n      amount\n      currencyCode\n    }\n    financialStatus\n    fulfillments(first: 1) {\n      nodes {\n        status\n      }\n    }\n    id\n    number\n    processedAt\n  }\n\n\n  query CustomerOrders(\n    $endCursor: String\n    $first: Int\n    $last: Int\n    $startCursor: String\n  ) {\n    customer {\n      ...CustomerOrders\n    }\n  }\n': {
+  "#graphql\n  #graphql\n  fragment CustomerOrders on Customer {\n    orders(\n      sortKey: PROCESSED_AT,\n      reverse: true,\n      first: $first,\n      last: $last,\n      before: $startCursor,\n      after: $endCursor\n    ) {\n      nodes {\n        ...OrderItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        endCursor\n        startCursor\n      }\n    }\n  }\n  #graphql\n  fragment OrderItem on Order {\n    totalPrice {\n      amount\n      currencyCode\n    }\n    financialStatus\n    fulfillments(first: 1) {\n      nodes {\n        status\n      }\n    }\n    id\n    number\n    processedAt\n    # Just the first line item — used as the order card's thumbnail image.\n    lineItems(first: 1) {\n      nodes {\n        title\n        image {\n          altText\n          height\n          id\n          url\n          width\n        }\n      }\n    }\n  }\n\n\n  query CustomerOrders(\n    $endCursor: String\n    $first: Int\n    $last: Int\n    $startCursor: String\n  ) {\n    customer {\n      ...CustomerOrders\n    }\n  }\n": {
     return: CustomerOrdersQuery;
     variables: CustomerOrdersQueryVariables;
   };
-  '#graphql\n  query SubscriptionsContractsQuery {\n    customer {\n      subscriptionContracts(first: 100) {\n        nodes {\n          ...SubscriptionContract\n          lines(first: 100) {\n            nodes {\n              name\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SubscriptionContract on SubscriptionContract {\n    id\n    status\n    createdAt\n    billingPolicy {\n      ...SubscriptionBillingPolicy\n    }\n    discounts(first: 20) {\n      nodes {\n        ...SubscriptionDiscountFragment\n      }\n    }\n  }\n  fragment SubscriptionBillingPolicy on SubscriptionBillingPolicy {\n    interval\n    intervalCount {\n      count\n      precision\n    }\n  }\n  fragment SubscriptionDiscountFragment on SubscriptionDiscount {\n    id\n    title\n    recurringCycleLimit\n    value {\n      __typename\n      ... on SubscriptionDiscountFixedAmountValue {\n        amount {\n          amount\n        }\n      }\n      ... on SubscriptionDiscountPercentageValue {\n        percentage\n      }\n    }\n  }\n\n': {
+  "#graphql\n  query SubscriptionsContractsQuery {\n    customer {\n      subscriptionContracts(first: 100) {\n        nodes {\n          ...SubscriptionContract\n          lines(first: 100) {\n            nodes {\n              id\n              name\n              quantity\n              currentPrice {\n                amount\n                currencyCode\n              }\n              # Used as the subscription card's thumbnail — same idea as the\n              # first line item's image on an order card.\n              image {\n                altText\n                height\n                id\n                url\n                width\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment SubscriptionContract on SubscriptionContract {\n    id\n    status\n    createdAt\n    nextBillingDate\n    billingPolicy {\n      ...SubscriptionBillingPolicy\n    }\n    discounts(first: 20) {\n      nodes {\n        ...SubscriptionDiscountFragment\n      }\n    }\n  }\n  fragment SubscriptionBillingPolicy on SubscriptionBillingPolicy {\n    interval\n    intervalCount {\n      count\n      precision\n    }\n  }\n  fragment SubscriptionDiscountFragment on SubscriptionDiscount {\n    id\n    title\n    recurringCycleLimit\n    value {\n      __typename\n      ... on SubscriptionDiscountFixedAmountValue {\n        amount {\n          amount\n        }\n      }\n      ... on SubscriptionDiscountPercentageValue {\n        percentage\n      }\n    }\n  }\n\n": {
     return: SubscriptionsContractsQueryQuery;
     variables: SubscriptionsContractsQueryQueryVariables;
   };

@@ -89,7 +89,7 @@ export default function AccountProfile() {
   const action = useActionData<ActionResponse>();
   const customer = action?.customer ?? account?.customer;
 
-  const labelClassName = 'typo-p-small';
+  const labelClassName = 'typo-body-l';
   const inputClassName =
     'w-full rounded-xl bg-[#FDFDFD] shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 py-4 typo-body-l text-black placeholder:text-mid-grey outline-none focus:ring-2 focus:ring-black/10 read-only:text-mid-grey';
 
@@ -161,7 +161,7 @@ export default function AccountProfile() {
             />
           </div>
           <div className="space-y-2">
-            <p className={labelClassName}>Address</p>
+            <p className={labelClassName}>Address (Default)</p>
             <div className={inputClassName}>
               {customer.defaultAddress?.formatted ? (
                 customer.defaultAddress.formatted.map((line, index) => (
